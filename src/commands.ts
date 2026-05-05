@@ -38,7 +38,7 @@ export const toggleItalic: Command = (state, dispatch) =>
   toggleMark(markType('em'))(state, dispatch)
 
 export const toggleStrikethrough: Command = (state, dispatch) =>
-  toggleMark(markType('strikethrough'))(state, dispatch)
+  toggleMark(markType('strike_through'))(state, dispatch)
 
 export const toggleCode: Command = (state, dispatch) =>
   toggleMark(markType('code'))(state, dispatch)
@@ -99,10 +99,16 @@ export const insertTable: Command = (state, dispatch) => {
 }
 
 export const insertMathBlock: Command = (state, dispatch) => {
-  // Math support requires a math node spec (deferred to T2 full-migration patch).
-  // For v0.1.0 minimum-viable-build, insert a $$..$$ markdown placeholder.
+  const mathBlock = schema.nodes.math_block
+  if (!mathBlock) {
+    if (dispatch) {
+      dispatch(state.tr.insertText('\n$$\n\\\n$$\n'))
+    }
+    return true
+  }
   if (dispatch) {
-    dispatch(state.tr.insertText('\n$$\n\\\n$$\n'))
+    const node = mathBlock.create({ value: '' })
+    dispatch(state.tr.replaceSelectionWith(node))
   }
   return true
 }

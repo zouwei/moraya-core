@@ -42,35 +42,38 @@ const parser = new MarkdownParser(defaultSchema, md, {
   blockquote: { block: 'blockquote' },
   paragraph: { block: 'paragraph' },
   list_item: { block: 'list_item' },
-  bullet_list: { block: 'bullet_list', getAttrs: (_, tokens, i) => ({ tight: listIsTight(tokens, i) }) },
+  bullet_list: { block: 'bullet_list' },
   ordered_list: {
     block: 'ordered_list',
-    getAttrs: (tok, tokens, i) => ({
+    getAttrs: (tok) => ({
       order: +(tok.attrGet('start') ?? 1),
-      tight: listIsTight(tokens, i),
     }),
   },
   heading: { block: 'heading', getAttrs: (tok) => ({ level: +tok.tag.slice(1) }) },
-  code_block: { block: 'code_block', noCloseToken: true },
+  code_block: {
+    block: 'code_block',
+    getAttrs: () => ({ language: 'text' }),
+    noCloseToken: true,
+  },
   fence: {
     block: 'code_block',
-    getAttrs: (tok) => ({ params: tok.info || '' }),
+    getAttrs: (tok) => ({ language: (tok.info || '').trim() || 'text' }),
     noCloseToken: true,
   },
   hr: { node: 'horizontal_rule' },
   image: {
     node: 'image',
     getAttrs: (tok) => ({
-      src: tok.attrGet('src'),
-      title: tok.attrGet('title') || null,
-      alt: (tok.children?.[0]?.content ?? '') || null,
+      src: tok.attrGet('src') || '',
+      title: tok.attrGet('title') || '',
+      alt: (tok.children?.[0]?.content ?? '') || '',
     }),
   },
-  hardbreak: { node: 'hard_break' },
+  hardbreak: { node: 'hardbreak' },
 
   em: { mark: 'em' },
   strong: { mark: 'strong' },
-  s: { mark: 'strikethrough' },
+  s: { mark: 'strike_through' },
   link: {
     mark: 'link',
     getAttrs: (tok) => ({
@@ -80,16 +83,6 @@ const parser = new MarkdownParser(defaultSchema, md, {
   },
   code_inline: { mark: 'code', noCloseToken: true },
 })
-
-function listIsTight(tokens: ReadonlyArray<{ hidden: boolean }>, i: number): boolean {
-  for (let j = i + 1; j < tokens.length; j++) {
-    const t = tokens[j]
-    if (!t) break
-    if (t.hidden) continue
-    return false
-  }
-  return true
-}
 
 /** Parse markdown synchronously into a ProseMirror Doc. Never throws. */
 export function parseMarkdown(content: string): Node {
@@ -131,8 +124,9 @@ const serializer = new MarkdownSerializer(
       state.wrapBlock('> ', null, node, () => state.renderContent(node))
     },
     code_block(state, node) {
-      const params = (node.attrs.params as string) || ''
-      state.write('```' + params + '\n')
+      const language = (node.attrs.language as string) || ''
+      const fence = language && language !== 'text' ? language : ''
+      state.write('```' + fence + '\n')
       state.text(node.textContent, false)
       state.ensureNewLine()
       state.write('```')
@@ -172,7 +166,7 @@ const serializer = new MarkdownSerializer(
       const title = node.attrs.title ? ' ' + quoteAttr(node.attrs.title as string) : ''
       state.write('![' + alt + '](' + src + title + ')')
     },
-    hard_break(state, node, parent, index) {
+    hardbreak(state, node, parent, index) {
       for (let i = index + 1; i < parent.childCount; i++) {
         if (parent.child(i).type !== node.type) {
           state.write('\\\n')
@@ -187,7 +181,7 @@ const serializer = new MarkdownSerializer(
   {
     em: { open: '*', close: '*', mixable: true, expelEnclosingWhitespace: true },
     strong: { open: '**', close: '**', mixable: true, expelEnclosingWhitespace: true },
-    strikethrough: { open: '~~', close: '~~', mixable: true, expelEnclosingWhitespace: true },
+    strike_through: { open: '~~', close: '~~', mixable: true, expelEnclosingWhitespace: true },
     link: {
       open(_state, mark, parent, index) {
         return isPlainURL(mark, parent, index, 1) ? '<' : '['
