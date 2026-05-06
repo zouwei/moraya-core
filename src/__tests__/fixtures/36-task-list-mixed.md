@@ -1,0 +1,5 @@
+- [ ] Plain task
+- Regular bullet
+- [x] Done task
+- Another regular bullet
+- [ ] Pending task

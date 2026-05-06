@@ -1,0 +1,6 @@
+- [x] Outer done
+  - [ ] Inner pending
+  - [x] Inner done
+- [ ] Outer pending
+  - [ ] Deep one
+    - [x] Even deeper
