@@ -5,8 +5,8 @@ import {
   wrapIn,
   lift,
 } from 'prosemirror-commands'
-import { wrapInList } from 'prosemirror-schema-list'
-import { type Node, type MarkType, type NodeType } from 'prosemirror-model'
+import { wrapInList, liftListItem } from 'prosemirror-schema-list'
+import { type Node, type MarkType, type NodeType, type Attrs } from 'prosemirror-model'
 import { defaultSchema } from './schema'
 
 /**
@@ -63,6 +63,64 @@ export const toggleOrderedList: Command = (state, dispatch) =>
 
 export const toggleBulletList: Command = (state, dispatch) =>
   wrapInList(nodeType('bullet_list'))(state, dispatch)
+
+/**
+ * Toggle a list: wrap if not in this list type, lift out if already in it.
+ * Schema-agnostic — uses `state.schema` rather than `defaultSchema`.
+ */
+function makeToggleList(typeName: 'bullet_list' | 'ordered_list'): Command {
+  return (state, dispatch, view) => {
+    const listType = state.schema.nodes[typeName]
+    const listItemType = state.schema.nodes.list_item
+    if (!listType || !listItemType) return false
+    const { $from } = state.selection
+    for (let d = $from.depth; d >= 0; d--) {
+      if ($from.node(d).type === listType) {
+        return liftListItem(listItemType)(state, dispatch, view)
+      }
+    }
+    return wrapInList(listType)(state, dispatch, view)
+  }
+}
+
+export const wrapInBulletList: Command = makeToggleList('bullet_list')
+export const wrapInOrderedList: Command = makeToggleList('ordered_list')
+
+/**
+ * Wrap current block(s) in a bullet list with task-list items (checked: false).
+ * Two-step: first apply wrapInList against the bullet_list type, then
+ * post-process newly-created list_item nodes within the affected range to
+ * set `checked: false` so they render as task items.
+ */
+export const wrapInTaskList: Command = (state, dispatch) => {
+  const bulletListType = state.schema.nodes.bullet_list
+  const listItemType = state.schema.nodes.list_item
+  if (!bulletListType || !listItemType) return false
+  if (!wrapInList(bulletListType)(state)) return false
+  if (!dispatch) return true
+
+  let listTr: Transaction | undefined
+  wrapInList(bulletListType)(state, (tr) => { listTr = tr })
+  if (!listTr) return false
+
+  const { from, to } = listTr.selection
+  const updates: Array<{ pos: number; attrs: Attrs }> = []
+  listTr.doc.nodesBetween(
+    Math.max(0, from - 200),
+    Math.min(listTr.doc.content.size, to + 200),
+    (node, pos) => {
+      if (node.type === listItemType && node.attrs.checked === null) {
+        updates.push({ pos, attrs: { ...node.attrs, checked: false } })
+      }
+    },
+  )
+  for (let i = updates.length - 1; i >= 0; i--) {
+    const u = updates[i]!
+    listTr.setNodeMarkup(u.pos, undefined, u.attrs)
+  }
+  dispatch(listTr.scrollIntoView())
+  return true
+}
 
 export const toggleCodeBlock: Command = (state, dispatch) => {
   const cb = nodeType('code_block')

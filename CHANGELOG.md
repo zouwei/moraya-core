@@ -2,7 +2,77 @@
 
 All notable changes to `@moraya/markdown-core` are documented here. SemVer.
 
-## [Unreleased] — schema + markdown-faithful migration batches (2026-05-05 — 2026-05-06)
+## [Unreleased] — schema + markdown + plugins/setup migration batches (2026-05-05 — 2026-05-06)
+
+### plugins + setup batch (2026-05-06)
+
+#### Added (8 plugins migrated faithfully)
+- **`plugins/definition-list.ts`** — `createDefListInputRule(schema)` factory (schema-parameterized)
+- **`plugins/emoji.ts`** — `createEmojiPlugin()` converts `:shortcode:` → emoji via `node-emoji` peer dep
+- **`plugins/cursor-syntax.ts`** — Typora-style source-syntax overlay (heading/blockquote prefix + paired mark delimiters for strong/em/code/strike_through)
+- **`plugins/enter-handler.ts`** — unified Enter-key handler (table cell row navigation + Cmd+Enter add row + Shift+Enter hardbreak + plain Enter exits last row + code-fence detection + pipe-table detection with `parsePipeTableHeader`/`buildTableFromHeaders`)
+- **`plugins/inline-code-convert.ts`** — backtick-pair collapse + ZWSP cursor target after trailing `code/strong/em/strike_through` marks + storedMarks management at code-ZWSP boundary
+- **`plugins/link-text-plugin.ts`** — `[text](url)` literal-text decoration + cursor-leave collapse to link mark + cursor-enter expand-back-to-literal
+- **`plugins/mermaid-renderer.ts`** — lazy-loaded mermaid render utility (serial render queue, theme-color resolution from CSS custom properties); `mermaid` declared as optional peer (`peerDependenciesMeta.mermaid.optional = true`)
+
+All plugin code is **host-agnostic**: zero Tauri / store / DOM-singleton imports. Schema lookups go through `state.schema.nodes[name]` / `state.schema.marks[name]` so each plugin works against any consumer-injected schema produced by `createSchema(config)`.
+
+#### Skipped (intentional — moved out of core scope)
+- **`keybindings.ts`** is **NOT a ProseMirror plugin** — it's static `KeyBinding[]` data consumed only by Moraya's CommandPalette UI (file save / zoom / sidebar toggle / etc.). Heavily app-specific shortcut metadata; stays in moraya/. The v0.60.0-pre §3 file-tree listing this in `plugins/` was a documentation artifact.
+
+#### Pending for next batch (3 DI-coupled plugins)
+- `editor-props-plugin.ts` (580 lines, needs `Platform.getCurrentFilePath` + `isMacOS` + `LinkOpener.open` injection)
+- `code-block-view.ts` (780 lines, needs full `RendererRegistry` integration + mermaid wiring)
+- `highlight.ts` faithful hljs integration (current core stub is no-op; full migration requires per-block decoration cache from Moraya CLAUDE.md performance §6/§9 contract)
+
+### setup.ts batch (2026-05-06)
+
+Replaces the 6KB minimum-viable stub with a 21KB faithful migration of Moraya desktop's editor lifecycle (730 lines).
+
+#### Added
+- `preloadEnhancementPlugins(schema)` — schema-keyed Tier 1 lazy-load cache (highlight + emoji currently; code-block-view + KaTeX CSS in next batch)
+- `createImageSelectionPlugin()` — blue-overlay decoration for selected image / `<img>` html_inline nodes
+- **`buildInputRules(schema, tier1)`** — 12 input rules: code-fence, blockquote, bullet/ordered list, heading 1-6, hr, math block + inline, strong (`**` / `__`), em (`*` / `_`), inline code, strike_through (`~~`), task-list checkbox, link `[text](url)`, def-list (Tier 1)
+- **`buildKeymap(schema)`** — full keymap from Moraya:
+  - `Mod-z/y/Shift-z` → `undo` / `redo` (top-level ESM imports, replaces 3 `require('prosemirror-history')` calls per §1.1.1 Pure ESM)
+  - `Mod-b/i/e/Shift-x` → strong / em / code / strike_through marks
+  - `Mod-Alt-0..6` → paragraph / heading levels
+  - `Mod-Alt-c` → code_block, `Mod-Shift-b` → blockquote
+  - `Tab` / `Shift-Tab` / `Mod-]` / `Mod-[` → list indent/outdent
+  - `Mod-a` → code-block-local select-all OR doc-wide AllSelection
+  - `Shift-Enter` → hardbreak with `isInline: false`
+  - `Backspace` → 5-case WebKit contenteditable bug fix (full-doc fast delete + NodeSelection-on-atom + cursor-end-before-atom + cursor-start-after-atom + end-of-paragraph-after-inline-atom + end-of-textblock surrogate-pair-aware delete)
+  - `Delete` → block-atom protection (NodeSelection move + textblock-end consume)
+- **listShortcutsPlugin** — `Cmd+Alt+O/U/X` → ordered/bullet/task list using `event.code` (macOS Option-key safe, Moraya CLAUDE.md "Option键快捷键处理" feedback memory)
+- **`createDirtyTrackPlugin`** + **`createLazyChangePlugin`** — O(1) text-content callback vs debounced markdown-serialization callback
+- Full `createEditor(opts)` + `createEditorPlugins(opts, schema?)` — assembles 13 base plugins + Tier 1 lazy-loaded plugins in faithful order:
+  1. listShortcuts → 2. inputRules → 3. enter-handler → 4. buildKeymap → 5. baseKeymap →
+  6. history (skippable for v0.72 Yjs) → 7. dropCursor → 8. columnResizing →
+  9. cursorSyntax → 10. linkText → 11. inlineCodeConvert → 12. imageSelection →
+  13. dirty/lazy-change → 14. Tier 1 highlight + emoji
+- `wrapInBulletList` / `wrapInOrderedList` / `wrapInTaskList` exported from `commands.ts` (schema-agnostic via `state.schema`)
+
+#### Plugin order fingerprint (§1.2.2)
+- New `__tests__/plugin-order.spec.ts`: 6 snapshot/assertion tests covering default Web config, desktop-style config, history disabled (Yjs path), table-resize disabled, onChange/onDocChanged callback variants. **Snapshot is committed** so any reorder/add/remove triggers explicit reviewer review.
+
+#### New peer deps
+- `mermaid@^11.0.0` (optional via `peerDependenciesMeta`)
+- `node-emoji@^2.0.0`
+- `prosemirror-commands@^1.7.0`
+- `prosemirror-dropcursor@^1.8.0`
+- `prosemirror-inputrules@^1.5.0`
+- `prosemirror-keymap@^1.2.0`
+- `prosemirror-schema-list@^1.5.0`
+- `prosemirror-tables@^1.8.0`
+
+#### Verification (this batch)
+- ✅ `pnpm typecheck` clean (strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes)
+- ✅ `pnpm test`: **68/68 pass** (was 62/62; +6 plugin-order fingerprint tests)
+- ✅ `pnpm build`: ESM + .d.ts; `dist/index.js` gzipped = 22.7 KB (28% of 80 KB budget)
+- ✅ §1.1.4 purity gates green: 0 Node API / 0 `require()` / 0 host imports in dist
+- ✅ All `require()` calls in original Moraya `setup.ts:282/286/290/343` replaced with top-level ESM imports per §1.1.1
+
+### markdown.ts batch (2026-05-06)
 
 ### markdown.ts batch (2026-05-06)
 
@@ -130,12 +200,9 @@ All notable changes to `@moraya/markdown-core` are documented here. SemVer.
 - `defaultSchema` now built from the full faithful 23N+6M, not the prior 15-node stub
 
 ### Still pending (subsequent batches)
-- setup.ts: Tier 1 lazy-load (`preloadEnhancementPlugins`),
-  `buildInputRules` / `buildKeymap`, `createImageSelectionPlugin`,
-  nodeViews wiring, `columnResizing`
-- 11 plugins: code-block-view, cursor-syntax, definition-list, editor-props-plugin,
-  emoji, enter-handler, inline-code-convert, keybindings, link-text-plugin,
-  mermaid-renderer + faithful highlight.js integration in `highlight.ts`
+- 3 DI-coupled plugins: `editor-props-plugin` (Platform + LinkOpener DI),
+  `code-block-view` (full RendererRegistry integration + mermaid + KaTeX wire-up + nodeViews),
+  faithful `highlight.js` integration (current `plugins/highlight.ts` is a no-op stub)
 - 38 fixtures (currently 17): empty-replace / link-input-rule / large-async /
   KaTeX error / frontmatter YAML/TOML/JSON / footnote / wikilink / hashtag /
   Mermaid / blockquote-nested / autolink / hardbreak edge cases / 50KB real doc, etc.

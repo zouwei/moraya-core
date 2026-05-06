@@ -1,0 +1,169 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style: no enableMermaid) 1`] = `
+[
+  {
+    "index": 0,
+    "key": "moraya-list-shortcuts$",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": false,
+    },
+  },
+  {
+    "index": 1,
+    "key": "<no-key:1>",
+    "slots": {
+      "props": true,
+      "state": true,
+      "view": false,
+    },
+  },
+  {
+    "index": 2,
+    "key": "moraya-enter-handler$",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": false,
+    },
+  },
+  {
+    "index": 3,
+    "key": "<no-key:3>",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": false,
+    },
+  },
+  {
+    "index": 4,
+    "key": "<no-key:4>",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": false,
+    },
+  },
+  {
+    "index": 5,
+    "key": "history$",
+    "slots": {
+      "props": true,
+      "state": true,
+      "view": false,
+    },
+  },
+  {
+    "index": 6,
+    "key": "<no-key:6>",
+    "slots": {
+      "props": false,
+      "state": false,
+      "view": true,
+    },
+  },
+  {
+    "index": 7,
+    "key": "tableColumnResizing$",
+    "slots": {
+      "props": true,
+      "state": true,
+      "view": false,
+    },
+  },
+  {
+    "index": 8,
+    "key": "moraya-cursor-syntax$",
+    "slots": {
+      "props": true,
+      "state": true,
+      "view": false,
+    },
+  },
+  {
+    "index": 9,
+    "key": "moraya-link-text$",
+    "slots": {
+      "props": true,
+      "state": true,
+      "view": false,
+    },
+  },
+  {
+    "index": 10,
+    "key": "moraya-inline-code-convert$",
+    "slots": {
+      "props": false,
+      "state": false,
+      "view": false,
+    },
+  },
+  {
+    "index": 11,
+    "key": "moraya-image-selection$",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": false,
+    },
+  },
+  {
+    "index": 12,
+    "key": "moraya-highlight$",
+    "slots": {
+      "props": true,
+      "state": true,
+      "view": false,
+    },
+  },
+  {
+    "index": 13,
+    "key": "moraya-emoji$",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": false,
+    },
+  },
+]
+`;
+
+exports[`plugin order fingerprint (§1.2.2) > desktop-style consumer config (enableMermaid + enableHistory + enableImageSelection + enableTableResize) 1`] = `
+[
+  "moraya-list-shortcuts$1",
+  "<no-key:1>",
+  "moraya-enter-handler$",
+  "<no-key:3>",
+  "<no-key:4>",
+  "history$",
+  "<no-key:6>",
+  "tableColumnResizing$",
+  "moraya-cursor-syntax$",
+  "moraya-link-text$",
+  "moraya-inline-code-convert$",
+  "moraya-image-selection$1",
+  "moraya-highlight$",
+  "moraya-emoji$",
+]
+`;
+
+exports[`plugin order fingerprint (§1.2.2) > history disabled (Yjs-style consumer per §10.3) 1`] = `
+[
+  "moraya-list-shortcuts$2",
+  "<no-key:1>",
+  "moraya-enter-handler$",
+  "<no-key:3>",
+  "<no-key:4>",
+  "<no-key:5>",
+  "tableColumnResizing$",
+  "moraya-cursor-syntax$",
+  "moraya-link-text$",
+  "moraya-inline-code-convert$",
+  "moraya-image-selection$2",
+  "moraya-highlight$",
+  "moraya-emoji$",
+]
+`;
