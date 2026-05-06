@@ -58,6 +58,7 @@ import { createEnterHandlerPlugin } from './plugins/enter-handler'
 import { createCursorSyntaxPlugin } from './plugins/cursor-syntax'
 import { createLinkTextPlugin } from './plugins/link-text-plugin'
 import { createInlineCodeConvertPlugin } from './plugins/inline-code-convert'
+import { createEditorPropsPlugin } from './plugins/editor-props-plugin'
 import type {
   MediaResolver,
   LinkOpener,
@@ -69,15 +70,23 @@ import { createDocCache, type DocCache } from './doc-cache'
 
 // ── Tier 1: Enhancement plugins (dynamic imports, loaded in parallel) ──
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CodeBlockNodeView = any
+
 interface Tier1Plugins {
   highlight?: Plugin
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  codeBlockView?: any
+  /** NodeView factory: `(node, view, getPos) => NodeView`. Wired into nodeViews at editor mount. */
+  codeBlockView?: CodeBlockNodeView
   emoji?: Plugin
   defListInputRule?: InputRule
 }
 
-let tier1Cache: { schema: Schema; plugins: Tier1Plugins } | null = null
+interface Tier1CacheKey {
+  schema: Schema
+  rendererRegistry?: RendererRegistry
+}
+
+let tier1Cache: { key: Tier1CacheKey; plugins: Tier1Plugins } | null = null
 let tier1Loading: Promise<Tier1Plugins> | null = null
 
 /**
@@ -85,30 +94,41 @@ let tier1Loading: Promise<Tier1Plugins> | null = null
  * Each plugin becomes a separate Vite/Rollup chunk (automatic code splitting).
  * Can be called early (e.g. in onMount) to warm the cache.
  *
- * The `defListInputRule` requires a Schema, so this function is parameterised
- * by Schema. When invoked with the same Schema instance it returns the cached
- * plugins; for a different Schema it rebuilds the def-list input rule
- * (other plugins are schema-agnostic and reused).
+ * The `defListInputRule` requires a Schema; the `codeBlockView` factory
+ * closes over the consumer's `RendererRegistry`. The cache is keyed by
+ * (schema, rendererRegistry) so consumers with different injection produce
+ * different cached factories.
  */
-export function preloadEnhancementPlugins(schema: Schema): Promise<Tier1Plugins> {
-  if (tier1Cache && tier1Cache.schema === schema) return Promise.resolve(tier1Cache.plugins)
+export function preloadEnhancementPlugins(
+  schema: Schema,
+  rendererRegistry?: RendererRegistry,
+): Promise<Tier1Plugins> {
+  if (tier1Cache &&
+      tier1Cache.key.schema === schema &&
+      tier1Cache.key.rendererRegistry === rendererRegistry) {
+    return Promise.resolve(tier1Cache.plugins)
+  }
   if (tier1Loading) return tier1Loading
 
   tier1Loading = Promise.allSettled([
     import('./plugins/highlight'),
     import('./plugins/emoji'),
-  ]).then(([hl, em]) => {
+    import('./plugins/code-block-view'),
+  ]).then(([hl, em, cbv]) => {
     const plugins: Tier1Plugins = {}
     if (hl.status === 'fulfilled') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      plugins.highlight = (hl.value as any).createHighlightPlugin()
+      plugins.highlight = hl.value.createHighlightPlugin()
     }
     if (em.status === 'fulfilled') {
       plugins.emoji = em.value.createEmojiPlugin()
     }
+    if (cbv.status === 'fulfilled') {
+      plugins.codeBlockView = cbv.value.createCodeBlockNodeViewFactory({
+        ...(rendererRegistry ? { rendererRegistry } : {}),
+      })
+    }
     plugins.defListInputRule = createDefListInputRule(schema)
-    // code-block-view + KaTeX CSS lazy-load are wired in the next batch.
-    tier1Cache = { schema, plugins }
+    tier1Cache = { key: { schema, ...(rendererRegistry ? { rendererRegistry } : {}) }, plugins }
     tier1Loading = null
     return plugins
   })
@@ -709,8 +729,15 @@ export async function createEditorPlugins(
     ...(opts.linkOpener ? { linkOpener: opts.linkOpener } : {}),
   }
   const schema = schemaArg ?? createSchema(schemaConfig)
+  const linkOpener: LinkOpener = opts.linkOpener ?? {
+    open(url: string) {
+      if (typeof window !== 'undefined') {
+        window.open(url, '_blank', 'noopener,noreferrer')
+      }
+    },
+  }
 
-  const tier1 = await preloadEnhancementPlugins(schema)
+  const tier1 = await preloadEnhancementPlugins(schema, opts.rendererRegistry)
 
   const plugins: Plugin[] = [
     // List shortcuts using event.code (reliable on macOS where Option+key
@@ -754,6 +781,10 @@ export async function createEditorPlugins(
   if (opts.enableTableResize !== false) {
     plugins.push(columnResizing())
   }
+
+  // Editor props (paste handlers, link click → LinkOpener, math click fix,
+  // WKWebView caret + Backspace fixes, ArrowRight ZWSP escape)
+  plugins.push(createEditorPropsPlugin({ platform, linkOpener }))
 
   // Custom plugins
   plugins.push(createCursorSyntaxPlugin())
@@ -807,6 +838,15 @@ export async function createEditor(opts: CreateEditorOptions): Promise<MorayaEdi
 
   const plugins = await createEditorPlugins(opts, schema)
 
+  // Tier 1 nodeViews: code_block replaced with toolbar+picker+mermaid+renderer NodeView.
+  // We don't await preloadEnhancementPlugins again — createEditorPlugins already did.
+  const tier1 = await preloadEnhancementPlugins(schema, opts.rendererRegistry)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const nodeViews: Record<string, any> = {}
+  if (tier1.codeBlockView) {
+    nodeViews.code_block = tier1.codeBlockView
+  }
+
   const initialDoc = opts.initialContent
     ? parseMarkdown(opts.initialContent)
     : schema.topNodeType.createAndFill()!
@@ -814,6 +854,7 @@ export async function createEditor(opts: CreateEditorOptions): Promise<MorayaEdi
   const state = EditorState.create({ schema, doc: initialDoc, plugins })
   const view = new EditorView(opts.container, {
     state,
+    nodeViews,
     attributes: {
       class: 'moraya-editor',
       spellcheck: 'true',

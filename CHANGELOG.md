@@ -2,7 +2,78 @@
 
 All notable changes to `@moraya/markdown-core` are documented here. SemVer.
 
-## [Unreleased] — schema + markdown + plugins/setup migration batches (2026-05-05 — 2026-05-06)
+## [Unreleased] — schema + markdown + plugins/setup + DI plugins migration batches (2026-05-05 — 2026-05-06)
+
+### DI plugins batch (2026-05-06)
+
+Final batch of plugin migration. All 11 ProseMirror plugins from Moraya desktop's `src/lib/editor/plugins/` (excluding `review-decoration.ts` which stays in moraya/) are now in core.
+
+#### Added (3 DI-coupled plugins migrated faithfully)
+
+**`plugins/highlight.ts`** — full faithful 1:1 migration replaces the prior no-op stub.
+- Imports + registers 39 highlight.js languages (javascript / typescript / python / rust / go / c / cpp / java / ruby / php / swift / kotlin / yaml / json / bash / sql / xml / html / css / scss / dart / r / perl / scala / objectivec / dockerfile / ini / powershell / makefile / groovy / elixir / haskell / protobuf / graphql / latex / nginx / shell / markdown / diff / lua + svelte/jsx/tsx aliases + cs / py / sh / rb / kt / yml / md / pl / objc / ex / hs / proto / gql / tex / nginxconf / ps1)
+- `flattenHljsTree(rootNode)` + `scopeToClasses` walk hljs v11 emitter tree
+- Per-block cache keyed by `(language, code)` with FIFO eviction at 100 entries (Moraya CLAUDE.md "Performance Coding Standards" §6 contract)
+- 300 ms debounced full re-highlight via metadata-only transaction
+- File-switch (`tr.getMeta('file-switch')`) and full-delete (`tr.getMeta('full-delete')`) paths rebuild from scratch
+- Short-circuit when `tr.mapping` doesn't touch any code_block (saves ~90% of keystroke debounces)
+- Schema-agnostic (no `$lib/` imports); zero behavior drift from desktop
+
+**`plugins/editor-props-plugin.ts`** — full faithful 1:1 migration with `Platform` + `LinkOpener` DI.
+- `editorStore.getState().currentFilePath` → `platform.getCurrentFilePath()`
+- `isMacOS` from `$lib/utils/platform` → `platform.isMacOS`
+- `import('@tauri-apps/plugin-opener').{openPath,openUrl}` → `linkOpener.open(href)` (consumer's LinkOpener routes URL vs local-file)
+- 5-plugin merge preserved: `clipboardTextParser` + `handlePaste` (markdown image / empty link / degenerate slice fallbacks) + `transformPastedHTML` (language- → data-language) + `handleDOMEvents.{click,mousedown,keydown,keyup}` (link-hover class / Cmd+click open / math_block click / fast AllSelection delete / WKWebView Backspace fix) + `handleClick` (click-below-content append paragraph) + `handleClickOn` (image → TextSelection) + `handleKeyDown` (ArrowRight ZWSP escape / fast AllSelection delete fallback) + `decorations` (caret-empty-para macOS) + `view` lifecycle (scroll-after-paste + WKWebView empty-doc focus recovery)
+- `isLocalFilePath` / `resolveLocalPath` ported as pure helpers (resolve-against-currentFile uses `platform.getCurrentFilePath()`)
+
+**`plugins/code-block-view.ts`** — full faithful 1:1 migration with `RendererRegistry` DI.
+- `RENDERER_PLUGINS` / `loadRendererPlugin` / `rendererVersions` (moraya-internal) → `RendererRegistry` injected via `createCodeBlockNodeViewFactory({ rendererRegistry })`
+- Renderer plugin language list + versions derived from `registry.versions` keys
+- Mermaid still has built-in special-case path (`language === 'mermaid'`) using core's `plugins/mermaid-renderer.ts`
+- `LanguageEntry` registry (POPULAR_LANGUAGES + BASE_OTHER_LANGUAGES + dynamic renderer-plugin entries) + `findLanguageLabel`
+- Language picker with auto-detect via `hljs.highlightAuto` (relevance > 5 threshold), grouped Popular / All / Renderer Plugins, keyboard nav, outside-click + Escape dismiss, focus-stealing-prevention via append-to-`.editor-wrapper` (not into ProseMirror DOM)
+- Mermaid render path: lazy `loadMermaidApi()` → serial render queue → debounce 150 ms → SVG injection or error fallback → theme-change re-render via MutationObserver on `data-theme`
+- Renderer render path: `registry.load(lang).render(source, container)` with §3.3 error contract: `<div class="renderer-error" data-language data-error>` fallback DOM, `module.destroy?(container)` called on lang-change / NodeView destroy
+- Copy button + toggle-edit/preview button + `stopEvent` / `ignoreMutation` / `update` / `selectNode` / `deselectNode` / `destroy` lifecycle 1:1 from moraya
+- 580 lines → ~700 lines (faithful, no shortcuts; the §1.2.4 "no simplification" rule is honored)
+
+#### Wired into setup.ts (this batch)
+- `preloadEnhancementPlugins(schema, rendererRegistry?)` now loads **3 chunks** in parallel: highlight + emoji + **code-block-view** (was 2 in previous batch)
+- Cache key extended from `Schema` → `{ schema, rendererRegistry }` so consumers with different registry produce different cached factories
+- `createEditorPlugins` adds `createEditorPropsPlugin({ platform, linkOpener })` between `columnResizing` and `cursorSyntax`
+- `createEditor` wires `nodeViews.code_block` from `tier1.codeBlockView`
+- Default `LinkOpener` (`window.open(href, '_blank', 'noopener,noreferrer')`) added when consumer doesn't inject one
+
+#### Plugin order snapshot updates (§1.2.2)
+Snapshot diffs reflect intentional changes:
+- New `moraya-editor-props$` plugin added between `tableColumnResizing$` and `moraya-cursor-syntax$` (rank 8 → 9 shift for downstream plugins)
+- Highlight key renamed: `moraya-highlight$` (stub) → `moraya-syntax-highlight$` (faithful)
+Snapshots regenerated and committed per §1.2.2 reviewer-approval workflow.
+
+#### Verification (this batch)
+- ✅ `pnpm typecheck` clean (strict + noUncheckedIndexedAccess + exactOptionalPropertyTypes)
+- ✅ `pnpm test`: **68/68 pass** (snapshots updated + all roundtrip / api-contract / data-trap / plugin-order tests still passing)
+- ✅ `pnpm build`: ESM + .d.ts; `dist/index.js` gzipped = **33.9 KB** (41% of 80 KB budget)
+- ✅ §1.1.4 purity gates green (`.js` only): 0 Node API / 0 `require()` / 0 `@tauri-apps`/`@capacitor`/`electron` imports in dist
+- ✅ Tier 1 chunks: `highlight.js` 2.4 KB gzipped, `code-block-view.js` 6.1 KB gzipped (hljs + mermaid live in consumer's bundle as peer deps)
+
+#### Plugin migration progress: 11/11 ✅
+| Plugin | Status |
+|---|---|
+| keybindings | Stays in moraya (static data, not a PM plugin) |
+| definition-list | ✅ migrated |
+| emoji | ✅ migrated |
+| cursor-syntax | ✅ migrated |
+| enter-handler | ✅ migrated |
+| inline-code-convert | ✅ migrated |
+| link-text | ✅ migrated |
+| mermaid-renderer | ✅ migrated |
+| **highlight** | ✅ migrated (this batch) |
+| **editor-props-plugin** | ✅ migrated (this batch) |
+| **code-block-view** | ✅ migrated (this batch) |
+| review-decoration | Stays in moraya (v0.30.0+ team-collab specific) |
+
+
 
 ### plugins + setup batch (2026-05-06)
 
@@ -200,12 +271,13 @@ Replaces the 6KB minimum-viable stub with a 21KB faithful migration of Moraya de
 - `defaultSchema` now built from the full faithful 23N+6M, not the prior 15-node stub
 
 ### Still pending (subsequent batches)
-- 3 DI-coupled plugins: `editor-props-plugin` (Platform + LinkOpener DI),
-  `code-block-view` (full RendererRegistry integration + mermaid + KaTeX wire-up + nodeViews),
-  faithful `highlight.js` integration (current `plugins/highlight.ts` is a no-op stub)
 - 38 fixtures (currently 17): empty-replace / link-input-rule / large-async /
   KaTeX error / frontmatter YAML/TOML/JSON / footnote / wikilink / hashtag /
   Mermaid / blockquote-nested / autolink / hardbreak edge cases / 50KB real doc, etc.
+- Moraya desktop bridge layer + `TauriMediaResolver` / `TauriLinkOpener` /
+  `MorayaRendererRegistry` injection + bridge schema.ts re-export shim
+- Moraya desktop end-to-end smoke (`pnpm tauri dev`, save → disk byte diff vs v0.39.0 baseline)
+- `@moraya/markdown-core@0.1.0` first publish to GitHub Packages (only after bridge + behavior parity)
 - Behavior parity 3-layer verification (§1.2.2): plugin order fingerprint snapshot,
   fixture roundtrip CI gate dual-run with Moraya desktop, hand-test 3 representative
   notes save → disk byte diff

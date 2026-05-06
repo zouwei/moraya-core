@@ -76,6 +76,15 @@ exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style
   },
   {
     "index": 8,
+    "key": "moraya-editor-props$",
+    "slots": {
+      "props": true,
+      "state": false,
+      "view": true,
+    },
+  },
+  {
+    "index": 9,
     "key": "moraya-cursor-syntax$",
     "slots": {
       "props": true,
@@ -84,7 +93,7 @@ exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style
     },
   },
   {
-    "index": 9,
+    "index": 10,
     "key": "moraya-link-text$",
     "slots": {
       "props": true,
@@ -93,7 +102,7 @@ exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style
     },
   },
   {
-    "index": 10,
+    "index": 11,
     "key": "moraya-inline-code-convert$",
     "slots": {
       "props": false,
@@ -102,7 +111,7 @@ exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style
     },
   },
   {
-    "index": 11,
+    "index": 12,
     "key": "moraya-image-selection$",
     "slots": {
       "props": true,
@@ -111,16 +120,16 @@ exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style
     },
   },
   {
-    "index": 12,
-    "key": "moraya-highlight$",
+    "index": 13,
+    "key": "moraya-syntax-highlight$",
     "slots": {
       "props": true,
       "state": true,
-      "view": false,
+      "view": true,
     },
   },
   {
-    "index": 13,
+    "index": 14,
     "key": "moraya-emoji$",
     "slots": {
       "props": true,
@@ -141,11 +150,12 @@ exports[`plugin order fingerprint (§1.2.2) > desktop-style consumer config (ena
   "history$",
   "<no-key:6>",
   "tableColumnResizing$",
+  "moraya-editor-props$",
   "moraya-cursor-syntax$",
   "moraya-link-text$",
   "moraya-inline-code-convert$",
   "moraya-image-selection$1",
-  "moraya-highlight$",
+  "moraya-syntax-highlight$",
   "moraya-emoji$",
 ]
 `;
@@ -159,11 +169,12 @@ exports[`plugin order fingerprint (§1.2.2) > history disabled (Yjs-style consum
   "<no-key:4>",
   "<no-key:5>",
   "tableColumnResizing$",
+  "moraya-editor-props$",
   "moraya-cursor-syntax$",
   "moraya-link-text$",
   "moraya-inline-code-convert$",
   "moraya-image-selection$2",
-  "moraya-highlight$",
+  "moraya-syntax-highlight$",
   "moraya-emoji$",
 ]
 `;
