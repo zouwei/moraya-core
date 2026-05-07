@@ -1,5 +1,5 @@
 /**
- * Markdown ↔ ProseMirror Doc roundtrip for `@zouwei/moraya-core`.
+ * Markdown ↔ ProseMirror Doc roundtrip for `@moraya/core`.
  *
  * Faithful 1:1 migration from Moraya desktop `src/lib/editor/markdown.ts`.
  * Uses `prosemirror-markdown` with `markdown-it` as the tokenizer.

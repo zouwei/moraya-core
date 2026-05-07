@@ -1,5 +1,5 @@
 {
-  "name": "@zouwei/moraya-core",
+  "name": "@moraya/core",
   "version": "0.1.0",
   "description": "Shared markdown editor core for Moraya desktop and Moraya Web. ProseMirror schema, markdown-it parser, prosemirror-markdown serializer, plugins, and editor lifecycle factories. Pure ESM, host-agnostic, dependency-injected.",
   "type": "module",
@@ -47,8 +47,7 @@
     "LICENSE"
   ],
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "access": "public"
   },
   "repository": {
     "type": "git",

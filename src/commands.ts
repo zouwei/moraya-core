@@ -21,13 +21,13 @@ const schema = defaultSchema
 
 function markType(name: string): MarkType {
   const m = schema.marks[name]
-  if (!m) throw new Error(`[@zouwei/moraya-core] mark "${name}" not in schema`)
+  if (!m) throw new Error(`[@moraya/core] mark "${name}" not in schema`)
   return m
 }
 
 function nodeType(name: string): NodeType {
   const n = schema.nodes[name]
-  if (!n) throw new Error(`[@zouwei/moraya-core] node "${name}" not in schema`)
+  if (!n) throw new Error(`[@moraya/core] node "${name}" not in schema`)
   return n
 }
 

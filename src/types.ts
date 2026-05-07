@@ -1,5 +1,5 @@
 /**
- * Dependency-injection interfaces for `@zouwei/moraya-core`.
+ * Dependency-injection interfaces for `@moraya/core`.
  *
  * These 4 interfaces are the **only** boundary between the core package
  * (host-agnostic, pure ESM) and the consumer environment (Tauri / browser /
@@ -114,7 +114,7 @@ export interface SchemaConfig {
  * serializeMarkdown internal fallback. Consumers must NOT pass this to
  * createSchema(); doing so throws with a descriptive error.
  */
-export const NULL_MEDIA_RESOLVER_SENTINEL = Symbol('@zouwei/moraya-core:null-media-resolver')
+export const NULL_MEDIA_RESOLVER_SENTINEL = Symbol('@moraya/core:null-media-resolver')
 
 export interface NullMediaResolver extends MediaResolver {
   readonly [NULL_MEDIA_RESOLVER_SENTINEL]: true

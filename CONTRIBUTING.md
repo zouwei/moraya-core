@@ -1,4 +1,4 @@
-# Contributing to `@zouwei/moraya-core`
+# Contributing to `@moraya/core`
 
 This package is the shared markdown editor core for Moraya desktop and Moraya Web. Source of truth for the design contract:
 [`v0.60.0-pre-shared-markdown-core.md`](https://github.com/zouwei/moraya/blob/main/docs/iterations/v0.60.0-pre-shared-markdown-core.md).
@@ -101,7 +101,7 @@ Use one of:
    pnpm build && pnpm pack --pack-destination /tmp/
 
    # in the consumer repo:
-   pnpm add /tmp/zouwei-moraya-core-x.y.z.tgz
+   pnpm add /tmp/moraya-core-x.y.z.tgz
    ```
 
 2. **Local verdaccio**:
@@ -175,7 +175,7 @@ Before a release, verify locally:
 
 ```bash
 pnpm pack --pack-destination /tmp/
-tar -tzf /tmp/zouwei-moraya-core-x.y.z.tgz | grep -vE "^package/dist/"
+tar -tzf /tmp/moraya-core-x.y.z.tgz | grep -vE "^package/dist/"
 # expected output (exactly):
 #   package/LICENSE
 #   package/package.json

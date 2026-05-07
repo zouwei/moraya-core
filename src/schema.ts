@@ -1,5 +1,5 @@
 /**
- * Unified ProseMirror Schema for `@zouwei/moraya-core`.
+ * Unified ProseMirror Schema for `@moraya/core`.
  *
  * Faithful 1:1 migration from Moraya desktop `src/lib/editor/schema.ts`
  * with the following DI changes (v0.60.0-pre §F2.5):
@@ -960,14 +960,14 @@ const schemaCache = new WeakMap<MediaResolver, Schema>()
  */
 export function createSchema(config: SchemaConfig): Schema {
   if (!config || typeof config !== 'object') {
-    throw new TypeError('@zouwei/moraya-core: createSchema() requires a config object with a MediaResolver')
+    throw new TypeError('@moraya/core: createSchema() requires a config object with a MediaResolver')
   }
   if (!config.mediaResolver) {
-    throw new TypeError('@zouwei/moraya-core: createSchema() requires a MediaResolver')
+    throw new TypeError('@moraya/core: createSchema() requires a MediaResolver')
   }
   if (isNullMediaResolver(config.mediaResolver)) {
     throw new TypeError(
-      "@zouwei/moraya-core: do not pass nullMediaResolver to createSchema(). That instance is reserved for parseMarkdown/serializeMarkdown internal use only. Provide a real MediaResolver implementation (e.g. BrowserMediaResolver from '@zouwei/moraya-core/adapters/browser-media-resolver')."
+      "@moraya/core: do not pass nullMediaResolver to createSchema(). That instance is reserved for parseMarkdown/serializeMarkdown internal use only. Provide a real MediaResolver implementation (e.g. BrowserMediaResolver from '@moraya/core/adapters/browser-media-resolver')."
     )
   }
   const cached = schemaCache.get(config.mediaResolver)

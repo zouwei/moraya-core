@@ -1,17 +1,21 @@
 # Changelog
 
-All notable changes to `@zouwei/moraya-core` are documented here. SemVer.
+All notable changes to `@moraya/core` are documented here. SemVer.
 
-## [0.1.0] — 2026-05-06
+## [0.1.0] — 2026-05-07
 
-Initial release. Faithful 1:1 extraction of Moraya desktop's `src/lib/editor/` markdown editor core into a host-agnostic, dependency-injected ESM package, per the iteration spec at [`v0.60.0-pre-shared-markdown-core.md`](https://github.com/zouwei/moraya/blob/main/docs/iterations/v0.60.0-pre-shared-markdown-core.md).
+Initial public release on npmjs.com. Faithful 1:1 extraction of Moraya desktop's `src/lib/editor/` markdown editor core into a host-agnostic, dependency-injected ESM package, per the iteration spec at [`v0.60.0-pre-shared-markdown-core.md`](https://github.com/zouwei/moraya/blob/main/docs/iterations/v0.60.0-pre-shared-markdown-core.md).
 
 ### Package identity
 
-- **Name**: `@zouwei/moraya-core` (was working name `@moraya/markdown-core` during pre-release; renamed at v0.1.0 to match the GitHub repo owner — npm scope must equal the GitHub user/org owning the repo when publishing to GitHub Packages)
-- **Repo**: https://github.com/zouwei/moraya-core
-- **Registry**: GitHub Packages (https://npm.pkg.github.com), `access: restricted`
-- **License**: PolyForm Internal Use 1.0.0 (private; not for redistribution)
+- **Name**: `@moraya/core` (final name; renamed twice during pre-release: working name `@moraya/markdown-core` → interim `@zouwei/moraya-core` (GitHub Packages attempt) → final `@moraya/core` (npmjs.com public))
+- **Repo**: https://github.com/zouwei/moraya-core (public)
+- **Registry**: npmjs.com (https://registry.npmjs.org), `access: public` — anyone can `npm install @moraya/core` with no token
+- **License**: PolyForm Internal Use 1.0.0
+
+### Distribution rationale
+
+The original spec §5.1 chose GitHub Packages (private) for cost reasons, but GitHub Packages requires authentication even for public packages — incompatible with Moraya's open-source distribution model. The pre-release `@zouwei/moraya-core@0.1.0` published to GitHub Packages on 2026-05-06 was unpublished; `@moraya/core@0.1.0` on npmjs.com supersedes it.
 
 ### Surface
 

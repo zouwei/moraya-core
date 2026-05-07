@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 /**
- * Pure ESM build for @zouwei/moraya-core.
+ * Pure ESM build for @moraya/core.
  * Per v0.60.0-pre §1.1.1:
  * - module = ESM only (no CommonJS)
  * - target = ES2022 (compatible with iOS 14+ Safari, Android 8+ Chrome)

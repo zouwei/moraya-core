@@ -1,4 +1,4 @@
-# @zouwei/moraya-core
+# @moraya/core
 
 Shared markdown editor core for **Moraya desktop** (Tauri + Svelte 5) and **Moraya Web** (SvelteKit SPA). Pure ESM, host-agnostic, dependency-injected.
 
@@ -37,10 +37,10 @@ import {
   toggleLink, insertImage,
   // types
   type MediaResolver, type LinkOpener, type RendererRegistry, type RendererPluginModule, type Platform,
-} from '@zouwei/moraya-core'
+} from '@moraya/core'
 
-import { BrowserMediaResolver } from '@zouwei/moraya-core/adapters/browser-media-resolver'
-import '@zouwei/moraya-core/style'
+import { BrowserMediaResolver } from '@moraya/core/adapters/browser-media-resolver'
+import '@moraya/core/style'
 ```
 
 ## Consumer examples
@@ -48,7 +48,7 @@ import '@zouwei/moraya-core/style'
 ### Moraya desktop bridge (Svelte 5 + Tauri)
 
 ```ts
-import { createSchema } from '@zouwei/moraya-core'
+import { createSchema } from '@moraya/core'
 import { tauriMediaResolver } from './tauri-media-resolver'
 import { morayaRendererRegistry } from './moraya-renderer-registry'
 
@@ -61,8 +61,8 @@ export const schema = createSchema({
 ### Moraya Web (SvelteKit SPA)
 
 ```ts
-import { createSchema } from '@zouwei/moraya-core'
-import { BrowserMediaResolver } from '@zouwei/moraya-core/adapters/browser-media-resolver'
+import { createSchema } from '@moraya/core'
+import { BrowserMediaResolver } from '@moraya/core/adapters/browser-media-resolver'
 
 export const schema = createSchema({
   mediaResolver: new BrowserMediaResolver(),
