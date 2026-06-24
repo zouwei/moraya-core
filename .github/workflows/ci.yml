@@ -64,3 +64,9 @@ jobs:
             echo "::error::Main entry $GZIP_SIZE > 80KB gzipped"
             exit 1
           fi
+
+      # v0.96.0 §6 — i18n boundary check. `src/i18n/**` must stay isolated
+      # so future extraction to a standalone @moraya/i18n package is a
+      # path rename, not a refactor.
+      - name: Gate 5 — i18n isolation (no svelte / prosemirror / cross-module imports)
+        run: node scripts/i18n-isolation.mjs
