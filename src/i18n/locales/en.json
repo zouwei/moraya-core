@@ -392,7 +392,8 @@
     "currency_usd": "USD ($)",
     "currency_cny": "CNY (¥)",
     "currency_eur": "EUR (€)",
-    "change_currency": "Change currency"
+    "change_currency": "Change currency",
+    "upgrade": "Upgrade"
   },
   "cloud_picker": {
     "title_image": "Insert Cloud Image",
@@ -1946,7 +1947,8 @@
       "voice_local_badge": "On-device",
       "voice_permission_denied": "Microphone or speech permission denied. Enable it in Settings to use voice.",
       "voice_start_failed": "Could not start voice input.",
-      "voice_speak_failed": "Could not read this message aloud."
+      "voice_speak_failed": "Could not read this message aloud.",
+      "delete": "Delete"
     },
     "files": {
       "title": "Knowledge Base",
@@ -2000,7 +2002,8 @@
     "registered_at": "Registered {date}",
     "last_seen": "Last seen {date}",
     "error_register": "Could not register this device.",
-    "error_list": "Could not load device list."
+    "error_list": "Could not load device list.",
+    "recent": "Recent notifications"
   },
   "offline": {
     "cache_enabled": "Offline cache enabled",
@@ -2363,7 +2366,17 @@
     "recovery_unlock_subtitle": "Enter your 12-word recovery code to regain access.",
     "recovery_code_input": "Recovery Code (12 words, space-separated)",
     "recovery_unlock_button": "Recover",
-    "set_new_passphrase": "Set New Passphrase"
+    "set_new_passphrase": "Set New Passphrase",
+    "biometric_unlock_title": "Unlock Moraya",
+    "biometric_unlock_subtitle": "Authenticate to access your data",
+    "biometric_failed": "Authentication failed",
+    "unlock_with_biometric": "Unlock with biometric",
+    "unlock_with_face_id": "Unlock with Face ID",
+    "unlock_with_touch_id": "Unlock with Touch ID",
+    "unlock_with_fingerprint": "Unlock with fingerprint",
+    "unlock_with_iris": "Unlock with iris scan",
+    "unlock_with_passkey": "Unlock with passkey",
+    "use_passphrase_fallback": "Use passphrase instead"
   },
   "seo": {
     "title": "SEO Optimization",
@@ -3734,7 +3747,11 @@
       "empty": "No recordings yet. Start capturing your voice!",
       "reprocess": "Re-process",
       "delete": "Delete"
-    }
+    },
+    "hold_to_record": "Hold to record",
+    "release_to_send": "Release to send",
+    "cancel": "Slide to cancel",
+    "permission_denied": "Microphone permission denied"
   },
   "welcome": {
     "title": "Welcome to Moraya",
@@ -3914,5 +3931,13 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "ocr": {
+    "capture_button": "Capture & extract text",
+    "capture_short": "Capture",
+    "recognizing": "Recognizing text…",
+    "empty_result": "No text detected",
+    "failed": "OCR failed",
+    "engine_unavailable": "OCR not available on this device"
   }
 }

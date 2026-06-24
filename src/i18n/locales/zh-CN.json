@@ -392,7 +392,8 @@
     "currency_usd": "美元（$）",
     "currency_cny": "人民币（¥）",
     "currency_eur": "欧元（€）",
-    "change_currency": "更改货币"
+    "change_currency": "更改货币",
+    "upgrade": "升级"
   },
   "cloud_picker": {
     "title_image": "插入云端图片",
@@ -1946,7 +1947,8 @@
       "voice_local_badge": "设备端",
       "voice_permission_denied": "麦克风或语音识别权限被拒绝。请在系统设置中开启后再使用语音。",
       "voice_start_failed": "无法启动语音输入。",
-      "voice_speak_failed": "无法朗读这条消息。"
+      "voice_speak_failed": "无法朗读这条消息。",
+      "delete": "删除"
     },
     "files": {
       "title": "知识库",
@@ -2000,7 +2002,8 @@
     "registered_at": "注册于 {date}",
     "last_seen": "最近活跃 {date}",
     "error_register": "无法注册该设备。",
-    "error_list": "无法加载设备列表。"
+    "error_list": "无法加载设备列表。",
+    "recent": "最近通知"
   },
   "offline": {
     "cache_enabled": "离线缓存已启用",
@@ -2363,7 +2366,17 @@
     "recovery_unlock_subtitle": "输入你的 12 个单词恢复码以重新获得访问权限。",
     "recovery_code_input": "恢复码（12 个单词，用空格分隔）",
     "recovery_unlock_button": "恢复",
-    "set_new_passphrase": "设置新口令"
+    "set_new_passphrase": "设置新口令",
+    "biometric_unlock_title": "解锁 Moraya",
+    "biometric_unlock_subtitle": "验证身份以访问数据",
+    "biometric_failed": "身份验证失败",
+    "unlock_with_biometric": "生物识别解锁",
+    "unlock_with_face_id": "使用 Face ID 解锁",
+    "unlock_with_touch_id": "使用 Touch ID 解锁",
+    "unlock_with_fingerprint": "指纹解锁",
+    "unlock_with_iris": "虹膜识别解锁",
+    "unlock_with_passkey": "通行密钥解锁",
+    "use_passphrase_fallback": "改用密码"
   },
   "seo": {
     "title": "SEO 优化",
@@ -3734,7 +3747,11 @@
       "empty": "暂无录音记录，开始您的第一次录音吧！",
       "reprocess": "重新处理",
       "delete": "删除"
-    }
+    },
+    "hold_to_record": "按住录音",
+    "release_to_send": "松开发送",
+    "cancel": "滑动取消",
+    "permission_denied": "麦克风权限被拒绝"
   },
   "welcome": {
     "title": "欢迎使用 Moraya",
@@ -3914,5 +3931,13 @@
       "allow_always": "永久允许",
       "deny": "拒绝"
     }
+  },
+  "ocr": {
+    "capture_button": "拍照识别文字",
+    "capture_short": "拍照",
+    "recognizing": "正在识别…",
+    "empty_result": "未检测到文字",
+    "failed": "识别失败",
+    "engine_unavailable": "本设备不支持文字识别"
   }
 }
