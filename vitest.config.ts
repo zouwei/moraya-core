@@ -14,6 +14,12 @@ export default defineConfig({
         statements: 80,
       },
     },
-    include: ['src/__tests__/**/*.spec.ts'],
+    include: [
+      'src/__tests__/**/*.spec.ts',
+      // v0.96.0 i18n module uses colocated `src/i18n/__tests__/*.test.ts`.
+      // Pattern extended to pick up sub-module test folders without forcing
+      // a flat layout for every future feature.
+      'src/**/__tests__/**/*.test.ts',
+    ],
   },
 })

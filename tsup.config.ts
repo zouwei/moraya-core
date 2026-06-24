@@ -1,4 +1,6 @@
 import { defineConfig } from 'tsup'
+import { cpSync, mkdirSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 /**
  * Pure ESM build for @moraya/core.
@@ -19,6 +21,11 @@ export default defineConfig({
     'src/types.ts',
     'src/plugins/*.ts',
     'src/adapters/*.ts',
+    // v0.96.0 unified i18n — engine ships as its own subpath bundle. JSON
+    // payloads are copied verbatim by `publicDir` below; the per-locale
+    // dynamic `import()` inside loader.ts code-splits at the consumer's
+    // bundler so a user only downloads the active language.
+    'src/i18n/index.ts',
   ],
   format: ['esm'],
   dts: true,
@@ -42,4 +49,34 @@ export default defineConfig({
     'highlight.js',
   ],
   publicDir: 'src/styles',
+  /*
+   * v0.96.0 i18n locale handling.
+   *
+   * The 12 locale JSONs (~150 KB each) MUST stay separate files in dist so
+   * each consumer's bundler can code-split per language. With tsup's default
+   * (splitting: false), `await import('./locales/en.json')` would inline ALL
+   * 12 bundles into dist/i18n/index.js (~2.5 MB). Two fixes wired below:
+   *
+   *   1. esbuild plugin marks `./locales/<loc>.json` imports as external,
+   *      so the resolved path stays in the emitted JS as a runtime import.
+   *   2. onSuccess copies src/i18n/locales/ to dist/i18n/locales/ so the
+   *      external paths resolve at consumer Vite build time.
+   */
+  esbuildPlugins: [
+    {
+      name: 'moraya-i18n-locales-external',
+      setup(build) {
+        build.onResolve({ filter: /\.\/locales\/[\w-]+\.json$/ }, (args) => ({
+          path: args.path,
+          external: true,
+        }))
+      },
+    },
+  ],
+  onSuccess: async () => {
+    const src = resolve(__dirname, 'src/i18n/locales')
+    const dst = resolve(__dirname, 'dist/i18n/locales')
+    mkdirSync(dst, { recursive: true })
+    cpSync(src, dst, { recursive: true })
+  },
 })
