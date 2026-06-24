@@ -26,6 +26,16 @@ export default defineConfig({
     // dynamic `import()` inside loader.ts code-splits at the consumer's
     // bundler so a user only downloads the active language.
     'src/i18n/index.ts',
+    // v0.4.0 shared AI provider layer — separate subpath bundles, kept OUT of
+    // src/index.ts so the 80KB main-entry budget is unaffected.
+    'src/ai/index.ts',
+    'src/ai/types.ts',
+    'src/ai/drivers/*.ts',
+    // v0.4.0 chat-markdown — streaming-safe markdown→HTML for AI chat bubbles.
+    // Separate bundle so chat-only consumers (e.g. an external AI app that
+    // never touches the editor schema) only pay for ~7 KB + their own
+    // markdown-it peer, not the full ProseMirror payload.
+    'src/chat-markdown/index.ts',
   ],
   format: ['esm'],
   dts: true,
