@@ -2655,7 +2655,7 @@
     "select_section": "请从左侧选择一个设置分类。",
     "ai": {
       "title": "AI",
-      "cloud_providers": "云端模型",
+      "cloud_providers": "AI 服务商",
       "local_models": "端侧模型",
       "add": "添加",
       "edit": "编辑模型",
@@ -2683,7 +2683,7 @@
       "set_active": "切换",
       "status_ready": "可用",
       "status_not_configured": "未配置",
-      "empty_cloud": "尚未配置云端模型。点击「添加」可接入 OpenAI / Claude / Gemini / DeepSeek 或任意 OpenAI 兼容端点。",
+      "empty_cloud": "尚未配置 AI 服务。点击「添加」可接入 OpenAI / Claude / Gemini / DeepSeek 或任意 OpenAI 兼容端点。",
       "cloud_hint": "API Key 仅本地保存，直连服务商 API；Moraya 不会看到你的 Key。",
       "rag": {
         "title": "历史引用 (RAG)",

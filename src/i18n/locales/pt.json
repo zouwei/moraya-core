@@ -2663,7 +2663,7 @@
     "select_section": "Select a settings section from the left.",
     "ai": {
       "title": "AI",
-      "cloud_providers": "Cloud Providers",
+      "cloud_providers": "Provedores de IA",
       "local_models": "On-device Models",
       "add": "Add",
       "edit": "Edit provider",
@@ -2691,7 +2691,7 @@
       "set_active": "Use",
       "status_ready": "Ready",
       "status_not_configured": "Not configured",
-      "empty_cloud": "No cloud providers configured. Tap “Add” to set up OpenAI, Claude, Gemini, DeepSeek, or any OpenAI-compatible endpoint.",
+      "empty_cloud": "Nenhum provedor de IA configurado ainda. Toque em \"Adicionar\" para conectar OpenAI / Claude / Gemini / DeepSeek ou qualquer endpoint compatível com OpenAI.",
       "cloud_hint": "Your API keys are stored locally and sent directly to the provider — Moraya never sees them.",
       "rag": {
         "title": "History Reference (RAG)",

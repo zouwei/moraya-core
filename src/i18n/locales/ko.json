@@ -2663,7 +2663,7 @@
     "select_section": "왼쪽에서 설정 섹션을 선택합니다.",
     "ai": {
       "title": "AI",
-      "cloud_providers": "클라우드 제공업체",
+      "cloud_providers": "AI 공급자",
       "local_models": "온디바이스 모델",
       "add": "추가하다",
       "edit": "제공업체 수정",
@@ -2691,7 +2691,7 @@
       "set_active": "사용",
       "status_ready": "준비가 된",
       "status_not_configured": "구성되지 않음",
-      "empty_cloud": "구성된 클라우드 제공업체가 없습니다. OpenAI, Claude, Gemini, DeepSeek 또는 OpenAI 호환 엔드포인트를 설정하려면 \"추가\"를 탭하세요.",
+      "empty_cloud": "아직 AI 공급자가 설정되지 않았습니다. \"추가\"를 눌러 OpenAI / Claude / Gemini / DeepSeek 또는 OpenAI 호환 엔드포인트를 연결하세요.",
       "cloud_hint": "귀하의 API 키는 로컬에 저장되어 공급자에게 직접 전송됩니다. Moraya는 이를 결코 볼 수 없습니다.",
       "rag": {
         "title": "역사 참조(RAG)",
