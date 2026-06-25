@@ -11,6 +11,7 @@
 export * from './types'
 export * from './catalog'
 export * from './transport'
+// (image + voice re-exported below; their names don't collide with the above)
 export { streamChat, sendChat } from './chat'
 export { getDriver } from './drivers'
 export type { AIDriver, StreamFold } from './drivers/types'
@@ -23,3 +24,6 @@ export {
   buildOpenAIToolResultMessages,
 } from './drivers/tool-bridge'
 export { openaiEndpoint } from './drivers/util'
+// Image (OpenAI-compatible shared path) + voice/realtime provider types.
+export * from './image'
+export * from './voice'

@@ -30,6 +30,8 @@ export default defineConfig({
     // src/index.ts so the 80KB main-entry budget is unaffected.
     'src/ai/index.ts',
     'src/ai/types.ts',
+    'src/ai/image.ts',
+    'src/ai/voice.ts',
     'src/ai/drivers/*.ts',
     // v0.4.0 chat-markdown — streaming-safe markdown→HTML for AI chat bubbles.
     // Separate bundle so chat-only consumers (e.g. an external AI app that

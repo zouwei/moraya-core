@@ -52,6 +52,14 @@
       "import": "./dist/ai/types.js",
       "types": "./dist/ai/types.d.ts"
     },
+    "./ai/image": {
+      "import": "./dist/ai/image.js",
+      "types": "./dist/ai/image.d.ts"
+    },
+    "./ai/voice": {
+      "import": "./dist/ai/voice.js",
+      "types": "./dist/ai/voice.d.ts"
+    },
     "./ai/drivers/*": {
       "import": "./dist/ai/drivers/*.js",
       "types": "./dist/ai/drivers/*.d.ts"
