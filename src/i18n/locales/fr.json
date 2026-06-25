@@ -1,60 +1,58 @@
 {
   "admin": {
-    "__mt": true,
-    "title": "Team Admin",
-    "tab_members": "Members",
+    "title": "Administrateur d'équipe",
+    "tab_members": "Membres",
     "tab_kbs": "Knowledge Bases",
     "tab_usage": "Usage",
-    "members": "Members",
-    "knowledge_bases": "Knowledge Bases",
-    "invite_member": "Invite Member",
-    "remove_member": "Remove",
+    "members": "Membres",
+    "knowledge_bases": "Bases de connaissances",
+    "invite_member": "Inviter un membre",
+    "remove_member": "Retirer",
     "create_kb": "Create KB",
-    "no_members": "No members yet.",
+    "no_members": "Aucun membre pour l'instant.",
     "no_kbs": "No knowledge bases yet.",
-    "col_name": "Name",
+    "col_name": "Nom",
     "col_email": "Email",
     "col_role": "Role",
-    "col_joined": "Joined",
+    "col_joined": "Rejoint",
     "e2e": "E2E",
-    "ai": "AI",
-    "usage_summary": "Usage Summary",
-    "storage": "Storage",
-    "notes": "Notes",
-    "ai_queries": "AI Queries",
-    "active_members": "Active Members",
-    "this_month": "this month"
+    "ai": "IA",
+    "usage_summary": "Résumé d'utilisation",
+    "storage": "Stockage",
+    "notes": "Remarques",
+    "ai_queries": "Requêtes IA",
+    "active_members": "Membres actifs",
+    "this_month": "ce mois-ci"
   },
   "agent": {
-    "__mt": true,
-    "title": "AI Agent",
-    "subtitle": "Let AI handle multi-step tasks across your knowledge base",
-    "query_placeholder": "Describe a task for the agent to complete...",
-    "run": "Run",
+    "title": "Agent IA",
+    "subtitle": "Laissez l'IA gérer des tâches en plusieurs étapes dans votre base de connaissances",
+    "query_placeholder": "Décrivez une tâche que l'agent doit accomplir...",
+    "run": "Courir",
     "pause": "Pause",
-    "resume": "Resume",
+    "resume": "CV",
     "cancel": "Cancel",
-    "new_task": "New Task",
-    "final_answer": "Final Answer",
-    "upgrade_required": "AI Agent is available on Personal and above plans.",
+    "new_task": "Nouvelle tâche",
+    "final_answer": "Réponse finale",
+    "upgrade_required": "AI Agent est disponible sur les forfaits personnels et supérieurs.",
     "mode": {
-      "react": "ReAct (Adaptive)",
-      "plan_execute": "Plan & Execute"
+      "react": "Réagir (adaptatif)",
+      "plan_execute": "Planifier et exécuter"
     },
     "history": {
-      "title": "Agent History",
-      "search_placeholder": "Search tasks...",
-      "no_results": "No tasks match your search.",
-      "empty": "No agent tasks yet. Start your first task!",
-      "steps": "steps"
+      "title": "Historique des agents",
+      "search_placeholder": "Rechercher des tâches...",
+      "no_results": "Aucune tâche ne correspond à votre recherche.",
+      "empty": "Aucune tâche d'agent pour l'instant. Commencez votre première tâche !",
+      "steps": "mesures"
     },
     "market": {
-      "title": "Agent Templates",
-      "subtitle": "Browse ready-to-use agent templates",
-      "search_placeholder": "Search templates...",
-      "no_results": "No templates match your search.",
-      "all_tags": "All",
-      "use": "Use Template"
+      "title": "Modèles d'agents",
+      "subtitle": "Parcourez les modèles d'agent prêts à l'emploi",
+      "search_placeholder": "Rechercher des modèles...",
+      "no_results": "Aucun modèle ne correspond à votre recherche.",
+      "all_tags": "Tous",
+      "use": "Utiliser le modèle"
     }
   },
   "ai": {
@@ -101,7 +99,8 @@
       "testing": "Test en cours...",
       "connected": "Connecté !",
       "failed": "Échec",
-      "test_failed": "Échec du test de connexion"
+      "test_failed": "Échec du test de connexion",
+      "endpoint_id_placeholder": "Saisissez l'ID du point de terminaison d'inférence"
     },
     "providers": {
       "claude": "Anthropic Claude",
@@ -191,51 +190,99 @@
     },
     "sections": {
       "image_ai": "IA image",
-      "image_aihint": "Configurations du modèle de génération d'images IA."
+      "image_aihint": "Configurations du modèle de génération d'images IA.",
+      "session_ai": "IA de session",
+      "session_aihint": "Configurations du modèle de chat textuel.",
+      "realtime_voice_ai": "IA vocale de bout en bout",
+      "realtime_voice_aihint": "Configurations de conversation vocale en temps réel (plusieurs fournisseurs)."
     },
     "generating": "Génération…",
-    "not_configured": "Fournisseur IA non configuré"
+    "not_configured": "Fournisseur IA non configuré",
+    "model_short": {
+      "none": "Aucun modèle configuré",
+      "chat": "Chat",
+      "realtime": "RT Voix",
+      "image": "Image",
+      "speech": "Voice"
+    },
+    "voice": {
+      "record": "Enregistrer la voix",
+      "cancel": "Annuler la saisie vocale",
+      "commit": "Utiliser la transcription"
+    },
+    "realtime": {
+      "chat_model_group": "Modèles de discussion",
+      "realtime_model_group": "Modèles de bout en bout",
+      "image_model_group": "Génération d'images",
+      "speech_model_group": "Transcription vocale",
+      "add_model": "+ Ajouter un modèle vocal",
+      "no_models": "Aucun modèle vocal de bout en bout configuré",
+      "no_models_hint": "Ajoutez un modèle vocal en temps réel pour activer le chat vocal par bouton d'onde.",
+      "missing_config": "Aucun modèle vocal de bout en bout disponible. Configurez-en un dans Paramètres -> Chat.",
+      "start_voice": "Démarrer une conversation vocale",
+      "stop_voice": "Arrêter la conversation vocale",
+      "live": "En direct",
+      "providers": {
+        "gemini-live": "Gémeaux en direct",
+        "openai-realtime": "OpenAI en temps réel",
+        "doubao-realtime": "Doubao en temps réel",
+        "qwen-realtime": "Qwen en temps réel",
+        "stepfun-realtime": "StepFun en temps réel",
+        "tongyi-bailing": "Tongyi écope",
+        "amazon-nova-sonic": "Amazon Nova Sonic"
+      },
+      "config": {
+        "access_key_id": "ID de clé d'accès",
+        "secret_access_key": "Clé d'accès secrète",
+        "session_token": "Jeton de session",
+        "doubao_app_id": "ID d'application (X-Api-App-ID)",
+        "doubao_access_key": "Jeton d'accès (X-Api-Access-Key)",
+        "doubao_secret_key": "Clé d'application (X-Api-App-Key)",
+        "voice": "Voix",
+        "region": "Région",
+        "optional": "Facultatif",
+        "secret_placeholder": "Entrez la clé secrète",
+        "missing_credential": "Veuillez d'abord fournir la clé API ou les informations d'identification requises."
+      }
+    }
   },
   "ai_budget": {
-    "__mt": true,
-    "title": "AI Budget",
-    "description": "Set monthly and per-call spending limits for AI requests routed through Moraya.",
-    "monthly_spend": "Monthly Spend",
-    "monthly_limit": "Monthly Limit",
-    "per_call_limit": "Per-Call Limit",
-    "hard_stop": "Hard Stop",
-    "hard_stop_hint": "Block all AI calls once the monthly limit is reached.",
-    "zero_unlimited": "0 = unlimited",
-    "limit_reached": "Monthly budget limit reached. AI calls are blocked.",
-    "near_limit": "You have used {pct}% of your monthly budget.",
-    "saved": "Settings saved.",
-    "save": "Save",
-    "reset": "Reset Month",
-    "how_it_works": "How It Works",
-    "info1": "The router tracks estimated and actual costs per API call.",
-    "info2": "Hard stop blocks new calls; soft limit shows warnings only.",
-    "info3": "Monthly counters reset on the 1st of each month automatically."
+    "title": "Budget IA",
+    "description": "Définissez des limites de dépenses mensuelles et par appel pour les demandes d'IA acheminées via Moraya.",
+    "monthly_spend": "Dépense mensuelle",
+    "monthly_limit": "Limite mensuelle",
+    "per_call_limit": "Limite par appel",
+    "hard_stop": "Arrêt dur",
+    "hard_stop_hint": "Bloquez tous les appels AI une fois la limite mensuelle atteinte.",
+    "zero_unlimited": "0 = illimité",
+    "limit_reached": "Limite budgétaire mensuelle atteinte. Les appels IA sont bloqués.",
+    "near_limit": "Vous avez utilisé {pct} % de votre budget mensuel.",
+    "saved": "Paramètres enregistrés.",
+    "save": "Sauvegarder",
+    "reset": "Réinitialiser le mois",
+    "how_it_works": "Comment ça marche",
+    "info1": "Le routeur suit les coûts estimés et réels par appel API.",
+    "info2": "L'arrêt brutal bloque les nouveaux appels ; soft limit shows warnings only.",
+    "info3": "Les compteurs mensuels se réinitialisent automatiquement le 1er de chaque mois."
   },
   "ai_history": {
-    "__mt": true,
-    "title": "AI Call History",
-    "total_calls": "Total Calls",
-    "month_cost": "This Month",
-    "success_rate": "Success Rate",
-    "tab_list": "Calls",
-    "tab_provider": "By Provider",
-    "tab_daily": "By Day",
-    "no_records": "No call records yet.",
-    "failed": "Failed",
-    "provider": "Provider",
-    "calls": "Calls",
-    "cost": "Cost",
-    "share": "Share"
+    "title": "Historique des appels IA",
+    "total_calls": "Total des appels",
+    "month_cost": "Ce mois-ci",
+    "success_rate": "Taux de réussite",
+    "tab_list": "Appels",
+    "tab_provider": "Par fournisseur",
+    "tab_daily": "De jour",
+    "no_records": "Aucun enregistrement d'appel pour l'instant.",
+    "failed": "Échoué",
+    "provider": "Fournisseur",
+    "calls": "Appels",
+    "cost": "Coût",
+    "share": "Partager"
   },
   "app": {
-    "__mt": true,
-    "name": "Moraya Web",
-    "tagline": "Your AI, your data, your cloud."
+    "name": "Web Moraya",
+    "tagline": "Votre IA, vos données, votre cloud."
   },
   "audit": {
     "report_title": "Document Audit Report: {filename}",
@@ -279,11 +326,10 @@
     "loading": "Loading audit log…"
   },
   "auth": {
-    "__mt": true,
-    "login": "Sign in with Picora",
-    "logout": "Sign out",
+    "login": "Connectez-vous avec Picora",
+    "logout": "se déconnecter",
     "logging_in": "Signing in...",
-    "login_title": "Welcome to Moraya Web",
+    "login_title": "Bienvenue sur MorayaWeb",
     "login_subtitle": "Sign in with your Picora account to access your knowledge base.",
     "continue_offline": "Continue offline (no sync)",
     "connect_picora": "Connect Picora to sync",
@@ -292,7 +338,6 @@
     "local_only_notice": "You are working locally. Notes are stored on this device only."
   },
   "billing": {
-    "__mt": true,
     "title": "Billing",
     "current_plan": "Current Plan",
     "upgrade_title": "Upgrade Your Plan",
@@ -347,7 +392,8 @@
     "currency_usd": "USD ($)",
     "currency_cny": "CNY (¥)",
     "currency_eur": "EUR (€)",
-    "change_currency": "Change currency"
+    "change_currency": "Change currency",
+    "upgrade": "Upgrade"
   },
   "cloud_picker": {
     "title_image": "Insérer une image cloud",
@@ -396,7 +442,6 @@
     "no_results": "Aucun résultat trouvé"
   },
   "commands": {
-    "__mt": true,
     "palette_title": "Command Palette",
     "placeholder": "Search commands...",
     "no_results": "No commands found",
@@ -433,7 +478,6 @@
     "new": "Nouveau"
   },
   "compose": {
-    "__mt": true,
     "title": "Compose article",
     "start_over": "Start over",
     "stepper_label": "Compose stages",
@@ -463,9 +507,9 @@
       "long": "Long"
     },
     "article": {
-      "title": "Write the article",
-      "ready": "Ready to generate. Tap below to stream the article.",
-      "generate": "Generate article",
+      "title": "Écrivez l'article",
+      "ready": "Prêt à générer. Appuyez ci-dessous pour diffuser l'article.",
+      "generate": "Générer un article",
       "generating": "Streaming from the model…",
       "cancel": "Stop",
       "regenerate": "Regenerate",
@@ -513,7 +557,6 @@
     }
   },
   "conflict": {
-    "__mt": true,
     "title": "Conflict Detected",
     "description": "This note was edited on another device.",
     "keep_server": "Keep server version",
@@ -569,7 +612,6 @@
     "new_note": "New note"
   },
   "enterprise": {
-    "__mt": true,
     "hsm": {
       "title": "Hardware Security Module (HSM)",
       "subtitle": "Connect your HSM provider for FIPS 140-2 Level 3+ key operations",
@@ -604,28 +646,28 @@
       "org_list": "Organizations",
       "members": "Members",
       "cross_org_sharing": "Cross-Org Sharing",
-      "shares_to": "shares KBs to",
+      "shares_to": "partage des Ko avec",
       "kb_ids_placeholder": "kb-1, kb-2, ...",
-      "request_share": "Request Share"
+      "request_share": "Demander un partage"
     },
     "compliance": {
-      "title": "Compliance & Archiving",
-      "subtitle": "GDPR, HIPAA, SOC2, ISO 27001 compliance exports and WORM archiving",
+      "title": "Conformité et archivage",
+      "subtitle": "Exportations conformes aux normes RGPD, HIPAA, SOC2, ISO 27001 et archivage WORM",
       "upgrade_required": "Compliance archiving requires the Enterprise plan.",
       "tabs": {
-        "retention": "Retention",
-        "worm": "WORM",
-        "export": "Export"
+        "retention": "Rétention",
+        "worm": "VER",
+        "export": "Exporter"
       },
       "retention": {
-        "title": "7-Year Retention",
-        "hint": "Records are retained for 7 years and cannot be deleted during this period.",
-        "days_left": "days left",
-        "years": "years"
+        "title": "Rétention de 7 ans",
+        "hint": "Les enregistrements sont conservés pendant 7 ans et ne peuvent être supprimés pendant cette période.",
+        "days_left": "jours restants",
+        "years": "années"
       },
       "worm": {
-        "title": "WORM Records",
-        "description": "Write-Once-Read-Many records are immutable once created.",
+        "title": "Enregistrements WORM",
+        "description": "Les enregistrements Write-Once-Read-Many sont immuables une fois créés.",
         "immutable_label": "Immutable",
         "immutable_desc": "Records cannot be modified or deleted after creation.",
         "retention_years": "Retention Period"
@@ -680,7 +722,6 @@
     }
   },
   "entitlement": {
-    "__mt": true,
     "connect": "Connect",
     "personal": "Personal",
     "team": "Team",
@@ -727,7 +768,6 @@
     }
   },
   "explorer": {
-    "__mt": true,
     "title": "Files",
     "filter_placeholder": "Filter notes...",
     "empty": "No notes yet",
@@ -775,7 +815,6 @@
     }
   },
   "fulltext_search": {
-    "__mt": true,
     "title": "Hybrid Search",
     "placeholder": "Search notes, memories, workflows...",
     "clear": "Clear",
@@ -891,7 +930,6 @@
     "merge_blocked": "Repository is in the middle of a merge. Resolve conflicts first."
   },
   "image_ctx": {
-    "__mt": true,
     "copy_url": "Copy URL",
     "replace": "Replace Image",
     "edit_alt": "Edit Alt Text",
@@ -1492,7 +1530,6 @@
     }
   },
   "media": {
-    "__mt": true,
     "upload_title": "Media Uploads",
     "uploading": "Uploading",
     "upload_done": "Uploaded",
@@ -1503,19 +1540,18 @@
     "mime_not_allowed": "File type not supported",
     "quota_warn": "This note has over 10MB of media",
     "quota_hard": "Media quota exceeded (100MB per note)",
-    "quota_title": "Media Usage",
-    "paste_title": "Paste Media"
+    "quota_title": "Utilisation des médias",
+    "paste_title": "Coller le média"
   },
   "memory": {
-    "__mt": true,
-    "title": "Long-Term Memory",
-    "upgrade_required": "Long-term memory requires Personal plan or above.",
-    "health_title": "Memory Health",
-    "settings_title": "Memory Settings",
+    "title": "Mémoire à long terme",
+    "upgrade_required": "La mémoire à long terme nécessite un plan personnel ou supérieur.",
+    "health_title": "Santé de la mémoire",
+    "settings_title": "Paramètres de mémoire",
     "half_life_label": "Memory half-life",
     "half_life_never": "Never (no decay)",
     "days": "days",
-    "export_import": "Export / Import",
+    "export_import": "Exporter/Importer",
     "memories_title": "Memories",
     "search_placeholder": "Search memories...",
     "filter_all": "All types",
@@ -1623,7 +1659,6 @@
     "empty": "Diagramme vide"
   },
   "mfa": {
-    "__mt": true,
     "title": "Multi-Factor Authentication",
     "description": "Configure MFA requirements for team members.",
     "policy": "MFA Policy",
@@ -1636,7 +1671,6 @@
     "saved_success": "MFA settings saved."
   },
   "migration": {
-    "__mt": true,
     "title": "KB Migration",
     "subtitle": "Move your knowledge base to a different storage provider",
     "new_migration": "New Migration",
@@ -1666,7 +1700,6 @@
     "confirm_delete": "Delete this migration session?"
   },
   "mobile": {
-    "__mt": true,
     "tab": {
       "nav_label": "Primary navigation",
       "edit": "Edit",
@@ -1817,28 +1850,28 @@
           "summarize": "Summarizing",
           "translate": "Translating",
           "polish": "Polishing",
-          "tone": "Tone",
-          "length": "Length",
+          "tone": "Tonifier",
+          "length": "Longueur",
           "article": "Writing article",
-          "cover": "Cover image",
-          "target_lang": "Target language",
-          "dictate": "Dictation",
-          "structurize": "Structuring"
+          "cover": "Image de couverture",
+          "target_lang": "Langue cible",
+          "dictate": "Dictée",
+          "structurize": "Structuration"
         },
         "write-article": {
-          "name": "Write article + cover",
-          "desc": "Topic → tone/length → article → AI cover",
-          "ask_tone": "What tone should the article take?",
-          "ask_length": "How long should it be?",
-          "cover_hint": "Generating a cover image…"
+          "name": "Rédiger un article + couverture",
+          "desc": "Sujet → ton/longueur → article → couverture AI",
+          "ask_tone": "Quel ton doit prendre l’article ?",
+          "ask_length": "Combien de temps cela devrait-il durer ?",
+          "cover_hint": "Générer une image de couverture…"
         },
         "translate": {
-          "name": "Translate",
-          "desc": "Translate text into a target language",
-          "ask_lang": "Translate into which language?"
+          "name": "Traduire",
+          "desc": "Traduire du texte dans une langue cible",
+          "ask_lang": "Traduire dans quelle langue ?"
         },
         "voice-transcribe": {
-          "name": "Voice → note",
+          "name": "Voix → note",
           "desc": "Dictate, then structure into a note",
           "hint": "Tap done when you finish speaking."
         },
@@ -1914,7 +1947,8 @@
       "voice_local_badge": "On-device",
       "voice_permission_denied": "Microphone or speech permission denied. Enable it in Settings to use voice.",
       "voice_start_failed": "Could not start voice input.",
-      "voice_speak_failed": "Could not read this message aloud."
+      "voice_speak_failed": "Could not read this message aloud.",
+      "delete": "Delete"
     },
     "files": {
       "title": "Knowledge Base",
@@ -1944,7 +1978,6 @@
     }
   },
   "notifications": {
-    "__mt": true,
     "title": "Push Notifications",
     "subtitle": "Receive alerts when your AI tasks finish or collaborators @ you.",
     "unsupported": "This browser does not support push notifications.",
@@ -1953,7 +1986,7 @@
     "denied_hint": "Open your browser settings to re-enable notifications.",
     "enable": "Enable",
     "disable": "Disable",
-    "no_token": "Failed to obtain a device token.",
+    "no_token": "Échec de l'obtention d'un jeton d'appareil.",
     "device_registered": "This device is registered:",
     "registered_devices": "Registered devices",
     "no_devices": "No devices registered yet.",
@@ -1969,10 +2002,18 @@
     "registered_at": "Registered {date}",
     "last_seen": "Last seen {date}",
     "error_register": "Could not register this device.",
-    "error_list": "Could not load device list."
+    "error_list": "Could not load device list.",
+    "recent": "Recent notifications"
+  },
+  "ocr": {
+    "capture_button": "Capture & extract text",
+    "capture_short": "Capturer",
+    "recognizing": "Recognizing text…",
+    "empty_result": "No text detected",
+    "failed": "Échec de la ROC",
+    "engine_unavailable": "OCR non disponible sur cet appareil"
   },
   "offline": {
-    "__mt": true,
     "cache_enabled": "Offline cache enabled",
     "cache_disabled": "Offline cache disabled",
     "cache_size": "{size} cached",
@@ -1991,19 +2032,17 @@
     "collapse": "Collapse"
   },
   "perf": {
-    "__mt": true,
     "memory_warning": "High memory usage detected ({percent}%)",
-    "memory_critical": "Critical memory usage ({percent}%)",
-    "memory_trend_growing": "Memory growing",
-    "memory_trend_stable": "Memory stable",
-    "memory_trend_shrinking": "Memory shrinking",
+    "memory_critical": "Utilisation critique de la mémoire ({percent} %)",
+    "memory_trend_growing": "Mémoire croissante",
+    "memory_trend_stable": "Mémoire stable",
+    "memory_trend_shrinking": "Réduction de la mémoire",
     "vitals_score": "Performance score: {score}",
     "vitals_good": "Good",
     "vitals_needs_improvement": "Needs improvement",
     "vitals_poor": "Poor"
   },
   "permissions": {
-    "__mt": true,
     "paste_title": "Allow Clipboard Access?",
     "paste_desc": "Moraya wants to read image data from your clipboard. This is used only when you paste an image.",
     "allow_once": "Allow Once",
@@ -2156,7 +2195,6 @@
     "seo_no_provider": "Aucun fournisseur IA configuré. Veuillez en configurer un dans les paramètres."
   },
   "pwa": {
-    "__mt": true,
     "install_prompt": "Install Moraya Web for a better experience.",
     "install": "Install",
     "dismiss": "Not now",
@@ -2164,7 +2202,6 @@
     "refresh": "Refresh"
   },
   "quickopen": {
-    "__mt": true,
     "title": "Quick Open",
     "placeholder": "Search notes...",
     "no_results": "No notes found",
@@ -2172,7 +2209,6 @@
     "hint_cmd_enter": "⌘↵ Open in new tab"
   },
   "rag": {
-    "__mt": true,
     "title": "AI Knowledge Search (RAG)",
     "mode_label": "Search Mode",
     "mode_disabled": "Disabled",
@@ -2190,9 +2226,9 @@
     "sources_count": "{n} note excerpts",
     "jump_to_source": "Jump to note →",
     "no_sources": "No sources",
-    "server_mode_warning": "Server mode lets Moraya temporarily decrypt your notes for indexing. Requires Cloud KMS.",
-    "model_version": "Model version",
-    "upgrade_for_cross_kb": "Upgrade to Personal to search across all your knowledge bases."
+    "server_mode_warning": "Le mode serveur permet à Moraya de décrypter temporairement vos notes pour les indexer. Nécessite Cloud KMS.",
+    "model_version": "Version du modèle",
+    "upgrade_for_cross_kb": "Passez à Personnel pour effectuer une recherche dans toutes vos bases de connaissances."
   },
   "review": {
     "panel_title": "Révisions",
@@ -2282,7 +2318,6 @@
     "invalid_regex": "Invalid regular expression"
   },
   "security": {
-    "__mt": true,
     "title": "Security",
     "encryption_mode_label": "Encryption Mode",
     "mode_none": "None",
@@ -2291,11 +2326,11 @@
     "setup_title": "Set Up E2E Encryption",
     "setup_subtitle": "Your notes will be encrypted before leaving your device. Moraya cannot read your notes.",
     "passphrase_label": "Passphrase",
-    "passphrase_confirm_label": "Confirm Passphrase",
+    "passphrase_confirm_label": "Confirmer la phrase secrète",
     "passphrase_strength_weak": "Too weak",
-    "passphrase_strength_fair": "Fair",
-    "passphrase_strength_strong": "Strong",
-    "passphrase_strength_very_strong": "Very strong",
+    "passphrase_strength_fair": "Équitable",
+    "passphrase_strength_strong": "Fort",
+    "passphrase_strength_very_strong": "Très fort",
     "passphrase_min_length": "Minimum 12 characters",
     "passphrase_mismatch": "Passphrases do not match",
     "passphrase_too_weak": "Passphrase is too weak. Use a longer, more complex phrase.",
@@ -2316,13 +2351,13 @@
     "migrate_subtitle": "Your notes will be re-encrypted using your cloud KMS. Moraya can use your KMS to assist with AI features.",
     "migrate_warning": "This is a one-way migration. You cannot revert to E2E mode without exporting and re-importing all data.",
     "migrate_confirm": "I understand and want to proceed",
-    "migrate_progress": "Migrating {completed}/{total} notes...",
+    "migrate_progress": "Migration des notes {completed}/{total}...",
     "migrate_done": "Migration complete!",
-    "migrate_failed": "Migration failed. Your original data is unchanged.",
-    "kms_provider_label": "KMS Provider",
-    "kms_key_arn_label": "Key ARN / Key ID",
-    "kms_role_arn_label": "Role ARN (for AssumeRole)",
-    "kms_verify": "Verify KMS Connection",
+    "migrate_failed": "La migration a échoué. Vos données d'origine sont inchangées.",
+    "kms_provider_label": "Fournisseur KMS",
+    "kms_key_arn_label": "ARN de clé/ID de clé",
+    "kms_role_arn_label": "ARN de rôle (pour AssumeRole)",
+    "kms_verify": "Vérifier la connexion KMS",
     "kms_verified": "KMS connection verified",
     "kms_verify_failed": "KMS connection failed",
     "back": "Back",
@@ -2336,10 +2371,20 @@
     "last_unlock": "Last unlocked: {time}",
     "use_recovery_code": "Use recovery code instead",
     "recovery_unlock_title": "Recover Access",
-    "recovery_unlock_subtitle": "Enter your 12-word recovery code to regain access.",
+    "recovery_unlock_subtitle": "Entrez votre code de récupération de 12 mots pour retrouver l'accès.",
     "recovery_code_input": "Recovery Code (12 words, space-separated)",
-    "recovery_unlock_button": "Recover",
-    "set_new_passphrase": "Set New Passphrase"
+    "recovery_unlock_button": "Récupérer",
+    "set_new_passphrase": "Définir une nouvelle phrase secrète",
+    "biometric_unlock_title": "Débloquez Moraya",
+    "biometric_unlock_subtitle": "Authentifiez-vous pour accéder à vos données",
+    "biometric_failed": "L'authentification a échoué",
+    "unlock_with_biometric": "Unlock with biometric",
+    "unlock_with_face_id": "Unlock with Face ID",
+    "unlock_with_touch_id": "Unlock with Touch ID",
+    "unlock_with_fingerprint": "Unlock with fingerprint",
+    "unlock_with_iris": "Unlock with iris scan",
+    "unlock_with_passkey": "Unlock with passkey",
+    "use_passphrase_fallback": "Use passphrase instead"
   },
   "seo": {
     "title": "Optimisation SEO",
@@ -2359,7 +2404,6 @@
     "step_description": "Générer le titre, l'extrait et les étiquettes"
   },
   "sessions": {
-    "__mt": true,
     "title": "Active Sessions",
     "active_sessions": "Active Sessions",
     "anomaly_alerts": "Security Alerts",
@@ -2372,7 +2416,7 @@
     "no": "Cancel",
     "dismiss": "Dismiss",
     "just_now": "Just now",
-    "hours_ago": "h ago",
+    "hours_ago": "il y a h",
     "days_ago": "d ago"
   },
   "settings": {
@@ -2578,7 +2622,9 @@
       }
     },
     "tab_desc": {
-      "export": "Configurer l'export PDF — taille de page, marges, polices et options de contenu."
+      "export": "Configurer l'export PDF — taille de page, marges, polices et options de contenu.",
+      "image": "Configure cloud storage providers for image uploads.",
+      "publish": "Configure publishing destinations for your documents. Push Markdown files to GitHub Pages, generate RSS feeds, or post to custom API endpoints."
     },
     "export": {
       "paper_size": "Format de papier",
@@ -3009,19 +3055,18 @@
     "local_workspace": "Local"
   },
   "sso": {
-    "__mt": true,
     "title": "Single Sign-On",
     "description": "Configure SSO to let team members authenticate via your identity provider.",
     "enable_sso": "Enable SSO",
-    "require_sso": "Require SSO for all members",
+    "require_sso": "Exiger l'authentification unique pour tous les membres",
     "oidc": "OIDC / OAuth 2.0",
     "saml": "SAML 2.0",
     "provider": "Identity Provider",
-    "custom_provider": "Custom",
-    "issuer": "Issuer URL",
-    "client_id": "Client ID",
-    "client_secret": "Client Secret",
-    "scopes": "Scopes",
+    "custom_provider": "Coutume",
+    "issuer": "URL de l'émetteur",
+    "client_id": "Identifiant client",
+    "client_secret": "Secret client",
+    "scopes": "Portées",
     "idp_metadata_url": "IdP Metadata URL",
     "sp_entity_id": "SP Entity ID",
     "sp_acs_url": "ACS URL",
@@ -3047,7 +3092,6 @@
     "ai_tooltip": "IA"
   },
   "storage": {
-    "__mt": true,
     "title": "Storage",
     "connected_providers": "Connected Providers",
     "connect_provider": "Connect Provider",
@@ -3074,7 +3118,7 @@
     "access_key_label": "Access Key ID",
     "secret_key_label": "Secret Access Key",
     "role_arn_label": "Role ARN (for STS)",
-    "account_id_label": "Account ID",
+    "account_id_label": "Identifiant du compte",
     "key_id_label": "Key ID",
     "application_key_label": "Application Key",
     "binding_label": "Display Name",
@@ -3137,7 +3181,6 @@
     "dirty_dot": "Unsaved changes"
   },
   "team": {
-    "__mt": true,
     "title": "Team Knowledge Bases",
     "create": "New Team KB",
     "no_kbs": "You don't have any team knowledge bases yet.",
@@ -3589,7 +3632,6 @@
     }
   },
   "theme": {
-    "__mt": true,
     "title": "Appearance",
     "mode_title": "Color Mode",
     "mode_light": "Light",
@@ -3640,7 +3682,34 @@
     "summarize_prompt": "Veuillez générer un résumé de réunion à partir de la transcription suivante. Identifiez les points de discussion clés, les décisions prises et les actions à mener. Formatez en Markdown.",
     "no_speech_config": "Aucun fournisseur de reconnaissance vocale configuré. Veuillez en ajouter un dans Paramètres → Voix.",
     "no_speech_config_hint": "Allez dans Paramètres → Voix pour ajouter un fournisseur de reconnaissance vocale (ex. Deepgram).",
-    "go_to_voice_settings": "Ouvrir les paramètres vocaux"
+    "go_to_voice_settings": "Ouvrir les paramètres vocaux",
+    "mute_mic": "Mute mic",
+    "unmute_mic": "Unmute mic",
+    "source_label": "Source",
+    "source_mic": "Mic",
+    "source_system": "System",
+    "source_mixed": "Mixed",
+    "mode_label": "Mode",
+    "mode_transcription": "Transcription",
+    "mode_interview": "Interview",
+    "summarize_interview": "Summarize Interview",
+    "to_document_append": "Append to Current Document",
+    "interview_summarize_prompt": "Please summarize the following interview transcript. Extract key questions, concise answer points, and optimization suggestions. Format as Markdown.",
+    "interview_no_aiconfig": "No chat AI model configured. Please add one in Settings → AI.",
+    "interview_empty_answer": "AI returned an empty answer.",
+    "interview_answer_pending": "Analyzing latest context...",
+    "interview_answer_failed": "Failed to generate interview answer.",
+    "interview_system_share_hint": "Interview mode follows the current audio source setting; screen sharing is requested only when System source is selected.",
+    "interview_native_system_hint": "Interview mode follows the current audio source setting. On macOS, System and Mixed source use native system-audio capture instead of the screen-sharing dialog.",
+    "system_source_restart_hint": "Recording was stopped after switching to System/Mixed source. Click Start again to re-authorize and continue.",
+    "system_source_click_start_hint": "L'autorisation de la source système doit être déclenchée à partir du bouton Démarrer. Veuillez cliquer à nouveau sur Démarrer.",
+    "system_source_permission_denied": "L'autorisation de la source système a été refusée. Autorisez le partage d'écran et activez le partage audio, puis réessayez.",
+    "system_source_no_audio_track_hint": "Aucune piste audio du système n'a été capturée. Dans la boîte de dialogue de partage, activez le partage audio et préférez Écran entier ; si votre plate-forme ne dispose pas d'option de partage audio, utilisez une source micro ou mixte.",
+    "system_source_unsupported_hint": "This environment does not expose a system-audio track in the share dialog. Source has auto-fallen back to Mic. For true system audio, use a native loopback capture path.",
+    "system_source_native_hint": "macOS native system-audio capture is active. No screen-sharing dialog is required for System source.",
+    "system_source_native_mixed_hint": "macOS native system-audio capture is active. Mixed source combines native system audio with microphone input in-app.",
+    "system_source_native_permission_denied": "macOS denied native system-audio capture. Allow the app in System Settings → Privacy & Security, then try again.",
+    "system_source_runtime_incompatible": "This macOS runtime is not fully compatible with native system-audio capture. Update macOS or switch to Mic source."
   },
   "update": {
     "title": "Informations de version",
@@ -3660,14 +3729,13 @@
     "new_version_available": "Nouvelle version disponible ! Cliquez pour mettre à jour."
   },
   "voice": {
-    "__mt": true,
     "title": "Voice Capture",
     "provider": "Provider",
     "language": "Language",
     "doubao": "Doubao (Realtime)",
-    "start": "Record",
-    "stop": "Stop",
-    "processing": "Processing...",
+    "start": "Enregistrer",
+    "stop": "Arrêt",
+    "processing": "Traitement...",
     "transcript": "Transcript",
     "words": "words",
     "structurize": "AI Structurize",
@@ -3682,12 +3750,16 @@
     "history": {
       "title": "Voice History",
       "new_capture": "+ New Recording",
-      "search_placeholder": "Search transcripts...",
-      "no_results": "No transcripts match your search.",
-      "empty": "No recordings yet. Start capturing your voice!",
+      "search_placeholder": "Rechercher des transcriptions...",
+      "no_results": "Aucune transcription ne correspond à votre recherche.",
+      "empty": "Aucun enregistrement pour l'instant. Commencez à capturer votre voix !",
       "reprocess": "Re-process",
-      "delete": "Delete"
-    }
+      "delete": "Supprimer"
+    },
+    "hold_to_record": "Hold to record",
+    "release_to_send": "Release to send",
+    "cancel": "Slide to cancel",
+    "permission_denied": "Microphone permission denied"
   },
   "welcome": {
     "title": "Bienvenue dans Moraya",
