@@ -238,6 +238,12 @@ pnpm test        # vitest (217+ tests)
 pnpm typecheck   # tsc --noEmit
 ```
 
+## npm publish
+
+```bash
+npm login 
+npm publish --access public 
+```
 ---
 
 ## Production users
