@@ -82,7 +82,7 @@
     "type": "git",
     "url": "git+https://github.com/zouwei/moraya-core.git"
   },
-  "license": "PolyForm-Internal-Use-1.0.0",
+  "license": "GPL-3.0-only",
   "sideEffects": [
     "./dist/style.css"
   ],

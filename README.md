@@ -253,4 +253,11 @@ Built something with `@moraya/core`? Open a PR to add yourself.
 
 ## License
 
-See [LICENSE](./LICENSE).
+`@moraya/core` is **dual-licensed**:
+
+- **[GNU GPL v3.0](./LICENSE)** — free for use in GPL-compatible open-source projects. Any product that incorporates `@moraya/core` (npm dependency, static/dynamic linking, bundling) must also be GPL-3.0 and publish its full source code.
+- **Commercial license** — required for closed-source, proprietary, non-GPL-compatible open source (MIT/Apache), or hosted SaaS use. Contact **huzougege@gmail.com**.
+
+See [LICENSING.md](./LICENSING.md) for full terms and a decision table.
+
+Copyright © 2026 zouwei.
