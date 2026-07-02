@@ -1,6 +1,6 @@
 {
   "name": "@moraya/core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Shared markdown editor core for Moraya desktop and Moraya Web. ProseMirror schema, markdown-it parser, prosemirror-markdown serializer, plugins, and editor lifecycle factories. Pure ESM, host-agnostic, dependency-injected.",
   "type": "module",
   "main": "./dist/index.js",
@@ -35,6 +35,7 @@
       "import": "./dist/plugins/*.js",
       "types": "./dist/plugins/*.d.ts"
     },
+    "./plugins/*.css": "./dist/plugins/*.css",
     "./adapters/*": {
       "import": "./dist/adapters/*.js",
       "types": "./dist/adapters/*.d.ts"
@@ -84,7 +85,8 @@
   },
   "license": "GPL-3.0-only",
   "sideEffects": [
-    "./dist/style.css"
+    "./dist/style.css",
+    "./dist/plugins/*.css"
   ],
   "scripts": {
     "build": "tsup",
@@ -95,6 +97,7 @@
     "lint": "eslint src --ext .ts",
     "spdx:check": "node scripts/check-spdx.mjs",
     "spdx:fix": "node scripts/check-spdx.mjs --fix",
+    "version:bump": "node scripts/bump-version.mjs",
     "prepublishOnly": "npm run spdx:check && npm run build && npm run test"
   },
   "peerDependencies": {

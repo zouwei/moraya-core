@@ -238,12 +238,39 @@ pnpm test        # vitest (217+ tests)
 pnpm typecheck   # tsc --noEmit
 ```
 
-## npm publish
+## 版本发布
+
+### 语义化升版
 
 ```bash
-npm login 
-npm publish --access public 
+pnpm version:bump patch         # 0.5.1 → 0.5.2
+pnpm version:bump minor         # 0.5.1 → 0.6.0
+pnpm version:bump major         # 0.5.1 → 1.0.0
 ```
+
+### 指定版本号
+
+```bash
+pnpm version:bump 0.7.0         # 直接设为 0.7.0（也支持 0.7.0-beta.1 等预发布 tag）
+```
+
+### 脚本执行后按提示走完发布链
+
+```bash
+git add package.json && git commit -m "chore: release v0.5.2"
+git tag v0.5.2
+git push origin main --tags     # 推送代码 + tag
+npm publish --access public     # prepublishOnly 会先跑 spdx:check + build + test；
+                                #   scoped 包必须带 --access public，否则 402
+```
+
+发布后同步升级下游 consumer 的 `package.json`：
+
+- moraya (PC) → `"@moraya/core": "^0.5.2"`
+- moraya-web  → `"@moraya/core": "^0.5.2"`
+
+`pnpm install` 会在每个下游仓库自动拉新包 + 更新 lockfile。
+
 ---
 
 ## Production users
