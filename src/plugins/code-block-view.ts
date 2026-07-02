@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * CodeBlock NodeView — toolbar with language label, language picker, copy button,
  * mermaid preview, and renderer-plugin preview.

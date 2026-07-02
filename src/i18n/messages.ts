@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Pure message helpers — flatten / interpolate / merge / lookup. No side
  * effects, no I/O, no global state. Used by `index.ts` to back the active

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Minimal pub/sub primitive compatible with Svelte's `Readable<T>` contract
  * (`{ subscribe(run) => unsub }`) — without importing svelte/store.

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Roundtrip CI gate (v0.60.0-pre §4.2):
  *   serialize(parse(serialize(parse(x)))) === serialize(parse(x))

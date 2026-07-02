@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 import type { AIProvider } from '../types'
 import type { AIDriver } from './types'
 import { claudeDriver } from './claude'

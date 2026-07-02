@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 import { PROVIDER_BASE_URLS } from '../catalog'
 import type { AIProviderConfig } from '../types'
 

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Chat orchestrator — composes a per-provider driver with a platform transport.
  * Platform-agnostic: no fetch, no Tauri. Streaming uses a small callback→async

@@ -70,3 +70,9 @@ jobs:
       # path rename, not a refactor.
       - name: Gate 5 — i18n isolation (no svelte / prosemirror / cross-module imports)
         run: node scripts/i18n-isolation.mjs
+
+      # v0.5.0 — every source file must carry an SPDX identifier so the
+      # GPL-3.0 / commercial dual license is unambiguous even when a single
+      # file is copied out of the repo. Auto-fixable via `pnpm spdx:fix`.
+      - name: Gate 6 — SPDX license headers on all source files
+        run: node scripts/check-spdx.mjs

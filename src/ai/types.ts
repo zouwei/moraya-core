@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Shared AI provider types — baselined on the Moraya desktop app, reconciled
  * with the web/mobile app. Platform-agnostic: no host/native imports, no Node

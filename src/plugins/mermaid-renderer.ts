@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Mermaid renderer — lazy-loads the mermaid library and provides a render API.
  *

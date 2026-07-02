@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 import type { AIRequest, AIResponse, ChatMessage, ToolCallRequest } from '../types'
 import type { TransportRequest } from '../transport'
 import type { AIDriver, StreamFold } from './types'

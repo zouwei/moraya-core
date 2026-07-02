@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Shared image generation — the OpenAI-compatible `/images/generations` path
  * used by every Moraya image provider that speaks that protocol (web's

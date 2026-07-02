@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Tool formatting + response parsing, shared by all consumers.
  * Ported verbatim from the desktop app's tool-bridge (MCP-specific glue like

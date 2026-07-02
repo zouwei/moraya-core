@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Public API contract & error handling (v0.60.0-pre §3.2 + §4.5).
  */

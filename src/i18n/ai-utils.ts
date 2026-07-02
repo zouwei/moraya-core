@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * AI-prompt helpers. Originally lived in `moraya/src/lib/i18n/i18n.ts` — used
  * when an AI conversation runs in a locale different from the active UI

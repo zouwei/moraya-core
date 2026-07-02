@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Provider catalog — default models, base URLs, labels, id aliases.
  * Baselined on the desktop app. Pure data; no host imports.

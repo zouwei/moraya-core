@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   loadBundle,

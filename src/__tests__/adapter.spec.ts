@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 import { describe, test, expect, vi } from 'vitest'
 import { BrowserMediaResolver } from '../adapters/browser-media-resolver'
 

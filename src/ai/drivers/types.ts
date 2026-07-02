@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /** Per-provider driver contract. Drivers are PURE: build a request (no secret)
  *  and parse responses/streams. */
 import type { AIProviderConfig, AIRequest, AIResponse, ToolCallRequest, AIUsage } from '../types'

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Voice/STT + realtime (端到端) provider TYPES + catalogs — shared so the
  * provider definitions live in one place. NOTE: the functional transports

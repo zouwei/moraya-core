@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Locale detection helpers. Pure / framework-agnostic — uses only standard
  * browser APIs (`navigator.language`) with defensive guards for SSR / Node /

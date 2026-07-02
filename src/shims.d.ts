@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Module shims for markdown-it plugins lacking TypeScript declarations.
  * Both ship as plain JS without bundled .d.ts; we treat them as

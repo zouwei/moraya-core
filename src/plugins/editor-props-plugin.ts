@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Unified editor props plugin — merges 5 separate ProseMirror plugins into one.
  *

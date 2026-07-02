@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 zouwei
+
 /**
  * Plugin order fingerprint snapshot (v0.60.0-pre §1.2.2).
  *
