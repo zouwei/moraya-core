@@ -1,0 +1,254 @@
+/*
+ * @moraya/core — code-block plugin styles.
+ *
+ * Companion CSS for `src/plugins/code-block-view.ts` (the `code_block`
+ * NodeView factory wired into `createEditor` via `setup.ts`). Consumers
+ * (moraya PC, moraya-web, external embeds) MUST import this file for the
+ * NodeView to render correctly — the JS creates the DOM elements
+ * (`.code-block-wrapper`, `.code-block-toolbar`, `.code-lang-label`,
+ * `.code-copy-btn`, `.code-lang-picker`, `.code-lang-search-input`, …) but
+ * relies on this stylesheet for their visual language.
+ *
+ *     import '@moraya/core/plugins/code-block.css'
+ *
+ * Symptom when this file is missing: the language picker gets created with
+ * inline `position: fixed / top / left` correctly, but no background /
+ * border / width — so it floats invisibly on top of the document, and the
+ * search input + language list appear to bleed into the code block below.
+ * (This bit moraya-web on iOS Simulator in v0.4.x — see moraya-web's
+ * CLAUDE.md entry for the fix history.)
+ *
+ * Variable naming convention:
+ *   • Preferred (matches PC's editor.css): `--bg-*`, `--text-*`,
+ *     `--border-*`, `--accent-color`, `--font-*`, `--transition-fast`.
+ *   • Fallback (matches moraya-web's variables.css): `--color-bg-*`,
+ *     `--color-text-*`, `--color-border`, `--color-accent`, etc.
+ *   • Final fallback: hex literal, so the stylesheet works even on
+ *     consumers that haven't defined either naming scheme.
+ *
+ * The resolution `var(--PC, var(--WEB, HEX))` inline-repeats across every
+ * rule below — this is the price of hosting-agnostic CSS in a shared
+ * module, but it means one stylesheet works verbatim on all consumers.
+ */
+
+/* ── Wrapper around each code_block node ─────────────────────────────── */
+.moraya-editor .code-block-wrapper {
+  position: relative;
+  margin: 1em 0;
+  padding-top: 1.5rem;
+  background: var(--bg-secondary, var(--color-bg-secondary, #f5f5f5));
+  border-radius: 6px;
+}
+.moraya-editor .code-block-wrapper.ProseMirror-selectednode {
+  outline: 2px solid var(--accent-color, var(--color-accent, #6366f1));
+}
+.moraya-editor .code-block-wrapper.renderer-preview-mode,
+.moraya-editor .code-block-wrapper.mermaid-preview-mode {
+  background: transparent;
+  padding-top: 0;
+}
+
+/* ── Toolbar strip (language chip + copy button) ─────────────────────── */
+/* Hidden by default on hover-capable devices; revealed on hover / node
+   selection / when the language picker is open. */
+.moraya-editor .code-block-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.15rem 0.75rem;
+  font-size: var(--font-size-xs, 11px);
+  color: var(--text-muted, var(--color-text-muted, #888));
+  user-select: none;
+  border-radius: 6px 6px 0 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.moraya-editor .code-block-wrapper:hover .code-block-toolbar,
+.moraya-editor .code-block-wrapper.ProseMirror-selectednode .code-block-toolbar,
+.moraya-editor .code-block-wrapper.picker-open .code-block-toolbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Touch devices have no hover — the toolbar has to stay visible or users
+   can't reach the language chip. `(pointer: coarse)` scopes to
+   touchscreens without dragging desktop users along at narrow widths. */
+@media (pointer: coarse) {
+  .moraya-editor .code-block-toolbar {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Language chip (click → open picker) */
+.moraya-editor .code-lang-label {
+  cursor: pointer;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-family: var(--font-mono, var(--font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace));
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  transition: background 0.12s, color 0.12s;
+}
+.moraya-editor .code-lang-label:hover {
+  background: var(--bg-hover, var(--color-bg-hover, rgba(0,0,0,0.06)));
+  color: var(--text-primary, var(--color-text, #1a1a1a));
+}
+
+/* Copy button */
+.moraya-editor .code-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, var(--color-text-muted, #888));
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  transition: background 0.12s, color 0.12s;
+}
+.moraya-editor .code-copy-btn:hover {
+  background: var(--bg-hover, var(--color-bg-hover, rgba(0,0,0,0.06)));
+  color: var(--text-primary, var(--color-text, #1a1a1a));
+}
+.moraya-editor .code-copy-btn svg:last-child { display: none; }
+.moraya-editor .code-copy-btn.copied svg:first-child { display: none; }
+.moraya-editor .code-copy-btn.copied svg:last-child { display: block; }
+.moraya-editor .code-copy-btn.copied {
+  color: #22863a;
+  background: rgba(34, 134, 58, 0.12);
+}
+
+/* Right-side toolbar group (mermaid toggle + copy) */
+.moraya-editor .code-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+/* ── Language picker popup ───────────────────────────────────────────── */
+/* NOT scoped to `.moraya-editor` — the plugin appends this element to
+   `.editor-wrapper` or `document.body` (see code-block-view.ts:338), so
+   at runtime the picker lives OUTSIDE the ProseMirror subtree and any
+   `.moraya-editor` scope would miss it. */
+.code-lang-picker {
+  z-index: 9999;
+  background: var(--bg-primary, var(--color-bg, #ffffff));
+  border: 1px solid var(--border-color, var(--color-border, #e0e0e0));
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 200px;
+  max-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+.code-lang-search {
+  padding: 0.35rem;
+  border-bottom: 1px solid var(--border-light, var(--color-border, #e0e0e0));
+  flex-shrink: 0;
+}
+.code-lang-search-input {
+  width: 100%;
+  border: 1px solid var(--border-color, var(--color-border, #e0e0e0));
+  border-radius: 4px;
+  padding: 0.25rem 0.4rem;
+  font-size: var(--font-size-xs, 12px);
+  background: var(--bg-primary, var(--color-bg, #ffffff));
+  color: var(--text-primary, var(--color-text, #1a1a1a));
+  outline: none;
+  font-family: var(--font-sans, var(--font-family-sans, system-ui, sans-serif));
+}
+.code-lang-search-input:focus {
+  border-color: var(--accent-color, var(--color-accent, #6366f1));
+}
+.code-lang-list {
+  overflow-y: auto;
+  flex: 1;
+}
+.code-lang-group-label {
+  padding: 0.25rem 0.5rem;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted, var(--color-text-muted, #888));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.code-lang-divider {
+  height: 1px;
+  background: var(--border-light, var(--color-border, #e0e0e0));
+  margin: 0.15rem 0;
+}
+.code-lang-option {
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  font-size: var(--font-size-xs, 12px);
+  transition: background 0.12s;
+}
+.code-lang-option:hover {
+  background: var(--bg-hover, var(--color-bg-hover, rgba(0,0,0,0.06)));
+}
+.code-lang-option.selected {
+  color: var(--accent-color, var(--color-accent, #6366f1));
+  font-weight: 500;
+}
+.code-lang-empty {
+  padding: 0.5rem;
+  text-align: center;
+  font-size: var(--font-size-xs, 12px);
+  color: var(--text-muted, var(--color-text-muted, #888));
+}
+.code-lang-suggestion {
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  font-size: var(--font-size-xs, 12px);
+  color: var(--accent-color, var(--color-accent, #6366f1));
+  transition: background 0.12s;
+}
+.code-lang-suggestion:hover {
+  background: var(--bg-hover, var(--color-bg-hover, rgba(0,0,0,0.06)));
+}
+.code-lang-suggestion .suggestion-icon { font-size: 10px; margin-right: 2px; }
+.code-lang-suggestion .suggestion-hint {
+  color: var(--text-muted, var(--color-text-muted, #888));
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+/* ── Inner <pre> / <code> emitted by the NodeView ────────────────────── */
+/* Wrapper owns the background — pre stays transparent and just sets the
+   monospace font + line height for the code payload. */
+.moraya-editor .code-block-pre {
+  font-family: var(--font-mono, var(--font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace));
+  font-size: 0.9em;
+  line-height: 1.6;
+  padding: 0 1.2em 0.75em;
+  margin: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: transparent;
+  border-radius: 0;
+}
+.moraya-editor .code-block-code {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  color: inherit;
+}
+
+/* RTL — mirror the icon / hint margins in the language picker's "detected"
+   suggestion row. PC's editor.css used to own these; migrated here alongside
+   the LTR rules so RTL consumers pick them up automatically. */
+[dir="rtl"] .code-lang-suggestion .suggestion-icon {
+  margin-right: 0;
+  margin-left: 2px;
+}
+[dir="rtl"] .code-lang-suggestion .suggestion-hint {
+  margin-left: 0;
+  margin-right: 4px;
+}
