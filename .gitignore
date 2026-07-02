@@ -7,3 +7,6 @@ dist/
 coverage/
 .tsbuildinfo
 *.tsbuildinfo
+
+# pnpm pack / npm pack tarballs (local build artifacts)
+*.tgz
