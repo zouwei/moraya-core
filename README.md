@@ -240,36 +240,38 @@ pnpm typecheck   # tsc --noEmit
 
 ## 版本发布
 
-### 语义化升版
+### 一键发布（推荐）
+
+一条命令完成「升版 → 发布 npm → 等待 registry → 升级所有下游 consumer → 校验 → commit+push」，杜绝「忘发 core」「漏升某个平台」：
 
 ```bash
-pnpm version:bump patch         # 0.5.1 → 0.5.2
-pnpm version:bump minor         # 0.5.1 → 0.6.0
-pnpm version:bump major         # 0.5.1 → 1.0.0
+pnpm release patch              # 0.5.1 → 0.5.2，发布并联动升级 moraya + moraya-web
+pnpm release minor              # 0.5.1 → 0.6.0
+pnpm release 0.7.0              # 指定版本
+pnpm release patch --dry-run    # 打印完整计划，什么都不改（首次强烈建议先跑）
+pnpm release --skip-publish     # core 已在 npm，只联动升级 consumer（或补做失败的 consumer）
+pnpm release patch --yes        # 跳过确认提示
 ```
 
-### 指定版本号
+流程与安全性：
+
+- **前置检查**：core 必须在 `main` 且工作树干净（发布模式）；任何 consumer 若已有未提交的 `package.json`/`pnpm-lock.yaml` 改动则中止，避免误覆盖你正在改的依赖。
+- **消费者自动识别**：扫描 `../moraya`、`../moraya-web`、`../moraya-mobile`，只升级真正依赖 `@moraya/core` 的仓库（mobile 无直接依赖，自动跳过）。
+- **发布权威路径**：本地 `npm publish --access public`（`prepublishOnly` 先跑 spdx:check + build + test；若账号要求 OTP 会在终端提示输入）。
+- **registry 传播等待**：轮询 `npm view` 直到新版本可解析，再动 consumer。
+- **每个 consumer**：改依赖 → `pnpm install` → `pnpm check` → `check-core-dep release` 自校验 → commit + push。任一步失败即停，已发布的 core 不受影响，可 `--skip-publish` 重跑补齐剩余 consumer。
+
+### 底层命令（手动分步，一般用不到）
+
+`pnpm release` 内部复用下面这些；只在需要手动控制某一步时才单独调用：
 
 ```bash
-pnpm version:bump 0.7.0         # 直接设为 0.7.0（也支持 0.7.0-beta.1 等预发布 tag）
+pnpm version:bump patch         # 仅改 core package.json 版本号
+git add package.json && git commit -m "chore: release v0.5.2" && git tag v0.5.2
+git push origin main --tags
+npm publish --access public     # scoped 包必须带 --access public，否则 402
+# 然后到每个下游仓库把 "@moraya/core" 改成 "^0.5.2" 并 pnpm install + commit
 ```
-
-### 脚本执行后按提示走完发布链
-
-```bash
-git add package.json && git commit -m "chore: release v0.5.2"
-git tag v0.5.2
-git push origin main --tags     # 推送代码 + tag
-npm publish --access public     # prepublishOnly 会先跑 spdx:check + build + test；
-                                #   scoped 包必须带 --access public，否则 402
-```
-
-发布后同步升级下游 consumer 的 `package.json`：
-
-- moraya (PC) → `"@moraya/core": "^0.5.2"`
-- moraya-web  → `"@moraya/core": "^0.5.2"`
-
-`pnpm install` 会在每个下游仓库自动拉新包 + 更新 lockfile。
 
 ---
 

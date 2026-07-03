@@ -98,7 +98,8 @@
     "spdx:check": "node scripts/check-spdx.mjs",
     "spdx:fix": "node scripts/check-spdx.mjs --fix",
     "version:bump": "node scripts/bump-version.mjs",
-    "prepublishOnly": "npm run spdx:check && npm run build && npm run test"
+    "prepublishOnly": "npm run spdx:check && npm run build && npm run test",
+    "release": "node scripts/release-with-consumers.mjs"
   },
   "peerDependencies": {
     "highlight.js": "^11.11.0",
