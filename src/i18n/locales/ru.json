@@ -326,7 +326,7 @@
     "loading": "Loading audit log…"
   },
   "auth": {
-    "login": "Войти с помощью Picora",
+    "login": "Войти с помощью {brand}",
     "logout": "выход",
     "logging_in": "Signing in...",
     "login_title": "Добро пожаловать в сеть Морайя",

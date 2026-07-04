@@ -326,7 +326,7 @@
     "loading": "Loading audit log…"
   },
   "auth": {
-    "login": "Sign in with Picora",
+    "login": "{brand} でサインイン",
     "logout": "サインアウト",
     "logging_in": "サインイン中...",
     "login_title": "Welcome to Moraya Web",

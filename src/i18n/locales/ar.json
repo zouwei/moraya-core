@@ -326,7 +326,7 @@
     "loading": "Loading audit log…"
   },
   "auth": {
-    "login": "تسجيل الدخول مع بيكورا",
+    "login": "تسجيل الدخول مع {brand}",
     "logout": "تسجيل الخروج",
     "logging_in": "تسجيل الدخول...",
     "login_title": "مرحبا بكم في مورايا ويب",

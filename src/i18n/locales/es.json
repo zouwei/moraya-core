@@ -326,7 +326,7 @@
     "loading": "Loading audit log…"
   },
   "auth": {
-    "login": "Iniciar sesión con Picora",
+    "login": "Iniciar sesión con {brand}",
     "logout": "Sign out",
     "logging_in": "Iniciando sesión...",
     "login_title": "Bienvenidos a Moraya Web",

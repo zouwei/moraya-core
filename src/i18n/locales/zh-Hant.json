@@ -326,7 +326,7 @@
     "loading": "Loading audit log…"
   },
   "auth": {
-    "login": "用 Picora 賬號登入",
+    "login": "用 {brand} 賬號登入",
     "logout": "退出登入",
     "logging_in": "登入中...",
     "login_title": "歡迎使用 Moraya Web",

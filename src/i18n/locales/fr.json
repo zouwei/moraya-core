@@ -326,7 +326,7 @@
     "loading": "Chargement du journal d'audit…"
   },
   "auth": {
-    "login": "Connectez-vous avec Picora",
+    "login": "Connectez-vous avec {brand}",
     "logout": "se déconnecter",
     "logging_in": "Connexion...",
     "login_title": "Bienvenue sur MorayaWeb",

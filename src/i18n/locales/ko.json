@@ -326,7 +326,7 @@
     "loading": "감사 로그 로드 중…"
   },
   "auth": {
-    "login": "Picora로 로그인",
+    "login": "{brand}로 로그인",
     "logout": "로그아웃",
     "logging_in": "로그인 중...",
     "login_title": "모라야 웹에 오신 것을 환영합니다",

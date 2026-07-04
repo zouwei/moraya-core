@@ -326,7 +326,7 @@
     "loading": "加载审计日志中…"
   },
   "auth": {
-    "login": "用 Picora 账号登录",
+    "login": "用 {brand} 账号登录",
     "logout": "退出登录",
     "logging_in": "登录中...",
     "login_title": "欢迎使用 Moraya Web",
