@@ -3939,5 +3939,8 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "math": {
+    "placeholder": "LaTeX eingeben, z. B. x_0 oder \\frac{a}{b}"
   }
 }

@@ -1,0 +1,179 @@
+/*
+ * @moraya/core — math source-editing plugin styles.
+ *
+ * Companion CSS for `src/plugins/math-node-views.ts` (the `math_block` /
+ * `math_inline` NodeView factories wired into `createEditor` via `setup.ts`).
+ * Consumers MUST import this file for the in-place LaTeX source editor to
+ * render correctly:
+ *
+ *     import '@moraya/core/plugins/math-source.css'
+ *
+ * The JS creates the DOM (`.math-src-row`, `.math-src-field`,
+ * `.math-src-highlight`, `.math-src-input`, `.math-src-delim`,
+ * `.math-preview`, and the `.math-*-inline` variants) but relies on this
+ * stylesheet for the overlay geometry (transparent input over a synced
+ * syntax-highlight backdrop) and the token colors.
+ *
+ * COLORS are driven by `--math-src-*` custom properties with sensible
+ * built-in fallbacks, so the stylesheet works standalone. Consumers may
+ * override any token from their own theme (light/dark) to match their
+ * palette — e.g. Moraya PC defines them in `variables.css`.
+ */
+
+/* ── Layout ─────────────────────────────────────────────────────────── */
+
+.moraya-editor .math-block-nodeview {
+  margin: 1em 0;
+}
+
+.moraya-editor .math-nodeview .math-preview {
+  text-align: center;
+  overflow-x: auto;
+  cursor: pointer;
+}
+
+.moraya-editor .math-nodeview.editing .math-preview {
+  /* Live preview under the source line — slightly dimmed to signal "output" */
+  opacity: 0.85;
+}
+
+/* Source line: $$ [textarea] $$ — dedicated "math zone" palette. */
+.moraya-editor .math-src-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45em;
+  padding: 0.35em 0.6em;
+  margin-bottom: 0.5em;
+  background: var(--math-src-bg, #f5f3fc);
+  border-radius: 6px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.88em;
+  line-height: 1.55;
+}
+
+.moraya-editor .math-src-delim {
+  color: var(--math-src-delim, #7c3aed);
+  font-weight: 700;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* Overlay: transparent textarea over a synced syntax-highlight backdrop.
+   The backdrop (.math-src-highlight) carries the visible, colored glyphs;
+   the textarea provides editing + caret only. Both MUST share identical
+   font metrics / padding / wrapping so glyphs and caret align exactly. */
+.moraya-editor .math-src-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.moraya-editor .math-src-highlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  font: inherit;
+  line-height: inherit;
+  color: var(--math-src-text, #37306b);
+}
+
+.moraya-editor .math-src-row .math-src-input {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: transparent;
+  font: inherit;
+  line-height: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  caret-color: var(--math-src-caret, #7c3aed);
+}
+
+.moraya-editor .math-src-row .math-src-input::placeholder {
+  color: var(--math-src-delim, #7c3aed);
+  opacity: 0.5;
+}
+
+/* Inline variant: $ [input] $ replaces the rendered formula in place */
+.moraya-editor .math-inline-nodeview {
+  display: inline;
+}
+
+.moraya-editor .math-preview-inline {
+  cursor: pointer;
+}
+
+.moraya-editor .math-src-inline {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
+  padding: 0.05em 0.35em;
+  background: var(--math-src-bg, #f5f3fc);
+  border-radius: 4px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.9em;
+}
+
+.moraya-editor .math-src-field-inline {
+  position: relative;
+  display: inline-block;
+}
+
+.moraya-editor .math-src-highlight-inline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  white-space: pre;
+  font: inherit;
+  color: var(--math-src-text, #37306b);
+}
+
+.moraya-editor .math-src-inline .math-src-input {
+  position: relative;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: transparent;
+  font: inherit;
+  caret-color: var(--math-src-caret, #7c3aed);
+}
+
+/* ── LaTeX token colors (shared by block + inline backdrops) ─────────── */
+
+.moraya-editor .math-src-highlight .tok-cmd,
+.moraya-editor .math-src-highlight-inline .tok-cmd {
+  color: var(--math-src-tok-cmd, #7c3aed);
+  font-weight: 600;
+}
+.moraya-editor .math-src-highlight .tok-brace,
+.moraya-editor .math-src-highlight-inline .tok-brace {
+  color: var(--math-src-tok-brace, #be185d);
+}
+.moraya-editor .math-src-highlight .tok-script,
+.moraya-editor .math-src-highlight-inline .tok-script {
+  color: var(--math-src-tok-script, #b45309);
+  font-weight: 600;
+}
+.moraya-editor .math-src-highlight .tok-amp,
+.moraya-editor .math-src-highlight-inline .tok-amp {
+  color: var(--math-src-tok-script, #b45309);
+}
+
+/* KaTeX failed to parse — show raw source in the math error color */
+.moraya-editor .math-nodeview .math-error {
+  color: var(--math-src-error, #cc2f2f);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  white-space: pre-wrap;
+}

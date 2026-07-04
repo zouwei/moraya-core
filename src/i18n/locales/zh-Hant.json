@@ -3939,5 +3939,8 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "math": {
+    "placeholder": "輸入 LaTeX，例如 x_0 或 \\frac{a}{b}"
   }
 }

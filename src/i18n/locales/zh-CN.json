@@ -3939,5 +3939,8 @@
     "empty_result": "未检测到文字",
     "failed": "识别失败",
     "engine_unavailable": "本设备不支持文字识别"
+  },
+  "math": {
+    "placeholder": "输入 LaTeX，例如 x_0 或 \\frac{a}{b}"
   }
 }

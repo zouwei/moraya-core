@@ -3939,5 +3939,8 @@
       "allow_always": "항상 허용",
       "deny": "부인하다"
     }
+  },
+  "math": {
+    "placeholder": "LaTeX 입력 (예: x_0, \\frac{a}{b})"
   }
 }

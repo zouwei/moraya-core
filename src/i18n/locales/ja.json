@@ -3939,5 +3939,8 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "math": {
+    "placeholder": "LaTeX を入力（例：x_0、\\frac{a}{b}）"
   }
 }

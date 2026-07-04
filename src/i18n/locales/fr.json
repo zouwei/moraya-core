@@ -3939,5 +3939,8 @@
       "allow_always": "Toujours autoriser",
       "deny": "Refuser"
     }
+  },
+  "math": {
+    "placeholder": "Saisir du LaTeX, p. ex. x_0 ou \\frac{a}{b}"
   }
 }

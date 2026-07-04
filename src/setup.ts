@@ -80,6 +80,10 @@ interface Tier1Plugins {
   highlight?: Plugin
   /** NodeView factory: `(node, view, getPos) => NodeView`. Wired into nodeViews at editor mount. */
   codeBlockView?: CodeBlockNodeView
+  /** Typora-style in-place math source editing (math_block). NodeView factory. */
+  mathBlockView?: CodeBlockNodeView
+  /** Typora-style in-place math source editing (math_inline). NodeView factory. */
+  mathInlineView?: CodeBlockNodeView
   emoji?: Plugin
   defListInputRule?: InputRule
 }
@@ -117,7 +121,8 @@ export function preloadEnhancementPlugins(
     import('./plugins/highlight'),
     import('./plugins/emoji'),
     import('./plugins/code-block-view'),
-  ]).then(([hl, em, cbv]) => {
+    import('./plugins/math-node-views'),
+  ]).then(([hl, em, cbv, mnv]) => {
     const plugins: Tier1Plugins = {}
     if (hl.status === 'fulfilled') {
       plugins.highlight = hl.value.createHighlightPlugin()
@@ -129,6 +134,10 @@ export function preloadEnhancementPlugins(
       plugins.codeBlockView = cbv.value.createCodeBlockNodeViewFactory({
         ...(rendererRegistry ? { rendererRegistry } : {}),
       })
+    }
+    if (mnv.status === 'fulfilled') {
+      plugins.mathBlockView = mnv.value.mathBlockNodeView
+      plugins.mathInlineView = mnv.value.mathInlineNodeView
     }
     plugins.defListInputRule = createDefListInputRule(schema)
     tier1Cache = { key: { schema, ...(rendererRegistry ? { rendererRegistry } : {}) }, plugins }
@@ -848,6 +857,15 @@ export async function createEditor(opts: CreateEditorOptions): Promise<MorayaEdi
   const nodeViews: Record<string, any> = {}
   if (tier1.codeBlockView) {
     nodeViews.code_block = tier1.codeBlockView
+  }
+  // Typora-style in-place math editing: click a formula → LaTeX source opens
+  // in the document flow (block: source line above live preview; inline:
+  // source replaces the rendered formula); blur commits, Escape reverts.
+  if (tier1.mathBlockView) {
+    nodeViews.math_block = tier1.mathBlockView
+  }
+  if (tier1.mathInlineView) {
+    nodeViews.math_inline = tier1.mathInlineView
   }
 
   const initialDoc = opts.initialContent

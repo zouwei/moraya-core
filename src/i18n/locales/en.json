@@ -3939,5 +3939,8 @@
     "empty_result": "No text detected",
     "failed": "OCR failed",
     "engine_unavailable": "OCR not available on this device"
+  },
+  "math": {
+    "placeholder": "Enter LaTeX, e.g. x_0 or \\frac{a}{b}"
   }
 }

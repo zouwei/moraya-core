@@ -3939,5 +3939,8 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "math": {
+    "placeholder": "أدخل LaTeX، مثل x_0 أو \\frac{a}{b}"
   }
 }

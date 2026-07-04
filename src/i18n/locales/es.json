@@ -3939,5 +3939,8 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "math": {
+    "placeholder": "Introduce LaTeX, p. ej. x_0 o \\frac{a}{b}"
   }
 }

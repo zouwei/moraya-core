@@ -3939,5 +3939,8 @@
       "allow_always": "हमेशा अनुमति दें",
       "deny": "अस्वीकार करना"
     }
+  },
+  "math": {
+    "placeholder": "LaTeX दर्ज करें, जैसे x_0 या \\frac{a}{b}"
   }
 }

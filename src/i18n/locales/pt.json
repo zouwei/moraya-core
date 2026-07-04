@@ -3939,5 +3939,8 @@
       "allow_always": "Always Allow",
       "deny": "Deny"
     }
+  },
+  "math": {
+    "placeholder": "Digite LaTeX, ex.: x_0 ou \\frac{a}{b}"
   }
 }
