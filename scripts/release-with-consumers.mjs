@@ -46,8 +46,10 @@ const coreRoot = resolve(__dirname, '..');
 // Sibling repos to consider as consumers (relative to moraya-core).
 const CONSUMER_DIRS = ['../moraya', '../moraya-web', '../moraya-mobile'];
 
-const NPM_POLL_INTERVAL_MS = 5_000;
-const NPM_POLL_TIMEOUT_MS = 5 * 60_000;
+const NPM_POLL_INTERVAL_MS = 10_000;
+// The CI Publish workflow runs install + test + build + OIDC publish, so give
+// it a generous budget before declaring the release stuck.
+const NPM_POLL_TIMEOUT_MS = 12 * 60_000;
 
 // ── arg parsing ──────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -154,28 +156,46 @@ console.log(`  core:       ${currentVersion} → ${C.green(targetVersion)}${SKIP
 console.log(`  mode:       ${DRY ? C.yellow('DRY RUN (no changes)') : 'LIVE'}`);
 console.log('  consumers:');
 for (const c of consumers) console.log(`    ${c.rel.padEnd(16)} ${c.currentSpec}  →  ^${targetVersion}`);
+if (!SKIP_PUBLISH) {
+  console.log(
+    C.dim(
+      '  note:       publish is CI-driven (tag push → OIDC). Requires the trusted\n' +
+        '              publisher to be configured on npmjs.com for @moraya/core.',
+    ),
+  );
+}
 console.log('');
 
 // ── preflight ────────────────────────────────────────────────────────────────
+// A live run aborts on any violation. A dry run downgrades them to warnings so
+// the full plan can still be previewed against a dirty working tree.
+function requireOrWarn(ok, msg) {
+  if (ok) return;
+  if (DRY) {
+    console.warn(C.yellow(`  ⚠ (would abort in a live run) ${msg.split('\n')[0]}`));
+    return;
+  }
+  die(msg);
+}
 if (!SKIP_PUBLISH) {
   const branch = query('git rev-parse --abbrev-ref HEAD', coreRoot);
-  if (branch !== 'main') die(`moraya-core is on "${branch}", not main. Switch to main before releasing.`);
-  if (!gitClean(coreRoot)) {
-    die(
-      'moraya-core has uncommitted changes. Commit or stash them first — a release must ' +
-        'publish a clean, tagged tree.\n' +
-        query('git status --short', coreRoot),
-    );
-  }
-  if (query(`git tag -l v${targetVersion}`, coreRoot)) {
-    die(`tag v${targetVersion} already exists. Pick a new version.`);
-  }
+  requireOrWarn(branch === 'main', `moraya-core is on "${branch}", not main. Switch to main before releasing.`);
+  requireOrWarn(
+    gitClean(coreRoot),
+    'moraya-core has uncommitted changes. Commit or stash them first — a release must ' +
+      'publish a clean, tagged tree.',
+  );
+  requireOrWarn(
+    !query(`git tag -l v${targetVersion}`, coreRoot),
+    `tag v${targetVersion} already exists. Pick a new version.`,
+  );
 }
 // Never clobber a consumer that has in-progress dep edits.
 for (const c of consumers) {
-  if (fileDirty(c.dir, 'package.json', 'pnpm-lock.yaml')) {
-    die(`${c.rel} has uncommitted package.json / pnpm-lock.yaml changes. Commit or revert them first.`);
-  }
+  requireOrWarn(
+    !fileDirty(c.dir, 'package.json', 'pnpm-lock.yaml'),
+    `${c.rel} has uncommitted package.json / pnpm-lock.yaml changes. Commit or revert them first.`,
+  );
 }
 
 if (!(await confirm(C.bold(`Proceed with ${DRY ? 'DRY RUN of ' : ''}release ${targetVersion}?`)))) {
@@ -183,9 +203,9 @@ if (!(await confirm(C.bold(`Proceed with ${DRY ? 'DRY RUN of ' : ''}release ${ta
   process.exit(0);
 }
 
-// ── 1. publish core ──────────────────────────────────────────────────────────
+// ── 1. bump + tag core → CI publishes via OIDC ───────────────────────────────
 if (!SKIP_PUBLISH) {
-  console.log(C.bold(`\n▸ Publishing ${PKG}@${targetVersion}`));
+  console.log(C.bold(`\n▸ Tagging v${targetVersion} — CI publishes to npm via OIDC`));
   if (!DRY) {
     corePkg.version = targetVersion;
     writeJSON(corePkgPath, corePkg);
@@ -195,14 +215,20 @@ if (!SKIP_PUBLISH) {
   mutate(`git add package.json`, coreRoot);
   mutate(`git commit -m "chore: release v${targetVersion}"`, coreRoot);
   mutate(`git tag v${targetVersion}`, coreRoot);
+  // Pushing the tag triggers .github/workflows/publish.yml, which publishes
+  // to npm via GitHub OIDC trusted publishing — no local `npm publish`, no
+  // OTP prompt. The poll below waits for that CI run to land the version.
   mutate(`git push origin main --tags`, coreRoot);
-  // Authoritative publish (prepublishOnly runs spdx:check + build + test).
-  // stdio inherited so an OTP prompt is visible/answerable.
-  mutate(`npm publish --access public`, coreRoot, { inherit: true });
 }
 
-// ── 2. wait for npm to serve the version ─────────────────────────────────────
-console.log(C.bold(`\n▸ Verifying ${PKG}@${targetVersion} on npm`));
+// ── 2. wait for CI to serve the version on npm ───────────────────────────────
+console.log(
+  C.bold(
+    SKIP_PUBLISH
+      ? `\n▸ Verifying ${PKG}@${targetVersion} on npm`
+      : `\n▸ Waiting for CI to publish ${PKG}@${targetVersion} to npm`,
+  ),
+);
 if (DRY) {
   console.log(C.dim(`  [dry] would poll npm until ${targetVersion} resolves`));
 } else {
@@ -220,13 +246,18 @@ if (DRY) {
       console.log(C.green(`  ✓ ${PKG}@${targetVersion} is live on npm`));
       break;
     }
-    process.stdout.write(C.dim('  …waiting for registry propagation\n'));
+    process.stdout.write(
+      C.dim('  …waiting for the Publish workflow (install + test + build + OIDC publish)\n'),
+    );
     execSync(`sleep ${NPM_POLL_INTERVAL_MS / 1000}`);
   }
   if (!ok) {
     die(
       `${PKG}@${targetVersion} did not appear on npm within ${NPM_POLL_TIMEOUT_MS / 60000} min.\n` +
-        `  If the publish failed (e.g. OTP), fix it and re-run with --skip-publish to only bump consumers.`,
+        `  Check the Publish workflow run: https://github.com/zouwei/moraya-core/actions\n` +
+        `  Common causes: OIDC trusted publisher not configured on npmjs.com, or a\n` +
+        `  test/build failure. Once the version is live, re-run with --skip-publish\n` +
+        `  to bump the consumers.`,
     );
   }
 }

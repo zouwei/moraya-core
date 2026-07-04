@@ -255,21 +255,31 @@ pnpm release patch --yes        # 跳过确认提示
 
 流程与安全性：
 
-- **前置检查**：core 必须在 `main` 且工作树干净（发布模式）；任何 consumer 若已有未提交的 `package.json`/`pnpm-lock.yaml` 改动则中止，避免误覆盖你正在改的依赖。
+- **前置检查**：core 必须在 `main` 且工作树干净（发布模式）；任何 consumer 若已有未提交的 `package.json`/`pnpm-lock.yaml` 改动则中止，避免误覆盖你正在改的依赖。（`--dry-run` 下这些检查降级为警告，方便预览完整计划。）
 - **消费者自动识别**：扫描 `../moraya`、`../moraya-web`、`../moraya-mobile`，只升级真正依赖 `@moraya/core` 的仓库（mobile 无直接依赖，自动跳过）。
-- **发布权威路径**：本地 `npm publish --access public`（`prepublishOnly` 先跑 spdx:check + build + test；若账号要求 OTP 会在终端提示输入）。
-- **registry 传播等待**：轮询 `npm view` 直到新版本可解析，再动 consumer。
+- **发布走 CI（免 OTP）**：脚本只做 bump + commit + tag + `git push --tags`；推 tag 触发 `.github/workflows/publish.yml`，由 **GitHub OIDC Trusted Publishing** 发到 npm。**没有本地 `npm publish`，不需要 OTP，不需要 NPM_TOKEN**。
+- **等待 CI 发布**：轮询 `npm view` 直到新版本可解析（CI 要跑 install+test+build+publish，预算 12 分钟），再动 consumer。
 - **每个 consumer**：改依赖 → `pnpm install` → `pnpm check` → `check-core-dep release` 自校验 → commit + push。任一步失败即停，已发布的 core 不受影响，可 `--skip-publish` 重跑补齐剩余 consumer。
+
+### 首次配置：npm Trusted Publishing（OIDC）
+
+CI 发布依赖一次性的 npmjs.com 配置（只有 `@moraya` scope 所有者能做）：
+
+1. 登录 npmjs.com → `@moraya/core` 包 → **Settings → Trusted Publishing → Add publisher**
+2. 选 **GitHub Actions**，填：Organization/user `zouwei`、Repository `moraya-core`、Workflow `publish.yml`、Environment 留空
+
+配好后，任何 `v*` tag 推送都会自动发布（2FA 免疫、无 token）。配置前 CI 会因鉴权失败——此时可临时用底层命令里的本地 `npm publish` 兜底。
 
 ### 底层命令（手动分步，一般用不到）
 
-`pnpm release` 内部复用下面这些；只在需要手动控制某一步时才单独调用：
+`pnpm release` 内部复用下面这些；只在需要手动控制某一步、或 OIDC 尚未配好需本地兜底时才单独调用：
 
 ```bash
 pnpm version:bump patch         # 仅改 core package.json 版本号
 git add package.json && git commit -m "chore: release v0.5.2" && git tag v0.5.2
-git push origin main --tags
-npm publish --access public     # scoped 包必须带 --access public，否则 402
+git push origin main --tags     # 推 tag → 触发 CI OIDC 发布（正常路径）
+# —— 若 OIDC 未配好，本地兜底（会提示输 OTP）：
+#   npm publish --access public
 # 然后到每个下游仓库把 "@moraya/core" 改成 "^0.5.2" 并 pnpm install + commit
 ```
 
