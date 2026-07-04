@@ -1,0 +1,76 @@
+/*
+ * @moraya/core — shared editor element baseline.
+ *
+ * Node-level styling for the WYSIWYG editable (`.moraya-editor`, the class
+ * createEditor sets via `attributes.class`). Consumers import it side-effect
+ * only:
+ *
+ *     import '@moraya/core/style'
+ *
+ * Scope: the elements that otherwise fall back to raw UA defaults on a bare
+ * host — blockquotes, inline code, and tables. Fenced code blocks and the
+ * math-source overlay ship their own stylesheets
+ * (`@moraya/core/plugins/code-block.css`, `.../math-source.css`).
+ *
+ * CSS variables resolve host-agnostically, matching the plugin stylesheets:
+ *
+ *     var(--PC-name, var(--web-name, <hex fallback>))
+ *
+ * so one file renders correctly on Moraya desktop (`--accent-color`,
+ * `--text-secondary`, …), Moraya Web (`--color-accent`,
+ * `--color-text-secondary`, …), or a bare consumer that defines neither (the
+ * hex literal). Selectors target `.moraya-editor` (present on the editable in
+ * every consumer); overflow / layout behavior is intentionally left to the
+ * host so mobile viewport handling stays consumer-owned.
+ */
+
+/* ── Blockquote ──────────────────────────────────────────────────────────── */
+.moraya-editor blockquote {
+  border-left: 3px solid var(--accent-color, var(--color-accent, #4a90d9));
+  padding-left: 1em;
+  margin: 1em 0;
+  color: var(--text-secondary, var(--color-text-secondary, #666));
+}
+[dir="rtl"] .moraya-editor blockquote {
+  border-left: none;
+  border-right: 3px solid var(--accent-color, var(--color-accent, #4a90d9));
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+/* ── Inline code (fenced blocks → @moraya/core/plugins/code-block.css) ────── */
+.moraya-editor :not(pre) > code {
+  font-family: var(--font-mono, var(--font-family-mono, ui-monospace, monospace));
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: var(--bg-secondary, var(--color-bg-secondary, #f4f4f4));
+  border-radius: 3px;
+  color: var(--text-primary, var(--color-text, #1a1a1a));
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.moraya-editor table {
+  border-collapse: collapse;
+  /* !important overrides prosemirror-tables' inline width:Xpx from columnResizing() */
+  width: 100% !important;
+  margin: 1em 0;
+  table-layout: auto;
+}
+.moraya-editor th,
+.moraya-editor td {
+  border: 1px solid var(--border-color, var(--color-border, #ddd));
+  padding: 0.1em 0.8em;
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 300px;
+}
+.moraya-editor th {
+  background: var(--bg-secondary, var(--color-bg-secondary, #f4f4f4));
+  font-weight: 600;
+}
+[dir="rtl"] .moraya-editor th,
+[dir="rtl"] .moraya-editor td {
+  text-align: right;
+}
