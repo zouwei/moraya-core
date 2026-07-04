@@ -4,11 +4,23 @@ on:
   push:
     tags:
       - 'v*'
+  # Allow a manual run to exercise the pipeline without cutting a new tag.
+  # (Publish is skipped if the version already exists — see the guard below.)
+  workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      # Required for npm Trusted Publishing (OIDC). GitHub mints a short-lived
+      # signed identity token that npm verifies against the trusted publisher
+      # configured on the package — no NPM_TOKEN secret, and 2FA-IMMUNE
+      # (the account's "require OTP on publish" enforcement does not apply to
+      # OIDC publishes). This replaces the token-based flow that kept failing
+      # with `EOTP: This operation requires a one-time password`.
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -18,17 +30,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@moraya'
-          # Writes the token into ~/.npmrc so `pnpm publish` picks it up.
-          # Without this, `always-auth` defaults to false and pnpm falls
-          # through to anonymous auth — npm then returns
-          # "404 Not Found - @moraya/core@X.Y.Z is not in this registry",
-          # which is npm's confusing way of saying the (empty) caller
-          # lacks publish access to the @moraya scope.
-          always-auth: true
+
+      # Trusted Publishing + automatic provenance require npm >= 11.5.1.
+      # setup-node ships npm 10.x with Node 22, so upgrade the global npm.
+      - name: Upgrade npm (OIDC trusted publishing needs >= 11.5.1)
+        run: npm install -g npm@latest
 
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -39,15 +48,27 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Publish to npmjs.com
-        # `--access public` is required for the FIRST publish of a scoped
-        # package under a new tag/version. `publishConfig.access=public`
-        # in package.json SHOULD cover this, but pnpm 10 has a known
-        # regression where the CLI flag wins over publishConfig — passing
-        # it explicitly here is belt-and-braces.
-        # `NPM_CONFIG_TOKEN` is the env var pnpm honors in addition to
-        # `NODE_AUTH_TOKEN`; setting both covers pnpm ≥8 and older.
-        run: pnpm publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # Idempotency: a re-run on an existing tag (or a manual dispatch after a
+      # local `pnpm release` already published) must not hard-fail with
+      # EPUBLISHCONFLICT. Skip the publish step when the version is already live.
+      - name: Check if version is already published
+        id: pub
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          if npm view "@moraya/core@$VER" version >/dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::@moraya/core@$VER already on npm — skipping publish."
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Publish via OIDC — no NODE_AUTH_TOKEN. `npm publish` (NOT `pnpm publish`,
+      # which does not yet support trusted publishing) performs the OIDC token
+      # exchange automatically because `id-token: write` is granted above and
+      # the package is configured with a matching trusted publisher on npmjs.com.
+      # `--provenance` attaches a signed build-provenance attestation (npm shows
+      # a "Published via GitHub Actions" badge).
+      - name: Publish to npm (Trusted Publishing / OIDC)
+        if: steps.pub.outputs.already == 'false'
+        run: npm publish --access public --provenance
