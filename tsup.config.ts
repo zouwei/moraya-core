@@ -38,6 +38,10 @@ export default defineConfig({
     // never touches the editor schema) only pay for ~7 KB + their own
     // markdown-it peer, not the full ProseMirror payload.
     'src/chat-markdown/index.ts',
+    // v0.7.0 memory — shared long-term-memory data contract + Markdown
+    // serialization (aligned with Picora dot-directory hosting). Tiny, zero-dep,
+    // its own bundle so non-memory consumers don't pay for it.
+    'src/memory/index.ts',
   ],
   format: ['esm'],
   dts: true,
