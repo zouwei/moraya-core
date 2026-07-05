@@ -32,7 +32,7 @@ Please include:
 - Distribution model (number of users, revenue expectation)
 - Which subpath exports you'll consume (`/schema`, `/markdown`, `/ai`, `/chat-markdown`, etc.)
 
-Commercial license pricing depends on scope. First-party Moraya products (Moraya PC / Web / Mobile — see the sibling repos under `zouwei/moraya-*`) operate under an internal commercial license grant.
+Commercial license pricing depends on scope. First-party products of the copyright holder — Moraya PC / Web / Mobile (sibling repos under `zouwei/moraya-*`) and **Protago** (`zouwei/protago`) — operate under an internal commercial license grant.
 
 ## 3. Contributor terms
 
