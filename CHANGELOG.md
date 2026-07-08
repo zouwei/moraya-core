@@ -2,6 +2,12 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.7.3] — 2026-07-08
+
+### Fixed
+
+- **Plain-text-only clipboard paste silently did nothing in the visual editor.** `clipboardTextParser` / `handlePaste`'s markdown-image branch / the large-paste async `handleDOMEvents.paste` path all called `parseMarkdown()` / `parseMarkdownAsync()` with no `schema` argument, which parses against `markdown.ts`'s internal `defaultSchema` singleton — a different `Schema` instance than any real editor actually uses (`createEditor()` always builds its own via `createSchema()`). The resulting `Slice`'s nodes carried mismatched `NodeType`/`MarkType` references, so `replaceSelection`/`replace` silently failed to insert anything. Reproduced with any clipboard content that has no `text/html` representation (e.g. a bare URL copied from a browser address bar, or any plain `<input>`/terminal source) — pasting such content into the visual editor did nothing, while the source-mode plain textarea (which doesn't touch ProseMirror at all) was unaffected. Fixed by passing the live schema (`$context.doc.type.schema` in `clipboardTextParser`, `view.state.schema` elsewhere) through all three call sites in `editor-props-plugin.ts`. The existing test suite for this file mounted its own test editor against `defaultSchema` itself, which masked the bug — tests now build against a real `createSchema()`-based schema (matching production) and a dedicated regression suite covers all three affected paths.
+
 ## [0.1.0] — 2026-05-07
 
 Initial public release on npmjs.com. Faithful 1:1 extraction of Moraya desktop's `src/lib/editor/` markdown editor core into a host-agnostic, dependency-injected ESM package, per the iteration spec at [`v0.60.0-pre-shared-markdown-core.md`](https://github.com/zouwei/moraya/blob/main/docs/iterations/v0.60.0-pre-shared-markdown-core.md).

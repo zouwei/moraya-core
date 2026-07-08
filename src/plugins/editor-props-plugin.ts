@@ -107,7 +107,15 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
        */
       clipboardTextParser(text, $context, plain) {
         if (plain || $context.parent.type.spec.code) return undefined!
-        const doc = parseMarkdown(text)
+        // MUST pass the live schema — parseMarkdown()'s default (no schema
+        // arg) parses against markdown.ts's own module-level `defaultSchema`
+        // singleton, which is a DIFFERENT Schema instance than the one this
+        // editor was built with (createEditor() calls createSchema() fresh
+        // per instance). A Slice built from a mismatched schema silently
+        // fails to insert — this was the root cause of "pasting a bare URL
+        // (or any plain-text-only clipboard, e.g. from a browser address
+        // bar) does nothing in visual mode, works fine in source mode".
+        const doc = parseMarkdown(text, $context.doc.type.schema)
         // If markdown parse produced a single empty paragraph, fall back to
         // literal text insertion to avoid replacing the current selection.
         if (doc.textContent.length === 0 && doc.content.size <= 2) return undefined!
@@ -130,7 +138,7 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
         // Markdown image syntax — parse so the image renders instead of being escaped
         const trimmed = plain.trim()
         if (/^!\[/.test(trimmed)) {
-          const doc = parseMarkdown(trimmed)
+          const doc = parseMarkdown(trimmed, view.state.schema)
           if (doc.content.size > 2) {
             const content = doc.content
             const inner = (content.childCount === 1 && content.firstChild!.type.name === 'paragraph')
@@ -220,7 +228,7 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
 
           pasteEvent.preventDefault()
           const { from, to } = view.state.selection
-          parseMarkdownAsync(plain).then(doc => {
+          parseMarkdownAsync(plain, view.state.schema).then(doc => {
             if (view.isDestroyed) return
             const content = doc.content
             if (content.size === 0) return // nothing usable came out of the parse

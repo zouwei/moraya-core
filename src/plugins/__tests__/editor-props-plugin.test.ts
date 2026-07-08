@@ -16,20 +16,30 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { EditorState, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { defaultSchema } from '../../schema'
+import { createSchema } from '../../schema'
+import { BrowserMediaResolver } from '../../adapters/browser-media-resolver'
 import { parseMarkdown } from '../../markdown'
 import { createEditorPropsPlugin } from '../editor-props-plugin'
+
+// A real, non-default schema — like every production editor actually gets
+// from createEditor() (which always builds a fresh schema via createSchema(),
+// never markdown.ts's internal `defaultSchema` singleton). Mounting tests
+// against `defaultSchema` itself would mask any bug where plugin code calls
+// parseMarkdown()/parseMarkdownAsync() without passing the live schema
+// (those default internally to `defaultSchema` too) — see the
+// "schema mismatch" describe block below for the regression this caught.
+const testSchema = createSchema({ mediaResolver: new BrowserMediaResolver() })
 
 let host: HTMLDivElement
 let view: EditorView | null = null
 
 function mount(md: string): EditorView {
-  const doc = parseMarkdown(md, defaultSchema)
+  const doc = parseMarkdown(md, testSchema)
   const plugin = createEditorPropsPlugin({
     platform: { getCurrentFilePath: () => null, isMacOS: false },
     linkOpener: { open: () => {} },
   })
-  const state = EditorState.create({ schema: defaultSchema, doc, plugins: [plugin] })
+  const state = EditorState.create({ schema: testSchema, doc, plugins: [plugin] })
   view = new EditorView(host, { state })
   return view
 }
@@ -124,5 +134,51 @@ describe('editor-props-plugin: large paste async fast path', () => {
 
     // Should not throw even though the view is gone.
     await new Promise(resolve => setTimeout(resolve, 50))
+  })
+})
+
+describe('editor-props-plugin: paste against a non-default (production-shaped) schema', () => {
+  // Regression: clipboardTextParser / handlePaste / the large-paste async
+  // path all called parseMarkdown()/parseMarkdownAsync() with NO schema arg,
+  // which parses against markdown.ts's `defaultSchema` singleton — a
+  // different Schema instance than any real editor (createEditor() always
+  // builds its own via createSchema()). The resulting Slice's nodes carried
+  // NodeType/MarkType references from the wrong schema, so `replaceSelection`
+  // silently failed to insert anything. Symptom: pasting plain-text-only
+  // clipboard content (e.g. a bare URL copied from a browser address bar,
+  // which never carries a text/html representation) did nothing in the
+  // visual editor, while the source-mode plain textarea was unaffected.
+  it('bare URL (plain-text-only clipboard) lands correctly', () => {
+    const v = mount('')
+    pasteText(v.dom, 'https://example.com/some-page')
+    expect(v.state.doc.textContent).toBe('https://example.com/some-page')
+  })
+
+  it('plain non-URL text (plain-text-only clipboard) lands correctly', () => {
+    const v = mount('')
+    pasteText(v.dom, 'hello plain world')
+    expect(v.state.doc.textContent).toBe('hello plain world')
+  })
+
+  it('markdown image syntax paste still renders via handlePaste\'s dedicated branch', () => {
+    const v = mount('')
+    pasteText(v.dom, '![alt text](https://example.com/pic.png)')
+    const img = v.state.doc.content.firstChild?.firstChild
+    expect(img?.type.name).toBe('image')
+    expect(img?.attrs['src']).toBe('https://example.com/pic.png')
+  })
+
+  it('large paste (async path) lands correctly against the live schema', async () => {
+    const v = mount('')
+    const section = '# Heading\n\nSome paragraph text that repeats many times to build size.\n\n'
+    const big = section.repeat(1000)
+    expect(big.length).toBeGreaterThan(50_000)
+
+    pasteText(v.dom, big)
+    await new Promise(resolve => setTimeout(resolve, 50))
+
+    expect(v.state.doc.textContent.length).toBeGreaterThan(0)
+    expect(v.state.doc.textContent).toContain('Heading')
+    expect(v.state.doc.textContent).toContain('Some paragraph text')
   })
 })
