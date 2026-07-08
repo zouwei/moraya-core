@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "Название базы знаний",
       "create": "Создавать",
       "cancel": "Cancel",
-      "kb_create_failed": "Could not create the knowledge base."
+      "kb_create_failed": "Could not create the knowledge base.",
+      "more": "Ещё"
     },
     "media": {
       "title": "Облачные изображения",

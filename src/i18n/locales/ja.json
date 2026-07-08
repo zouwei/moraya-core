@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "ナレッジベース名",
       "create": "作成する",
       "cancel": "Cancel",
-      "kb_create_failed": "Could not create the knowledge base."
+      "kb_create_failed": "Could not create the knowledge base.",
+      "more": "その他"
     },
     "media": {
       "title": "Cloud images",

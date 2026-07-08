@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "Nom de la base de connaissances",
       "create": "Créer",
       "cancel": "Annuler",
-      "kb_create_failed": "Impossible de créer la base de connaissances."
+      "kb_create_failed": "Impossible de créer la base de connaissances.",
+      "more": "Plus"
     },
     "media": {
       "title": "Images de nuages",

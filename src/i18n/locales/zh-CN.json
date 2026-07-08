@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "知识库名称",
       "create": "创建",
       "cancel": "取消",
-      "kb_create_failed": "无法创建知识库。"
+      "kb_create_failed": "无法创建知识库。",
+      "more": "更多"
     },
     "media": {
       "title": "云端图片",

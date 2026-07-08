@@ -30,10 +30,23 @@
 import { Fragment, Slice } from 'prosemirror-model'
 import { AllSelection, Plugin, PluginKey, TextSelection } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
-import { parseMarkdown } from '../markdown'
+import { parseMarkdown, parseMarkdownAsync } from '../markdown'
 import type { LinkOpener, Platform } from '../types'
 
 const editorPropsKey = new PluginKey('moraya-editor-props')
+
+// Mirrors markdown.ts's own ASYNC_PARSE_THRESHOLD (50_000 chars). Pasting a
+// document at or above this size runs `clipboardTextParser` SYNCHRONOUSLY on
+// the main thread inside the native `paste` DOM event — fine on desktop
+// hardware, but mobile WKWebView is far less tolerant of a multi-second
+// synchronous script during a user gesture. Symptom observed: pasting a long
+// markdown document directly into the visual editor silently did nothing
+// (the parse blocked long enough that the paste never visibly landed).
+// `handleDOMEvents.paste` below intercepts BEFORE ProseMirror's own paste
+// pipeline runs `clipboardTextParser` (which is what makes this fixable —
+// `handlePaste` fires too late, after that parse already happened to build
+// its `slice` argument), and does the parse via `parseMarkdownAsync` instead.
+const ASYNC_PASTE_THRESHOLD = 50_000
 
 /** Detect whether a URL is a local file path (absolute or relative). */
 function isLocalFilePath(href: string): boolean {
@@ -184,6 +197,51 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
       },
 
       handleDOMEvents: {
+        /**
+         * Large-paste fast path: parse asynchronously so a big markdown
+         * document doesn't block the main thread synchronously inside this
+         * event handler (see ASYNC_PASTE_THRESHOLD comment above). Returning
+         * `true` here stops ProseMirror's own paste pipeline from running at
+         * all for this event — including the synchronous `clipboardTextParser`
+         * call — so we own the entire insert ourselves.
+         *
+         * Falls through to the default (synchronous, existing) path for:
+         *   - anything without text/plain data (e.g. images — unaffected)
+         *   - text under the threshold (cheap enough to stay synchronous)
+         *   - paste target inside a code block (plain-text paste, no markdown
+         *     parsing involved either way — letting the default path run is
+         *     simpler and behaviorally identical)
+         */
+        paste(view, event) {
+          const pasteEvent = event as ClipboardEvent
+          const plain = pasteEvent.clipboardData?.getData('text/plain')
+          if (!plain || plain.length < ASYNC_PASTE_THRESHOLD) return false
+          if (view.state.selection.$from.parent.type.spec.code) return false
+
+          pasteEvent.preventDefault()
+          const { from, to } = view.state.selection
+          parseMarkdownAsync(plain).then(doc => {
+            if (view.isDestroyed) return
+            const content = doc.content
+            if (content.size === 0) return // nothing usable came out of the parse
+            const inner = (content.childCount === 1 && content.firstChild!.type.name === 'paragraph')
+              ? content.firstChild!.content
+              : content
+            // Selection may have moved during the async gap — clamp to the
+            // current doc bounds rather than assume from/to are still valid.
+            const docSize = view.state.doc.content.size
+            const safeFrom = Math.min(from, docSize)
+            const safeTo = Math.min(Math.max(to, safeFrom), docSize)
+            view.dispatch(view.state.tr.replace(safeFrom, safeTo, new Slice(inner, 0, 0)))
+          }).catch(err => {
+            // parseMarkdownAsync's own contract is "never rejects" — this is
+            // a defensive backstop in case that ever changes, not a path
+            // expected to run.
+            console.error('[editor-props-plugin] large-paste insert failed unexpectedly:', err)
+          })
+          return true
+        },
+
         /**
          * Safety: prevent WebView navigation on any remaining <a> clicks.
          * (Most <a> tags get expanded to literal text on mousedown, but this

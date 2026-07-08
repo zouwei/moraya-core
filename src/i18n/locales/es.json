@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "Nombre de la base de conocimientos",
       "create": "Crear",
       "cancel": "Cancel",
-      "kb_create_failed": "Could not create the knowledge base."
+      "kb_create_failed": "Could not create the knowledge base.",
+      "more": "Más"
     },
     "media": {
       "title": "Imágenes de la nube",

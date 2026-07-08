@@ -965,13 +965,17 @@ const ASYNC_PARSE_THRESHOLD = 50_000
 export function parseMarkdownAsync(markdown: string, schemaArg?: Schema): Promise<PmNode> {
   const p = getParserFor(schemaArg)
   const normalized = normalizeSmartQuotes(normalizeMathBlocks(markdown))
+  // Small-doc path delegates to parseMarkdown(), which already has its own
+  // internal try/catch + best-effort empty-doc fallback — nothing further
+  // to guard here.
   if (normalized.length < ASYNC_PARSE_THRESHOLD) {
     return Promise.resolve(parseMarkdown(normalized, schemaArg))
   }
   return new Promise(resolve => setTimeout(() => {
     try {
       resolve(p.parse(normalized))
-    } catch {
+    } catch (err) {
+      console.warn('[parseMarkdownAsync] best-effort fallback for malformed input:', err)
       resolve(p.schema.topNodeType.createAndFill()!)
     }
   }, 0))

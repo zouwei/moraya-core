@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "اسم قاعدة المعرفة",
       "create": "يخلق",
       "cancel": "يلغي",
-      "kb_create_failed": "لا يمكن إنشاء قاعدة المعرفة."
+      "kb_create_failed": "لا يمكن إنشاء قاعدة المعرفة.",
+      "more": "المزيد"
     },
     "media": {
       "title": "الصور السحابية",

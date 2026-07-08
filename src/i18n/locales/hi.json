@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "ज्ञान आधार नाम",
       "create": "बनाएं",
       "cancel": "रद्द करना",
-      "kb_create_failed": "ज्ञान का आधार नहीं बनाया जा सका."
+      "kb_create_failed": "ज्ञान का आधार नहीं बनाया जा सका.",
+      "more": "अधिक"
     },
     "media": {
       "title": "बादल छवियाँ",

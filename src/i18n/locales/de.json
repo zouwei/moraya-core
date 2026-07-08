@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "Name der Wissensdatenbank",
       "create": "Erstellen",
       "cancel": "Stornieren",
-      "kb_create_failed": "Die Wissensdatenbank konnte nicht erstellt werden."
+      "kb_create_failed": "Die Wissensdatenbank konnte nicht erstellt werden.",
+      "more": "Mehr"
     },
     "media": {
       "title": "Cloud images",

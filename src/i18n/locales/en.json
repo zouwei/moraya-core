@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "Knowledge base name",
       "create": "Create",
       "cancel": "Cancel",
-      "kb_create_failed": "Could not create the knowledge base."
+      "kb_create_failed": "Could not create the knowledge base.",
+      "more": "More"
     },
     "media": {
       "title": "Cloud images",

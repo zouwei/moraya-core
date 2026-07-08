@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "기술 자료 이름",
       "create": "만들다",
       "cancel": "취소",
-      "kb_create_failed": "기술 자료를 만들 수 없습니다."
+      "kb_create_failed": "기술 자료를 만들 수 없습니다.",
+      "more": "더보기"
     },
     "media": {
       "title": "클라우드 이미지",

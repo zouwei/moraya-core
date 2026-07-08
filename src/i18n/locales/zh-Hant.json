@@ -1988,7 +1988,8 @@
       "kb_name_placeholder": "知識庫名稱",
       "create": "建立",
       "cancel": "取消",
-      "kb_create_failed": "無法建立知識庫。"
+      "kb_create_failed": "無法建立知識庫。",
+      "more": "更多"
     },
     "media": {
       "title": "雲端圖片",
