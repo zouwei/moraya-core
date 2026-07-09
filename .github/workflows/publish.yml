@@ -36,8 +36,16 @@ jobs:
 
       # Trusted Publishing + automatic provenance require npm >= 11.5.1.
       # setup-node ships npm 10.x with Node 22, so upgrade the global npm.
+      #
+      # Pinned to a specific 11.x release, NOT `npm@latest`: the v0.7.4
+      # publish run (2026-07-09) picked up npm 12.0.0 — a brand-new major
+      # version published just before this ran — and its `--provenance` flow
+      # was broken (`MODULE_NOT_FOUND: Cannot find module 'sigstore'` inside
+      # npm's own libnpmpublish, i.e. an npm packaging bug, not anything in
+      # this repo). 11.18.0 is the last stable 11.x release before 12.0.0.
+      # Bump deliberately when ready to adopt a newer npm, not automatically.
       - name: Upgrade npm (OIDC trusted publishing needs >= 11.5.1)
-        run: npm install -g npm@latest
+        run: npm install -g npm@11.18.0
 
       - name: Install
         run: pnpm install --frozen-lockfile
