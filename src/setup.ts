@@ -496,6 +496,18 @@ function buildKeymap(schema: Schema): Plugin {
     if (!$cursor) return false
     const { parent, parentOffset } = $cursor
 
+    // Case 1.5: Cursor at the START of a heading → demote it to a paragraph
+    // instead of the default joinBackward (Typora/Notion convention: the
+    // first Backspace at a heading's start strips the "#" markup; a second
+    // Backspace — now in a plain paragraph — merges with whatever precedes
+    // it). Without this, joinBackward either no-ops (heading is the first
+    // block in the doc, nothing to lift into) or silently merges into the
+    // previous block, both of which leave the heading marker stuck once its
+    // text is gone.
+    if (parent.type.name === 'heading' && parentOffset === 0 && N.paragraph) {
+      return setBlockType(N.paragraph)(state, dispatch)
+    }
+
     // Case 2: Cursor at END of a textblock, next sibling is a block atom.
     // Main WebKit bug fix: delete the previous character via ProseMirror
     // transaction instead of letting native Backspace run.
