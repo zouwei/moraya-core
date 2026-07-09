@@ -2,6 +2,22 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.7.5] — 2026-07-09
+
+### Added
+
+- **`@moraya/core/plugins/block-drag`** — host-agnostic position/transaction logic for a visual-mode block drag handle (grab a block, drop it anywhere else in the document). Extracted from Moraya desktop's PC-only implementation so PC and Web share one tested module instead of duplicating it.
+  - `resolveDragUnit(doc, pos)` — resolves any position to its natural drag unit: the innermost enclosing `list_item` when nested inside a list (bullet or ordered, any depth), so list rows reorder one at a time instead of dragging the whole list; otherwise the whole top-level block (a table, code block, math block, or blockquote always moves as one atomic unit, never a fragment of it). Correctly handles the case where a position sits exactly at a list's own top/bottom content boundary — attributes it to the first/last item, not the whole list (a real bug caught by direct unit tests before this ever reached a consumer).
+  - `siblingRangeInContainer(doc, pos, containerFrom, containerTo)` — during an active drag, re-resolves a position constrained to the drag's own container (the enclosing list, or the whole doc), so a dragged list item can only be dropped among its own siblings.
+  - `moveBlockTransaction(state, blockFrom, blockTo, insertPos)` — builds the delete+insert transaction for the move (no-op-safe, sets a `NodeSelection` on the moved content for drop feedback).
+  - `firstContentPos(doc, unitFrom, unitTo)` / `topLevelBlockRange(doc, pos)` — supporting helpers (first-line detection for handle alignment; top-level-only resolution).
+  - DOM/mouse wiring (hover detection, the mousedown/mousemove/mouseup drag loop, handle icon + insertion-line rendering) is NOT part of this package — it's host-specific UI, implemented separately per consumer (PC: `Editor.svelte`; Web: `MorayaEditor.svelte`).
+  - 30 unit tests (`src/plugins/__tests__/block-drag.test.ts`).
+
+### Fixed
+
+- **Backspace at a heading's start didn't demote it to a paragraph.** Every existing Backspace case in `buildKeymap()` was a WebKit atom-adjacency workaround, none heading-aware, so the cursor-at-heading-start case fell through to `baseKeymap`'s `joinBackward` — a no-op when the heading is the first block in the doc, or a silent merge into the previous block otherwise. Either way there was no way to strip the heading marker once its text was gone. This only ever "worked" by accident on platforms whose native contenteditable Backspace happens to outdent headings (WebKit) — Chromium/Firefox don't replicate that, so PC looked fine while web got stuck. Now an explicit case demotes the heading to a paragraph first (Typora/Notion convention); a second Backspace then merges normally via the existing fallback.
+
 ## [0.7.3] — 2026-07-08
 
 ### Fixed
