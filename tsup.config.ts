@@ -42,6 +42,11 @@ export default defineConfig({
     // serialization (aligned with Picora dot-directory hosting). Tiny, zero-dep,
     // its own bundle so non-memory consumers don't pay for it.
     'src/memory/index.ts',
+    // v0.8.0 sync — shared document-sync engine: three-way diff/merge (extracted
+    // from desktop KB-sync) + the single-flight DocSyncEngine that fixes the
+    // false-conflict autosave races. Own bundle; pulls the node-diff3/diff
+    // optional peers, so non-sync consumers never load it.
+    'src/sync/index.ts',
   ],
   format: ['esm'],
   dts: true,
@@ -63,6 +68,9 @@ export default defineConfig({
     'markdown-it',
     'katex',
     'highlight.js',
+    // v0.8.0 sync optional peers — kept out of the bundle.
+    'node-diff3',
+    'diff',
   ],
   publicDir: 'src/styles',
   /*

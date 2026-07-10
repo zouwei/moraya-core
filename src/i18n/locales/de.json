@@ -561,7 +561,17 @@
     "description": "Diese Notiz wurde auf einem anderen Gerät bearbeitet.",
     "keep_server": "Behalten Sie die Serverversion bei",
     "keep_local": "Behalte meine Version",
-    "merge": "Manuell zusammenführen"
+    "merge": "Manuell zusammenführen",
+    "local": "Meine Version",
+    "remote": "Serverversion",
+    "base": "Gemeinsame Basis",
+    "take_local": "Meine",
+    "take_remote": "Server",
+    "take_both": "Beide",
+    "merge_preview": "Zusammenführungsvorschau",
+    "unresolved": "{n} ungelöst",
+    "apply": "Zusammenführung anwenden",
+    "auto_merged_toast": "Änderungen von einem anderen Gerät wurden automatisch zusammengeführt."
   },
   "context_menu": {
     "cut": "Ausschneiden",
@@ -1264,7 +1274,13 @@
       "keep_both": "Keep both (cloud copy saved as .conflict.md)",
       "skip": "Skip",
       "apply_one": "Apply this",
-      "apply_all": "Apply all selected ({n})"
+      "apply_all": "Apply all selected ({n})",
+      "take_local": "Lokal",
+      "take_remote": "Remote",
+      "take_both": "Beide",
+      "merge_preview": "Zusammenführungsvorschau",
+      "unresolved": "{n} ungelöst",
+      "apply_upload": "Anwenden & hochladen"
     },
     "statusbar": {
       "tooltip": "KB Sync status — click for details",

@@ -561,7 +561,17 @@
     "description": "이 메모는 다른 기기에서 수정되었습니다.",
     "keep_server": "서버 버전 유지",
     "keep_local": "내 버전 유지",
-    "merge": "수동으로 병합"
+    "merge": "수동으로 병합",
+    "local": "내 버전",
+    "remote": "서버 버전",
+    "base": "공통 기준",
+    "take_local": "내 것",
+    "take_remote": "서버",
+    "take_both": "둘 다",
+    "merge_preview": "병합 미리보기",
+    "unresolved": "{n}개 미해결",
+    "apply": "병합 적용",
+    "auto_merged_toast": "다른 기기의 변경 사항이 자동으로 병합되었습니다."
   },
   "context_menu": {
     "cut": "잘라내기",
@@ -1264,7 +1274,13 @@
       "keep_both": "둘 다 유지(클라우드 사본이 .contribute.md로 저장됨)",
       "skip": "건너뛰다",
       "apply_one": "이것을 적용하십시오",
-      "apply_all": "선택한 항목 모두 적용({n})"
+      "apply_all": "선택한 항목 모두 적용({n})",
+      "take_local": "로컬",
+      "take_remote": "원격",
+      "take_both": "둘 다",
+      "merge_preview": "병합 미리보기",
+      "unresolved": "{n}개 미해결",
+      "apply_upload": "적용 및 업로드"
     },
     "statusbar": {
       "tooltip": "KB 동기화 상태 - 자세한 내용을 보려면 클릭하세요.",

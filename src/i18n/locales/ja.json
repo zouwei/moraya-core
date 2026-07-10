@@ -561,7 +561,17 @@
     "description": "このメモは別のデバイスで編集されました。",
     "keep_server": "サーバーのバージョンを維持する",
     "keep_local": "私のバージョンを維持してください",
-    "merge": "手動でマージする"
+    "merge": "手動でマージする",
+    "local": "自分のバージョン",
+    "remote": "サーバーのバージョン",
+    "base": "共通のベース",
+    "take_local": "自分",
+    "take_remote": "サーバー",
+    "take_both": "両方",
+    "merge_preview": "マージプレビュー",
+    "unresolved": "{n} 件未解決",
+    "apply": "マージを適用",
+    "auto_merged_toast": "他のデバイスの変更を自動的にマージしました。"
   },
   "context_menu": {
     "cut": "切り取り",
@@ -1264,7 +1274,13 @@
       "keep_both": "Keep both (cloud copy saved as .conflict.md)",
       "skip": "Skip",
       "apply_one": "Apply this",
-      "apply_all": "Apply all selected ({n})"
+      "apply_all": "Apply all selected ({n})",
+      "take_local": "ローカル",
+      "take_remote": "リモート",
+      "take_both": "両方",
+      "merge_preview": "マージプレビュー",
+      "unresolved": "{n} 件未解決",
+      "apply_upload": "適用してアップロード"
     },
     "statusbar": {
       "tooltip": "KB Sync status — click for details",

@@ -561,7 +561,17 @@
     "description": "该笔记在其他设备上被修改了。",
     "keep_server": "保留服务器版本",
     "keep_local": "保留本地版本",
-    "merge": "手动合并"
+    "merge": "手动合并",
+    "local": "我的版本",
+    "remote": "服务器版本",
+    "base": "共同基准",
+    "take_local": "我的",
+    "take_remote": "服务器",
+    "take_both": "两者",
+    "merge_preview": "合并预览",
+    "unresolved": "{n} 处未解决",
+    "apply": "应用合并",
+    "auto_merged_toast": "已自动合并来自其他设备的更改。"
   },
   "context_menu": {
     "cut": "剪切",
@@ -1264,7 +1274,13 @@
       "keep_both": "保留双份（云端文件另存为 .conflict.md）",
       "skip": "跳过",
       "apply_one": "应用此项",
-      "apply_all": "应用全部所选（{n}）"
+      "apply_all": "应用全部所选（{n}）",
+      "take_local": "本地",
+      "take_remote": "云端",
+      "take_both": "两者",
+      "merge_preview": "合并预览",
+      "unresolved": "{n} 处未解决",
+      "apply_upload": "应用并上传"
     },
     "statusbar": {
       "tooltip": "KB 同步状态 — 点击查看详情",

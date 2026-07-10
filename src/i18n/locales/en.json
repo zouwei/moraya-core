@@ -561,7 +561,17 @@
     "description": "This note was edited on another device.",
     "keep_server": "Keep server version",
     "keep_local": "Keep my version",
-    "merge": "Merge manually"
+    "merge": "Merge manually",
+    "local": "My version",
+    "remote": "Server version",
+    "base": "Common base",
+    "take_local": "Mine",
+    "take_remote": "Server",
+    "take_both": "Both",
+    "merge_preview": "Merge preview",
+    "unresolved": "{n} unresolved",
+    "apply": "Apply merge",
+    "auto_merged_toast": "Changes from another device were merged automatically."
   },
   "context_menu": {
     "cut": "Cut",
@@ -1264,7 +1274,13 @@
       "keep_both": "Keep both (cloud copy saved as .conflict.md)",
       "skip": "Skip",
       "apply_one": "Apply this",
-      "apply_all": "Apply all selected ({n})"
+      "apply_all": "Apply all selected ({n})",
+      "take_local": "Local",
+      "take_remote": "Remote",
+      "take_both": "Both",
+      "merge_preview": "Merge preview",
+      "unresolved": "{n} unresolved",
+      "apply_upload": "Apply & upload"
     },
     "statusbar": {
       "tooltip": "KB Sync status — click for details",

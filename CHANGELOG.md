@@ -2,6 +2,16 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.8.0] — 2026-07-10
+
+### Added
+
+- **`@moraya/core/sync`** — shared document-synchronization engine, so PC / Web / Mobile share one merge semantics and one autosave state machine instead of each maintaining a fork. Two layers, both host-agnostic:
+  - **Pure merge primitives**, extracted verbatim from Moraya desktop's battle-tested KB-sync engine (v1.6.0, 298-test regression matrix): `threeWayDiff(last, local, remote, maxSize, initialAuthority)` (the directory-level decision table — upload/download/delete/conflict/aligned, with first-sync `initialAuthority` handling) and the git-style line merge `threeWayMergeLines` / `twoWayMergeLines` / `assembleMerged` / `conflictChunkCount` (`node-diff3`'s `diff3Merge` with `excludeFalseConflicts`; 2-way fallback via `diff`'s `diffLines`).
+  - **`DocSyncEngine`** — a single-document optimistic-concurrency state machine that replaces the ad-hoc per-consumer autosave loops which leaked a class of false "conflict detected" prompts. Model: optimistic concurrency (conditional write on a base etag) + client-side **single-flight** serialization + git-style 3-way auto-merge on conflict — the industry-standard shape for single-user multi-device sync (no OT/CRDT). Three invariants kill the false-conflict bug: single-flight (never two overlapping writes carrying a stale base), atomic base advance (`{etag, content}` moved together only after a write succeeds), and a trailing-write loop (a keystroke during an in-flight write re-writes with the fresh base). On a genuine server-side divergence the reconcile pipeline tries adopt-identical → remote-wins → clean 3-way merge → surface to the UI, with a progress-based circuit breaker (not a cross-flush streak counter) that only escalates to manual resolution for a real external writer. IO is dependency-injected via `DocSyncIO` (mirrors the AITransport DI pattern) — implementations return discriminated unions and never throw. 51 unit tests including deterministic concurrency-race cases.
+  - Requires the **optional peers** `node-diff3` and `diff` — only consumers importing `/sync` install them (kept out of every other bundle).
+- **i18n** — extended `conflict.*` (single-document rich resolve panel: `local`/`remote`/`base`/`take_local`/`take_remote`/`take_both`/`merge_preview`/`unresolved`/`apply`/`auto_merged_toast`) and lifted the 6 desktop `kb_sync.conflict.*` rich-panel keys (`take_*`/`merge_preview`/`unresolved`/`apply_upload`) into all 12 locales, so the desktop conflict panel no longer needs its local i18n override.
+
 ## [0.7.5] — 2026-07-09
 
 ### Added

@@ -561,7 +561,17 @@
     "description": "تم تحرير هذه الملاحظة على جهاز آخر.",
     "keep_server": "الاحتفاظ بنسخة الخادم",
     "keep_local": "احتفظ بنسختي",
-    "merge": "الدمج يدويًا"
+    "merge": "الدمج يدويًا",
+    "local": "نسختي",
+    "remote": "نسخة الخادم",
+    "base": "الأساس المشترك",
+    "take_local": "نسختي",
+    "take_remote": "الخادم",
+    "take_both": "كلاهما",
+    "merge_preview": "معاينة الدمج",
+    "unresolved": "{n} غير محلولة",
+    "apply": "تطبيق الدمج",
+    "auto_merged_toast": "تم دمج التغييرات من جهاز آخر تلقائيًا."
   },
   "context_menu": {
     "cut": "قص",
@@ -1264,7 +1274,13 @@
       "keep_both": "Keep both (cloud copy saved as .conflict.md)",
       "skip": "Skip",
       "apply_one": "Apply this",
-      "apply_all": "Apply all selected ({n})"
+      "apply_all": "Apply all selected ({n})",
+      "take_local": "محلي",
+      "take_remote": "بعيد",
+      "take_both": "كلاهما",
+      "merge_preview": "معاينة الدمج",
+      "unresolved": "{n} غير محلولة",
+      "apply_upload": "تطبيق ورفع"
     },
     "statusbar": {
       "tooltip": "KB Sync status — click for details",

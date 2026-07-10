@@ -561,7 +561,17 @@
     "description": "Эта заметка была отредактирована на другом устройстве.",
     "keep_server": "Сохранить версию сервера",
     "keep_local": "Держи мою версию",
-    "merge": "Объединить вручную"
+    "merge": "Объединить вручную",
+    "local": "Моя версия",
+    "remote": "Версия сервера",
+    "base": "Общая основа",
+    "take_local": "Моя",
+    "take_remote": "Сервер",
+    "take_both": "Обе",
+    "merge_preview": "Предпросмотр слияния",
+    "unresolved": "{n} не разрешено",
+    "apply": "Применить слияние",
+    "auto_merged_toast": "Изменения с другого устройства были объединены автоматически."
   },
   "context_menu": {
     "cut": "Вырезать",
@@ -1264,7 +1274,13 @@
       "keep_both": "Keep both (cloud copy saved as .conflict.md)",
       "skip": "Skip",
       "apply_one": "Apply this",
-      "apply_all": "Apply all selected ({n})"
+      "apply_all": "Apply all selected ({n})",
+      "take_local": "Локально",
+      "take_remote": "Удалённо",
+      "take_both": "Обе",
+      "merge_preview": "Предпросмотр слияния",
+      "unresolved": "{n} не разрешено",
+      "apply_upload": "Применить и загрузить"
     },
     "statusbar": {
       "tooltip": "KB Sync status — click for details",

@@ -561,7 +561,17 @@
     "description": "該筆記在其他裝置上被修改了。",
     "keep_server": "保留伺服器版本",
     "keep_local": "保留本地版本",
-    "merge": "手動合併"
+    "merge": "手動合併",
+    "local": "我的版本",
+    "remote": "伺服器版本",
+    "base": "共同基準",
+    "take_local": "我的",
+    "take_remote": "伺服器",
+    "take_both": "兩者",
+    "merge_preview": "合併預覽",
+    "unresolved": "{n} 處未解決",
+    "apply": "套用合併",
+    "auto_merged_toast": "已自動合併來自其他裝置的變更。"
   },
   "context_menu": {
     "cut": "剪下",
@@ -1264,7 +1274,13 @@
       "keep_both": "保留雙份（雲端檔案另存為 .conflict.md）",
       "skip": "跳過",
       "apply_one": "套用此項",
-      "apply_all": "套用全部所選（{n}）"
+      "apply_all": "套用全部所選（{n}）",
+      "take_local": "本地",
+      "take_remote": "雲端",
+      "take_both": "兩者",
+      "merge_preview": "合併預覽",
+      "unresolved": "{n} 處未解決",
+      "apply_upload": "套用並上傳"
     },
     "statusbar": {
       "tooltip": "KB 同步狀態 — 點擊查看詳情",

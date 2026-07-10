@@ -561,7 +561,17 @@
     "description": "Cette note a été modifiée sur un autre appareil.",
     "keep_server": "Conserver la version du serveur",
     "keep_local": "Garder ma version",
-    "merge": "Fusionner manuellement"
+    "merge": "Fusionner manuellement",
+    "local": "Ma version",
+    "remote": "Version du serveur",
+    "base": "Base commune",
+    "take_local": "La mienne",
+    "take_remote": "Serveur",
+    "take_both": "Les deux",
+    "merge_preview": "Aperçu de la fusion",
+    "unresolved": "{n} non résolu(s)",
+    "apply": "Appliquer la fusion",
+    "auto_merged_toast": "Les modifications d'un autre appareil ont été fusionnées automatiquement."
   },
   "context_menu": {
     "cut": "Couper",
@@ -1264,7 +1274,13 @@
       "keep_both": "Conservez les deux (copie cloud enregistrée sous .conflict.md)",
       "skip": "Sauter",
       "apply_one": "Appliquez ceci",
-      "apply_all": "Appliquer toutes les sélections ({n})"
+      "apply_all": "Appliquer toutes les sélections ({n})",
+      "take_local": "Local",
+      "take_remote": "Distant",
+      "take_both": "Les deux",
+      "merge_preview": "Aperçu de la fusion",
+      "unresolved": "{n} non résolu(s)",
+      "apply_upload": "Appliquer et envoyer"
     },
     "statusbar": {
       "tooltip": "État de KB Sync — cliquez pour plus de détails",
