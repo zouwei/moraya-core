@@ -39,6 +39,11 @@
  */
 
 import katex from 'katex'
+// Side-effect: registers the \ce/\pu chemistry macros (mhchem) on the katex
+// singleton — without it chemical equations render as red unknown-macro
+// markers. Idempotent with the same import in schema.ts; kept external in
+// tsup so it resolves to the consumer's single katex instance.
+import 'katex/contrib/mhchem'
 import type { Node as PMNode } from 'prosemirror-model'
 import { TextSelection } from 'prosemirror-state'
 import type { EditorView, NodeView } from 'prosemirror-view'

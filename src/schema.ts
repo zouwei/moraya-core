@@ -28,6 +28,11 @@
 import { Schema, Fragment } from 'prosemirror-model'
 import type { NodeSpec, MarkSpec, Node as PmNode } from 'prosemirror-model'
 import katex from 'katex'
+// Side-effect: registers the \ce/\pu chemistry macros (mhchem) on the katex
+// singleton so chemical equations render instead of erroring. Kept external in
+// tsup (like katex itself) — the consumer's bundler dedupes katex to a single
+// instance, so this one import covers every render path that shares it.
+import 'katex/contrib/mhchem'
 import {
   type SchemaConfig,
   type MediaResolver,
@@ -570,7 +575,10 @@ const math_inline: NodeSpec = {
     dom.dataset.type = 'math_inline'
     dom.dataset.value = code
     try {
-      katex.render(code, dom)
+      // throwOnError:false — align with the math-node-views interactive path:
+      // an unknown macro degrades to KaTeX's inline error marker instead of
+      // throwing and blanking the whole formula to red plain text.
+      katex.render(code, dom, { throwOnError: false })
     } catch {
       // §4.4 KaTeX error contract: render fallback marker; serializer reads data-tex attr.
       dom.textContent = code
@@ -604,7 +612,7 @@ const math_block: NodeSpec = {
     dom.dataset.type = 'math_block'
     dom.dataset.value = code
     try {
-      katex.render(code, dom, { displayMode: true })
+      katex.render(code, dom, { displayMode: true, throwOnError: false })
     } catch {
       dom.textContent = code
       dom.classList.add('math-error')

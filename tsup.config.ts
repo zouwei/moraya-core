@@ -67,6 +67,11 @@ export default defineConfig({
     'prosemirror-tables',
     'markdown-it',
     'katex',
+    // Subpath external — esbuild matches externals exactly, so 'katex' alone
+    // would NOT keep this side-effect import external; bundling it would pull
+    // in a SECOND katex instance and register the \ce/\pu macros on the wrong
+    // one. Must stay external so it resolves to the consumer's katex.
+    'katex/contrib/mhchem',
     'highlight.js',
     // v0.8.0 sync optional peers — kept out of the bundle.
     'node-diff3',

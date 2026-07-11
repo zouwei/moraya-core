@@ -2,6 +2,15 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.8.1] — 2026-07-11
+
+### Fixed
+
+- **Chemistry formulas (`\ce` / `\pu`, mhchem) rendered as red error markup.** KaTeX doesn't ship the mhchem macros; without the `katex/contrib/mhchem` side-effect import, `$\ce{H2O}$` showed a red unknown-macro marker in the interactive math NodeViews (`throwOnError: false` path) and display equations like `$$\ce{2KMnO4 ->[\Delta] K2MnO4 + MnO2 + O2 ^}$$` collapsed to red plain text in the schema `toDOM` fallback (which used KaTeX's default `throwOnError: true`). Now `schema.ts` and `plugins/math-node-views.ts` both register mhchem on the shared katex singleton, and the extension is declared external in tsup — critical, since bundling `mhchem.mjs` would drag in a *second* katex instance and register the macros on the wrong one. The full chemistry spectrum is gated by a new render suite (`mhchem-render.spec.ts`: molecules/ions, CJK reaction conditions, gas/precipitate arrows, reversible synthesis, redox, nuclear prescripts, `\pu` units) plus a round-trip fixture (`56-math-mhchem.md`) proving `\ce{...}` source survives parse→serialize byte-stable.
+- **Schema `toDOM` math fallback aligned to `throwOnError: false`.** Any *still*-unknown macro now degrades to KaTeX's inline error marker instead of throwing and blanking the entire formula to red plain text; the catch-fallback remains for genuine parse crashes.
+
+Consumers with their own direct `import katex from 'katex'` render paths (e.g. HTML export, chat bubbles) should add `import 'katex/contrib/mhchem'` alongside — the registration is idempotent.
+
 ## [0.8.0] — 2026-07-10
 
 ### Added
