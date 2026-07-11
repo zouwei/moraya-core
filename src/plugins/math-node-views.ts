@@ -44,6 +44,7 @@ import katex from 'katex'
 // markers. Idempotent with the same import in schema.ts; kept external in
 // tsup so it resolves to the consumer's single katex instance.
 import 'katex/contrib/mhchem'
+import { katexStrict } from '../katex-options'
 import type { Node as PMNode } from 'prosemirror-model'
 import { TextSelection } from 'prosemirror-state'
 import type { EditorView, NodeView } from 'prosemirror-view'
@@ -54,7 +55,7 @@ type GetPos = () => number | undefined
 /** Render LaTeX into `target`; falls back to error styling on bad input. */
 function renderKatex(target: HTMLElement, latex: string, displayMode: boolean) {
   try {
-    katex.render(latex, target, { displayMode, throwOnError: false })
+    katex.render(latex, target, { displayMode, throwOnError: false, strict: katexStrict })
     target.classList.remove('math-error')
   } catch {
     target.textContent = latex
