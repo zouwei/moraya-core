@@ -619,7 +619,9 @@
     "cancel": "Cancel",
     "words": "words",
     "chars": "chars",
-    "new_note": "New note"
+    "new_note": "New note",
+    "download": "Download",
+    "drag_handle_tooltip": "Drag to move · click to select"
   },
   "enterprise": {
     "hsm": {
@@ -898,7 +900,8 @@
     "committing": "Committing...",
     "sync_error": "Sync failed",
     "sync_now": "Sync now",
-    "not_installed": "Git not installed"
+    "not_installed": "Git not installed",
+    "unbind_picora_first": "Unbind Picora first"
   },
   "history": {
     "tab_label": "History",
@@ -1194,12 +1197,14 @@
     "empty": "No knowledge base found.",
     "create_in_picora": "Create a KB in Picora",
     "select_note": "Select a note to edit",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "local_migrated": "Migrated to local"
   },
   "kb_sync": {
     "card": {
       "bind": "☁ Picora Sync",
-      "settings": "☁ Bound · Settings"
+      "settings": "☁ Bound · Settings",
+      "unbind_git_first": "Unbind Git first"
     },
     "bind_dialog": {
       "title": "Bind Picora Sync — {name}",
@@ -1261,7 +1266,8 @@
       "unbind_confirm": "Remove Picora sync binding for \"{name}\"? Cloud data is preserved.",
       "view_conflicts": "Conflicts",
       "bind": "Bind to Picora",
-      "no_kbs": "No knowledge bases added yet."
+      "no_kbs": "No knowledge bases added yet.",
+      "memory_asset": "Memory assets"
     },
     "conflict": {
       "title": "Conflict Resolution — {name} ({n} items)",
@@ -1316,6 +1322,28 @@
       "auto_purge_hint": "Items older than 7 days are deleted automatically.",
       "entry_deleted_at": "Deleted {date}",
       "kb_unknown": "Unknown KB"
+    },
+    "memory_asset": {
+      "add_dir": "Add directory",
+      "add_dir_hint": "Choose a directory to scan for memory assets",
+      "bindings_desc": "Memory directories synced to this knowledge base",
+      "bindings_title": "Memory bindings",
+      "cancel": "Cancel",
+      "cloud_only": "Cloud only",
+      "confirm_delete": "Delete this memory binding?",
+      "delete_cloud": "Delete from cloud",
+      "delete_cloud_confirm": "Delete this memory from the cloud? This cannot be undone.",
+      "detected": "Detected memory directories",
+      "last_synced": "Last synced {time}",
+      "needs_picora": "Sign in to Picora to sync memory",
+      "never_synced": "Never synced",
+      "none_detected": "No memory directories detected",
+      "scan_dirs": "Scan directories",
+      "scan_empty": "No memory assets found",
+      "scan_pick_hint": "Pick a directory to scan"
+    },
+    "gate": {
+      "no_plan": "An active plan is required"
     }
   },
   "knowledge_base": {
@@ -1329,7 +1357,8 @@
     "delete_confirm": "Remove \"{name}\" from knowledge bases? The folder itself will not be deleted.",
     "switch_to": "Switch knowledge base",
     "save_hint": "This folder is not in your knowledge bases.",
-    "save_as_kb": "Save as Knowledge Base"
+    "save_as_kb": "Save as Knowledge Base",
+    "more": "More"
   },
   "link": {
     "open": "Open link",
@@ -1543,6 +1572,24 @@
       "tool_call_failed": "Tool call failed: {message}",
       "server_not_connected": "Server is not connected.",
       "tool_not_found": "Tool not found on any connected server."
+    },
+    "import": {
+      "camera_denied": "Camera access denied",
+      "clipboard_denied": "Clipboard access denied",
+      "invalid": "Invalid MCP configuration",
+      "paste": "Paste from clipboard",
+      "scan": "Scan QR code",
+      "scan_failed": "Scan failed",
+      "success": "MCP server imported"
+    },
+    "lan": {
+      "only_stdio": "Only stdio servers can be exposed on the LAN",
+      "expose": "Expose on LAN",
+      "copy": "Copy",
+      "config": "LAN configuration",
+      "copy_config": "Copy configuration",
+      "scan_hint": "Scan this QR code on another device",
+      "hint": "Share this server with devices on your network"
     }
   },
   "media": {
@@ -1623,7 +1670,17 @@
     "clear_cloud": "Clear cloud memories",
     "clear_cloud_confirm": "This deletes all memories stored in Picora. Local memories are kept.",
     "clear_cloud_done": "Cleared {n} cloud memories",
-    "quota_exceeded": "Cloud memory limit reached. Delete some memories or upgrade your plan."
+    "quota_exceeded": "Cloud memory limit reached. Delete some memories or upgrade your plan.",
+    "bind": "Bind",
+    "bind_to_kb": "Bind to knowledge base",
+    "bindings_desc": "Memory directories synced across your devices",
+    "bindings_none_detected": "No memory directories detected",
+    "bindings_title": "Memory bindings",
+    "last_synced": "Last synced {time}",
+    "never_synced": "Never synced",
+    "restore": "Restore",
+    "shared_memory_kb": "Shared memory knowledge base",
+    "unbind": "Unbind"
   },
   "menu": {
     "file": "File",
@@ -1985,7 +2042,14 @@
       "voice_permission_denied": "Microphone or speech permission denied. Enable it in Settings to use voice.",
       "voice_start_failed": "Could not start voice input.",
       "voice_speak_failed": "Could not read this message aloud.",
-      "delete": "Delete"
+      "delete": "Delete",
+      "menu": {
+        "chats": "Chats",
+        "drafts": "Drafts",
+        "templates": "Templates",
+        "workflows": "Workflows"
+      },
+      "settings_menu": "Settings"
     },
     "files": {
       "title": "Knowledge Base",
@@ -2498,7 +2562,12 @@
     },
     "auto_save": {
       "label": "Auto Save",
-      "interval": "Auto Save Interval"
+      "interval": "Auto Save Interval",
+      "max_interval": "Max autosave interval",
+      "minutes_unit": "min",
+      "max_interval_hint": "Save at least this often while editing",
+      "idle_interval": "Idle autosave delay",
+      "idle_interval_hint": "Save this long after you stop typing"
     },
     "remember_last_folder": "Remember last opened folder",
     "show_cloud_insert_entries": "Show cloud insert menu items",
@@ -2827,7 +2896,8 @@
         "cny_limit": "CNY limit / month",
         "alert_threshold": "Warn at (0–1)",
         "hint": "Setting either currency to 0 disables that cap. Warn threshold 0 disables warnings."
-      }
+      },
+      "available_models": "Available models"
     },
     "mcp": "MCP servers",
     "image_gen": {
@@ -2902,6 +2972,22 @@
       "rate": "Speed",
       "test": "Test voice",
       "test_sample": "Hello, I'm Moraya's on-device voice assistant."
+    },
+    "doc_versioning": {
+      "clear": "Clear history",
+      "desc": "Keep a rolling history of document versions",
+      "enable": "Enable version history",
+      "manage_in_picora": "Manage in Picora",
+      "max": "Max versions kept",
+      "state_off": "Off",
+      "state_on": "On",
+      "title": "Document versioning",
+      "usage": "Storage used"
+    },
+    "version_history": {
+      "label": "Version history",
+      "hint": "Keep a rolling history of saved versions",
+      "max": "Max versions kept"
     }
   },
   "shortcuts": {
@@ -3082,7 +3168,8 @@
     "tag_view": "Tags",
     "open": "Open sidebar",
     "close": "Close sidebar",
-    "local_workspace": "Local"
+    "local_workspace": "Local",
+    "untitled_file_name": "Untitled"
   },
   "sso": {
     "title": "Single Sign-On",
@@ -3980,5 +4067,70 @@
   },
   "math": {
     "placeholder": "Enter LaTeX, e.g. x_0 or \\frac{a}{b}"
+  },
+  "prompt_card": {
+    "background": "Background",
+    "context_file": "Context file"
+  },
+  "prompt_recall": {
+    "archive_failed": "Failed to archive",
+    "archived": "Archived",
+    "bind_unavailable": "Binding unavailable",
+    "bound": "Bound",
+    "card_copied": "Card copied",
+    "copied": "Copied",
+    "copy_failed": "Copy failed",
+    "dedup_done": "Archived {n} duplicates",
+    "inserted": "Inserted",
+    "loading": "Loading…",
+    "no_kb": "No knowledge base",
+    "note_saved": "Note saved",
+    "promote_failed": "Failed to promote",
+    "promoted": "Promoted to asset",
+    "restore_failed": "Failed to restore",
+    "restored": "Restored",
+    "search_placeholder": "Search prompts…",
+    "show_active": "Show active",
+    "show_archived": "Show archived",
+    "empty_archived": "No archived prompts",
+    "empty": "No prompts yet",
+    "no_match": "No matching prompts",
+    "has_context": "Has context",
+    "duplicate": "Duplicate",
+    "uses": "{n} uses",
+    "context_files": "Context files",
+    "unbind": "Unbind",
+    "note_label": "Note",
+    "note_placeholder": "Add a note…",
+    "save_note": "Save note",
+    "restore": "Restore",
+    "copy": "Copy",
+    "assemble": "Assemble",
+    "bind_file": "Bind file",
+    "insert": "Insert",
+    "dedup": "Deduplicate",
+    "promote": "Promote to asset",
+    "archive": "Archive"
+  },
+  "sync": {
+    "auto_merged": "Auto-merged",
+    "loading_kb": "Loading knowledge base…"
+  },
+  "version_history": {
+    "clear_confirm": "Clear all version history? This cannot be undone.",
+    "current": "Current",
+    "empty": "No versions yet",
+    "open_hint": "Open in a new tab (read-only)",
+    "restore": "Restore",
+    "restore_confirm": "Restore the version from {time}?",
+    "restore_failed": "Restore failed",
+    "restored": "Version restored",
+    "title": "Version history",
+    "statusbar_tooltip": "Version history",
+    "statusbar_disabled": "Version history is off",
+    "clear": "Clear history",
+    "cloud_loading": "Loading cloud versions…",
+    "cloud_only": "Cloud only",
+    "cloud_synced": "Synced to cloud"
   }
 }

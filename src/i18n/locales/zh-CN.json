@@ -619,7 +619,9 @@
     "cancel": "取消",
     "words": "字",
     "chars": "字符",
-    "new_note": "新建笔记"
+    "new_note": "新建笔记",
+    "download": "下载",
+    "drag_handle_tooltip": "拖动移动 · 点击选择"
   },
   "enterprise": {
     "hsm": {
@@ -898,7 +900,8 @@
     "committing": "提交中...",
     "sync_error": "同步失败",
     "sync_now": "立即同步",
-    "not_installed": "未安装 Git"
+    "not_installed": "未安装 Git",
+    "unbind_picora_first": "请先解绑 Picora"
   },
   "history": {
     "tab_label": "历史",
@@ -1194,12 +1197,14 @@
     "empty": "未找到知识库。",
     "create_in_picora": "在 Picora 中创建知识库",
     "select_note": "选择笔记开始编辑",
-    "untitled": "无标题"
+    "untitled": "无标题",
+    "local_migrated": "已迁移到本地"
   },
   "kb_sync": {
     "card": {
       "bind": "☁ Picora 同步",
-      "settings": "☁ 已绑定 · 设置"
+      "settings": "☁ 已绑定 · 设置",
+      "unbind_git_first": "请先解绑 Git"
     },
     "bind_dialog": {
       "title": "绑定 Picora 同步 — {name}",
@@ -1261,7 +1266,8 @@
       "unbind_confirm": "解除「{name}」的 Picora 同步绑定？云端数据将保留。",
       "view_conflicts": "冲突",
       "bind": "绑定到 Picora",
-      "no_kbs": "尚未添加任何知识库。"
+      "no_kbs": "尚未添加任何知识库。",
+      "memory_asset": "记忆资产"
     },
     "conflict": {
       "title": "冲突解决 — {name}（{n} 项）",
@@ -1316,6 +1322,28 @@
       "auto_purge_hint": "超过 7 天的条目会被自动删除。",
       "entry_deleted_at": "删除于 {date}",
       "kb_unknown": "未知知识库"
+    },
+    "memory_asset": {
+      "add_dir": "添加目录",
+      "add_dir_hint": "选择要扫描记忆资产的目录",
+      "bindings_desc": "已同步到此知识库的记忆目录",
+      "bindings_title": "记忆绑定",
+      "cancel": "取消",
+      "cloud_only": "仅云端",
+      "confirm_delete": "删除此记忆绑定？",
+      "delete_cloud": "从云端删除",
+      "delete_cloud_confirm": "从云端删除此记忆？此操作不可撤销。",
+      "detected": "检测到的记忆目录",
+      "last_synced": "上次同步 {time}",
+      "needs_picora": "登录 Picora 以同步记忆",
+      "never_synced": "从未同步",
+      "none_detected": "未检测到记忆目录",
+      "scan_dirs": "扫描目录",
+      "scan_empty": "未找到记忆资产",
+      "scan_pick_hint": "选择要扫描的目录"
+    },
+    "gate": {
+      "no_plan": "需要有效的订阅套餐"
     }
   },
   "knowledge_base": {
@@ -1329,7 +1357,8 @@
     "delete_confirm": "从知识库中移除「{name}」？文件夹本身不会被删除。",
     "switch_to": "切换知识库",
     "save_hint": "此文件夹尚未加入知识库。",
-    "save_as_kb": "保存为知识库"
+    "save_as_kb": "保存为知识库",
+    "more": "更多"
   },
   "link": {
     "open": "打开链接",
@@ -1543,6 +1572,24 @@
       "tool_call_failed": "工具调用失败：{message}",
       "server_not_connected": "服务器未连接。",
       "tool_not_found": "未在任何已连接服务器找到该工具。"
+    },
+    "import": {
+      "camera_denied": "相机权限被拒绝",
+      "clipboard_denied": "剪贴板权限被拒绝",
+      "invalid": "无效的 MCP 配置",
+      "paste": "从剪贴板粘贴",
+      "scan": "扫描二维码",
+      "scan_failed": "扫描失败",
+      "success": "已导入 MCP 服务器"
+    },
+    "lan": {
+      "only_stdio": "仅 stdio 服务器可在局域网暴露",
+      "expose": "在局域网暴露",
+      "copy": "复制",
+      "config": "局域网配置",
+      "copy_config": "复制配置",
+      "scan_hint": "在其他设备上扫描此二维码",
+      "hint": "与本地网络中的设备共享此服务器"
     }
   },
   "media": {
@@ -1623,7 +1670,17 @@
     "clear_cloud": "清空云端记忆",
     "clear_cloud_confirm": "这将删除存储在 Picora 中的所有记忆，本地记忆将保留。",
     "clear_cloud_done": "已清空 {n} 条云端记忆",
-    "quota_exceeded": "云端记忆已达上限。请删除部分记忆或升级套餐。"
+    "quota_exceeded": "云端记忆已达上限。请删除部分记忆或升级套餐。",
+    "bind": "绑定",
+    "bind_to_kb": "绑定到知识库",
+    "bindings_desc": "跨设备同步的记忆目录",
+    "bindings_none_detected": "未检测到记忆目录",
+    "bindings_title": "记忆绑定",
+    "last_synced": "上次同步 {time}",
+    "never_synced": "从未同步",
+    "restore": "恢复",
+    "shared_memory_kb": "共享记忆知识库",
+    "unbind": "解绑"
   },
   "menu": {
     "file": "文件",
@@ -1985,7 +2042,14 @@
       "voice_permission_denied": "麦克风或语音识别权限被拒绝。请在系统设置中开启后再使用语音。",
       "voice_start_failed": "无法启动语音输入。",
       "voice_speak_failed": "无法朗读这条消息。",
-      "delete": "删除"
+      "delete": "删除",
+      "menu": {
+        "chats": "对话",
+        "drafts": "草稿",
+        "templates": "模板",
+        "workflows": "工作流"
+      },
+      "settings_menu": "设置"
     },
     "files": {
       "title": "知识库",
@@ -2498,7 +2562,12 @@
     },
     "auto_save": {
       "label": "自动保存",
-      "interval": "自动保存间隔"
+      "interval": "自动保存间隔",
+      "max_interval": "最大自动保存间隔",
+      "minutes_unit": "分钟",
+      "max_interval_hint": "编辑时至少每隔此时长保存一次",
+      "idle_interval": "空闲自动保存延迟",
+      "idle_interval_hint": "停止输入后此时长再保存"
     },
     "remember_last_folder": "记住上次打开的文件夹",
     "show_cloud_insert_entries": "显示云端插入菜单项",
@@ -2827,7 +2896,8 @@
         "cny_limit": "CNY 月度上限",
         "alert_threshold": "警告阈值（0-1）",
         "hint": "任一币种设为 0 关闭该币种上限。警告阈值设为 0 关闭警告。"
-      }
+      },
+      "available_models": "可用模型"
     },
     "mcp": "MCP 服务器",
     "image_gen": {
@@ -2902,6 +2972,22 @@
       "rate": "语速",
       "test": "试听",
       "test_sample": "你好，我是 Moraya 的本地语音助手。"
+    },
+    "doc_versioning": {
+      "clear": "清除历史",
+      "desc": "保留文档版本的滚动历史",
+      "enable": "启用版本历史",
+      "manage_in_picora": "在 Picora 中管理",
+      "max": "保留的最大版本数",
+      "state_off": "关闭",
+      "state_on": "开启",
+      "title": "文档版本",
+      "usage": "已用存储"
+    },
+    "version_history": {
+      "label": "版本历史",
+      "hint": "保留已保存版本的滚动历史",
+      "max": "保留的最大版本数"
     }
   },
   "shortcuts": {
@@ -3082,7 +3168,8 @@
     "tag_view": "标签",
     "open": "打开侧边栏",
     "close": "关闭侧边栏",
-    "local_workspace": "本地"
+    "local_workspace": "本地",
+    "untitled_file_name": "未命名"
   },
   "sso": {
     "title": "单点登录",
@@ -3980,5 +4067,70 @@
   },
   "math": {
     "placeholder": "输入 LaTeX，例如 x_0 或 \\frac{a}{b}"
+  },
+  "prompt_card": {
+    "background": "背景",
+    "context_file": "上下文文件"
+  },
+  "prompt_recall": {
+    "archive_failed": "归档失败",
+    "archived": "已归档",
+    "bind_unavailable": "绑定不可用",
+    "bound": "已绑定",
+    "card_copied": "卡片已复制",
+    "copied": "已复制",
+    "copy_failed": "复制失败",
+    "dedup_done": "已归档 {n} 个重复项",
+    "inserted": "已插入",
+    "loading": "加载中…",
+    "no_kb": "无知识库",
+    "note_saved": "笔记已保存",
+    "promote_failed": "提升失败",
+    "promoted": "已提升为资产",
+    "restore_failed": "恢复失败",
+    "restored": "已恢复",
+    "search_placeholder": "搜索提示词…",
+    "show_active": "显示活跃",
+    "show_archived": "显示已归档",
+    "empty_archived": "没有已归档的提示词",
+    "empty": "暂无提示词",
+    "no_match": "没有匹配的提示词",
+    "has_context": "含上下文",
+    "duplicate": "重复",
+    "uses": "使用 {n} 次",
+    "context_files": "上下文文件",
+    "unbind": "解绑",
+    "note_label": "笔记",
+    "note_placeholder": "添加笔记…",
+    "save_note": "保存笔记",
+    "restore": "恢复",
+    "copy": "复制",
+    "assemble": "组装",
+    "bind_file": "绑定文件",
+    "insert": "插入",
+    "dedup": "去重",
+    "promote": "提升为资产",
+    "archive": "归档"
+  },
+  "sync": {
+    "auto_merged": "已自动合并",
+    "loading_kb": "加载知识库…"
+  },
+  "version_history": {
+    "clear_confirm": "清除所有版本历史？此操作不可撤销。",
+    "current": "当前",
+    "empty": "暂无版本",
+    "open_hint": "在新标签页打开（只读）",
+    "restore": "恢复",
+    "restore_confirm": "恢复 {time} 的版本？",
+    "restore_failed": "恢复失败",
+    "restored": "版本已恢复",
+    "title": "版本历史",
+    "statusbar_tooltip": "版本历史",
+    "statusbar_disabled": "版本历史已关闭",
+    "clear": "清除历史",
+    "cloud_loading": "加载云端版本…",
+    "cloud_only": "仅云端",
+    "cloud_synced": "已同步到云端"
   }
 }

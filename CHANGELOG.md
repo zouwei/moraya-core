@@ -2,6 +2,12 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.8.2] — 2026-07-14
+
+### Fixed
+
+- **130 UI keys referenced by PC/Web but missing from the merged locale bundles.** Features shipped *after* the v0.96.0 i18n consolidation called `t('…')` with keys that were never added to core's locale JSONs, so both consumers' `i18n-coverage.mjs` gate failed and the affected UI rendered raw key strings. Namespaces backfilled: Prompt Palette (`prompt_recall.*`), document versioning / version history (`settings.doc_versioning.*`, `settings.version_history.*`, `settings.auto_save.*`, `version_history.*`), MCP import + LAN sharing (`mcp.import.*`, `mcp.lan.*`), memory-asset binding (`memory.*`, `kb_sync.memory_asset.*`), and the mobile AI menu (`mobile.ai.menu.*`). All 130 keys authored in `en.json` + `zh-CN.json`; the other 10 locales fall back to English via the engine's `t()` fallback until a machine-translation pass fills them. Both PC and Web coverage gates now report 0 undefined.
+
 ## [0.8.1] — 2026-07-11
 
 ### Fixed
