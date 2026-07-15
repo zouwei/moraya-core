@@ -4,7 +4,8 @@
 import { describe, it, expect } from 'vitest'
 import { claudeDriver, openaiDriver, geminiDriver } from '../drivers'
 import { getDriver, streamChat, sendChat, normalizeProvider, resolveCatalog, DEFAULT_MODELS } from '../index'
-import type { CatalogView } from '../index'
+import { IMAGE_DEFAULT_MODELS, IMAGE_BASE_URLS, resolveImageSize, imageEndpoint, buildOpenAIImageBody } from '../index'
+import type { CatalogView, ImageProvider } from '../index'
 import type { AITransport, TransportRequest, StreamCallbacks } from '../transport'
 import type { AIProviderConfig, AIRequest } from '../types'
 
@@ -179,5 +180,35 @@ describe('resolveCatalog — capability filtering + local overlay', () => {
     expect(overridden.onDevice).toBe(true)
     const seeded = resolveCatalog({ platform: 'ios' }).find((p) => p.id === 'local-mlx')!
     expect(seeded.models).toEqual(DEFAULT_MODELS['local-mlx'])
+  })
+})
+
+describe('image provider catalog', () => {
+  const IMAGE_IDS: ImageProvider[] = ['openai', 'grok', 'gemini', 'qwen', 'doubao', 'custom']
+
+  it('base URLs + default models cover every image provider', () => {
+    for (const id of IMAGE_IDS) {
+      expect(IMAGE_BASE_URLS[id]).toBeDefined()
+      expect(Array.isArray(IMAGE_DEFAULT_MODELS[id])).toBe(true)
+    }
+    expect(IMAGE_DEFAULT_MODELS.openai[0]).toBe('dall-e-3')
+    expect(IMAGE_BASE_URLS.doubao).toBe('https://ark.cn-beijing.volces.com/api/v3')
+  })
+
+  it('resolveImageSize maps ratio+level to WxH with a safe fallback', () => {
+    expect(resolveImageSize('16:9', 'large')).toBe('1920x1080')
+    expect(resolveImageSize('1:1', 'medium')).toBe('1024x1024')
+    // @ts-expect-error — unknown ratio falls back
+    expect(resolveImageSize('nope', 'large')).toBe('1024x1024')
+  })
+
+  it('imageEndpoint dedups the version segment', () => {
+    expect(imageEndpoint('https://api.openai.com')).toBe('https://api.openai.com/v1/images/generations')
+    expect(imageEndpoint('https://api.openai.com/v1')).toBe('https://api.openai.com/v1/images/generations')
+  })
+
+  it('buildOpenAIImageBody omits n unless passed (Doubao Seedream requires its absence)', () => {
+    expect(buildOpenAIImageBody('dall-e-3', { prompt: 'x' })).not.toHaveProperty('n')
+    expect(buildOpenAIImageBody('dall-e-3', { prompt: 'x', n: 2 }).n).toBe(2)
   })
 })
