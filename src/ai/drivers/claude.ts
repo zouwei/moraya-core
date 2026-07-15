@@ -5,7 +5,7 @@ import type { AIProviderConfig, AIRequest, AIResponse, ChatMessage, ToolCallRequ
 import type { TransportRequest } from '../transport'
 import type { AIDriver, StreamFold } from './types'
 import { formatToolsForProvider, parseClaudeToolCalls } from './tool-bridge'
-import { resolveBaseUrl } from './util'
+import { resolveBaseUrl, stripVersionSuffix } from './util'
 
 function buildClaudeMessages(messages: ChatMessage[]): Array<Record<string, unknown>> {
   const result: Array<Record<string, unknown>> = []
@@ -40,7 +40,9 @@ export const claudeDriver: AIDriver = {
   supportsStreaming: true,
 
   buildChatRequest(config, request, stream): TransportRequest {
-    const baseUrl = resolveBaseUrl(config, 'https://api.anthropic.com')
+    // Strip any trailing /v1 so a version-suffixed base URL (web convention)
+    // doesn't become /v1/v1/messages.
+    const baseUrl = stripVersionSuffix(resolveBaseUrl(config, 'https://api.anthropic.com'))
     const systemMessages = request.messages.filter(m => m.role === 'system')
     const chatMessages = request.messages.filter(m => m.role !== 'system')
 

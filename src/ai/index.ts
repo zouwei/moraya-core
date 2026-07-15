@@ -26,7 +26,7 @@ export {
   buildClaudeToolResultMessages,
   buildOpenAIToolResultMessages,
 } from './drivers/tool-bridge'
-export { openaiEndpoint } from './drivers/util'
+export { openaiEndpoint, stripVersionSuffix } from './drivers/util'
 // Image (OpenAI-compatible shared path) + voice/realtime provider types.
 export * from './image'
 export * from './voice'

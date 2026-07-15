@@ -64,3 +64,69 @@ export const PROVIDER_ALIASES: Record<string, AIProvider> = {
 export function normalizeProvider(id: string): AIProvider {
   return (PROVIDER_ALIASES[id] ?? id) as AIProvider
 }
+
+/** Per-provider capability metadata. Cloud providers carry no flags. */
+export interface ProviderMeta {
+  /** On-device runtime (no network); available only on its matching platform. */
+  onDevice?: boolean
+  /** For on-device providers: the mobile platform that ships this runtime. */
+  platform?: 'ios' | 'android'
+}
+
+export const PROVIDER_META: Record<AIProvider, ProviderMeta> = {
+  claude: {},
+  openai: {},
+  gemini: {},
+  deepseek: {},
+  ollama: {},
+  grok: {},
+  mistral: {},
+  glm: {},
+  minimax: {},
+  doubao: {},
+  custom: {},
+  'local-mlx': { onDevice: true, platform: 'ios' },
+  'local-llama': { onDevice: true, platform: 'android' },
+}
+
+/** The consuming platform for {@link resolveCatalog}. */
+export type CatalogPlatform = 'desktop' | 'web' | 'ios' | 'android'
+
+export interface CatalogView {
+  /** Consuming platform. On-device providers appear only on their matching mobile platform. */
+  platform: CatalogPlatform
+  /** Client-supplied model options for on-device providers (overrides the seed defaults). */
+  localModels?: Partial<Record<AIProvider, string[]>>
+}
+
+export interface ResolvedProvider {
+  id: AIProvider
+  label: string
+  baseUrl: string
+  models: string[]
+  onDevice: boolean
+}
+
+/**
+ * Resolve the effective provider catalog for one platform — the single source of
+ * truth all Moraya clients consume instead of forking their own catalog.
+ *
+ * Capability filtering only (no user-preference / entitlement layer here):
+ * - On-device providers are included solely on their matching mobile platform,
+ *   so desktop/web naturally omit them.
+ * - Cloud providers are always included with core's authoritative model lists.
+ * - On-device model lists may be overridden per-platform via `view.localModels`
+ *   (e.g. iOS MLX vs Android GGUF bundles); absent an override, the seed default
+ *   in {@link DEFAULT_MODELS} is used.
+ */
+export function resolveCatalog(view: CatalogView): ResolvedProvider[] {
+  const out: ResolvedProvider[] = []
+  for (const id of Object.keys(PROVIDER_LABELS) as AIProvider[]) {
+    const meta = PROVIDER_META[id]
+    const onDevice = meta.onDevice === true
+    if (onDevice && meta.platform !== view.platform) continue
+    const models = onDevice ? view.localModels?.[id] ?? DEFAULT_MODELS[id] : DEFAULT_MODELS[id]
+    out.push({ id, label: PROVIDER_LABELS[id], baseUrl: PROVIDER_BASE_URLS[id], models, onDevice })
+  }
+  return out
+}

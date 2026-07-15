@@ -3,7 +3,8 @@
 
 import { describe, it, expect } from 'vitest'
 import { claudeDriver, openaiDriver, geminiDriver } from '../drivers'
-import { getDriver, streamChat, sendChat, normalizeProvider } from '../index'
+import { getDriver, streamChat, sendChat, normalizeProvider, resolveCatalog, DEFAULT_MODELS } from '../index'
+import type { CatalogView } from '../index'
 import type { AITransport, TransportRequest, StreamCallbacks } from '../transport'
 import type { AIProviderConfig, AIRequest } from '../types'
 
@@ -35,6 +36,25 @@ describe('drivers.buildChatRequest — no secret leakage', () => {
     expect(oneShot.url).toMatch(/:generateContent$/)
     expect(stream.url).toMatch(/:streamGenerateContent\?alt=sse$/)
     expect(oneShot.auth).toEqual({ scheme: 'query', queryParam: 'key' })
+  })
+})
+
+describe('drivers dedup version-suffixed base URLs (web convention)', () => {
+  it('claude: /v1-suffixed baseUrl does not become /v1/v1/messages', () => {
+    const t = claudeDriver.buildChatRequest(cfg({ baseUrl: 'https://api.anthropic.com/v1' }), req(), false)
+    expect(t.url).toBe('https://api.anthropic.com/v1/messages')
+  })
+  it('claude: origin-only baseUrl still gets /v1', () => {
+    const t = claudeDriver.buildChatRequest(cfg({ baseUrl: 'https://api.anthropic.com' }), req(), false)
+    expect(t.url).toBe('https://api.anthropic.com/v1/messages')
+  })
+  it('gemini: /v1beta-suffixed baseUrl does not double-prefix', () => {
+    const t = geminiDriver.buildChatRequest(cfg({ provider: 'gemini', model: 'gemini-2.5-flash', baseUrl: 'https://generativelanguage.googleapis.com/v1beta' }), req(), false)
+    expect(t.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent')
+  })
+  it('gemini: origin-only baseUrl still gets /v1beta', () => {
+    const t = geminiDriver.buildChatRequest(cfg({ provider: 'gemini', model: 'gemini-2.5-flash', baseUrl: 'https://generativelanguage.googleapis.com' }), req(), true)
+    expect(t.url).toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse')
   })
 })
 
@@ -123,5 +143,41 @@ describe('streamChat', () => {
     const body = JSON.stringify({ model: 'gpt-4o', choices: [{ message: { content: 'hi there' }, finish_reason: 'stop' }], usage: { prompt_tokens: 2, completion_tokens: 2 } })
     const r = await sendChat(cfg({ provider: 'openai', model: 'gpt-4o' }), req(), new FakeTransport([], body))
     expect(r.content).toBe('hi there')
+  })
+})
+
+describe('resolveCatalog — capability filtering + local overlay', () => {
+  const ids = (v: CatalogView) => resolveCatalog(v).map((p) => p.id)
+
+  it('desktop and web hide on-device providers, keep cloud ones', () => {
+    for (const platform of ['desktop', 'web'] as const) {
+      const got = ids({ platform })
+      expect(got).not.toContain('local-mlx')
+      expect(got).not.toContain('local-llama')
+      expect(got).toContain('claude')
+      expect(got).toContain('custom')
+    }
+  })
+
+  it('ios shows local-mlx only; android shows local-llama only', () => {
+    expect(ids({ platform: 'ios' })).toContain('local-mlx')
+    expect(ids({ platform: 'ios' })).not.toContain('local-llama')
+    expect(ids({ platform: 'android' })).toContain('local-llama')
+    expect(ids({ platform: 'android' })).not.toContain('local-mlx')
+  })
+
+  it('cloud model lists come from core and are marked not on-device', () => {
+    const claude = resolveCatalog({ platform: 'desktop' }).find((p) => p.id === 'claude')!
+    expect(claude.models).toEqual(DEFAULT_MODELS.claude)
+    expect(claude.onDevice).toBe(false)
+  })
+
+  it('localModels overrides the on-device seed; absent an override falls back to seed', () => {
+    const custom = ['My-Local-7B', 'My-Local-3B']
+    const overridden = resolveCatalog({ platform: 'ios', localModels: { 'local-mlx': custom } }).find((p) => p.id === 'local-mlx')!
+    expect(overridden.models).toEqual(custom)
+    expect(overridden.onDevice).toBe(true)
+    const seeded = resolveCatalog({ platform: 'ios' }).find((p) => p.id === 'local-mlx')!
+    expect(seeded.models).toEqual(DEFAULT_MODELS['local-mlx'])
   })
 })

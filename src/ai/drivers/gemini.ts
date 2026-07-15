@@ -5,7 +5,7 @@ import type { AIRequest, AIResponse, ChatMessage, ToolCallRequest } from '../typ
 import type { TransportRequest } from '../transport'
 import type { AIDriver, StreamFold } from './types'
 import { formatToolsForProvider, parseGeminiToolCalls } from './tool-bridge'
-import { resolveBaseUrl } from './util'
+import { resolveBaseUrl, stripVersionSuffix } from './util'
 
 function buildGeminiContents(messages: ChatMessage[]): Array<Record<string, unknown>> {
   return messages.map(msg => {
@@ -36,7 +36,9 @@ export const geminiDriver: AIDriver = {
   supportsStreaming: true,
 
   buildChatRequest(config, request, stream): TransportRequest {
-    const baseUrl = resolveBaseUrl(config, 'https://generativelanguage.googleapis.com')
+    // Strip any trailing /v1beta so a version-suffixed base URL (web convention)
+    // doesn't become /v1beta/v1beta/models.
+    const baseUrl = stripVersionSuffix(resolveBaseUrl(config, 'https://generativelanguage.googleapis.com'))
     const systemMessages = request.messages.filter(m => m.role === 'system')
     const chatMessages = request.messages.filter(m => m.role !== 'system')
 
