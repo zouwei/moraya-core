@@ -102,3 +102,70 @@ describe('buildKeymap: Backspace at heading start', () => {
     expect(v.state.doc.child(0).textContent).toBe('Intro paragraph.Hello')
   })
 })
+
+describe('buildKeymap: Backspace after trailing formatting mark (ZWSP sentinel)', () => {
+  it('deletes the last character of trailing bold text, not just the ZWSP', async () => {
+    const v = await mount('**Bold text**')
+    const endPos = v.state.doc.content.size - 1 // right after "Bold text", inside the paragraph
+
+    // Landing the cursor there is exactly what a real click does: the
+    // cursor-target plugin (inline-code-convert.ts) proactively inserts a
+    // ZWSP after trailing formatting marks and moves the cursor past it —
+    // see needsCursorTarget(). First Backspace should still remove "t".
+    const handled = backspaceAt(v, endPos)
+    expect(handled).toBe(true)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('Bold tex')
+  })
+
+  it('repeated Backspace presses each remove one character (no stuck state)', async () => {
+    const v = await mount('**abc**')
+    const endPos = v.state.doc.content.size - 1
+
+    backspaceAt(v, endPos)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('ab')
+    backspaceAt(v, v.state.selection.from)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('a')
+    backspaceAt(v, v.state.selection.from)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('')
+  })
+
+  it('deletes the last character of trailing italic text', async () => {
+    const v = await mount('*Italic*')
+    const endPos = v.state.doc.content.size - 1
+    const handled = backspaceAt(v, endPos)
+    expect(handled).toBe(true)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('Itali')
+  })
+
+  it('deletes the last character of trailing inline code (non-inclusive mark, ZWSP is its own node)', async () => {
+    const v = await mount('`code`')
+    const endPos = v.state.doc.content.size - 1
+    const handled = backspaceAt(v, endPos)
+    expect(handled).toBe(true)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('cod')
+  })
+
+  it('deletes the last character of trailing strikethrough text', async () => {
+    const v = await mount('~~struck~~')
+    const endPos = v.state.doc.content.size - 1
+    const handled = backspaceAt(v, endPos)
+    expect(handled).toBe(true)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('struc')
+  })
+
+  it('re-landing the cursor on an already-targeted bold run does not duplicate the ZWSP', async () => {
+    const v = await mount('**abc**')
+    const endPos = v.state.doc.content.size - 1
+    backspaceAt(v, endPos) // first Backspace: lands cursor + inserts the sentinel ZWSP
+    const zwspCountAfterFirst = (v.state.doc.textContent.match(/​/g) ?? []).length
+    expect(zwspCountAfterFirst).toBe(1)
+
+    // Re-setting the selection to the exact same (already-targeted) position —
+    // e.g. a second click, or any no-op selectionSet transaction — must not
+    // insert a second ZWSP (needsCursorTarget's "already has one" check has
+    // to recognize the merged-into-marked-run form, not just a bare node).
+    v.dispatch(v.state.tr.setSelection(TextSelection.create(v.state.doc, v.state.selection.from)))
+    const zwspCountAfterReselect = (v.state.doc.textContent.match(/​/g) ?? []).length
+    expect(zwspCountAfterReselect).toBe(1)
+  })
+})

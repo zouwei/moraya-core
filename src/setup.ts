@@ -60,7 +60,7 @@ import { createDefListInputRule } from './plugins/definition-list'
 import { createEnterHandlerPlugin } from './plugins/enter-handler'
 import { createCursorSyntaxPlugin } from './plugins/cursor-syntax'
 import { createLinkTextPlugin } from './plugins/link-text-plugin'
-import { createInlineCodeConvertPlugin } from './plugins/inline-code-convert'
+import { createInlineCodeConvertPlugin, ZWSP } from './plugins/inline-code-convert'
 import { createEditorPropsPlugin } from './plugins/editor-props-plugin'
 import type {
   MediaResolver,
@@ -380,6 +380,11 @@ function buildInputRules(schema: Schema, tier1: Tier1Plugins): Plugin {
 
 // ── Keymap ──────────────────────────────────────────────────────
 
+/** UTF-16 low surrogate check — a preceding high surrogate means the pair (e.g. emoji) must delete together. */
+function isLowSurrogate(code: number): boolean {
+  return code >= 0xDC00 && code <= 0xDFFF
+}
+
 function buildKeymap(schema: Schema): Plugin {
   const N = schema.nodes
   const M = schema.marks
@@ -567,10 +572,41 @@ function buildKeymap(schema: Schema): Plugin {
     if (parent.isTextblock && parentOffset === parent.content.size && parentOffset > 0) {
       if (dispatch) {
         const nb = $cursor.nodeBefore
-        if (nb && nb.isText && nb.text) {
+        if (nb && nb.isText && nb.text && nb.text.endsWith(ZWSP)) {
+          // Cursor sits right after the sentinel ZWSP that inline-code-convert.ts
+          // inserts (and keeps re-inserting) after trailing bold/italic/code/strike
+          // text so WebKit has a caret target past the mark. Deleting only the
+          // ZWSP is immediately undone by that plugin's appendTransaction — the
+          // marked run is still last-in-block, so it re-adds the same ZWSP right
+          // back, making Backspace a silent no-op. Delete through it instead:
+          // remove the ZWSP together with the character before it.
+          //
+          // Inclusive marks (strong/em/strike_through) pick up the mark at
+          // insertText time, so the ZWSP merges into the SAME text node as the
+          // preceding character (nb.text.length > 1). `code` is inclusive:false,
+          // so its ZWSP lands as its own unmarked node right after the code-marked
+          // one (nb.text === ZWSP, length 1) — the real character to delete is in
+          // a separate preceding sibling node.
+          if (nb.text.length > 1) {
+            const withoutZwsp = nb.text.slice(0, -1)
+            const delLen = isLowSurrogate(withoutZwsp.charCodeAt(withoutZwsp.length - 1)) ? 2 : 1
+            dispatch(state.tr.delete(sel.from - 1 - delLen, sel.from).scrollIntoView())
+          } else {
+            const zwspStart = sel.from - 1
+            const before = state.doc.resolve(zwspStart).nodeBefore
+            if (before) {
+              const delLen = before.isText && before.text
+                ? (isLowSurrogate(before.text.charCodeAt(before.text.length - 1)) ? 2 : 1)
+                : before.nodeSize
+              dispatch(state.tr.delete(zwspStart - delLen, sel.from).scrollIntoView())
+            } else {
+              // Textblock contains only the orphaned sentinel — delete it alone.
+              dispatch(state.tr.delete(zwspStart, sel.from).scrollIntoView())
+            }
+          }
+        } else if (nb && nb.isText && nb.text) {
           // Handle surrogate pairs (emoji etc.)
-          const code = nb.text.charCodeAt(nb.text.length - 1)
-          const delLen = (code >= 0xDC00 && code <= 0xDFFF) ? 2 : 1
+          const delLen = isLowSurrogate(nb.text.charCodeAt(nb.text.length - 1)) ? 2 : 1
           dispatch(state.tr.delete(sel.from - delLen, sel.from).scrollIntoView())
         } else if (nb) {
           dispatch(state.tr.delete(sel.from - nb.nodeSize, sel.from).scrollIntoView())

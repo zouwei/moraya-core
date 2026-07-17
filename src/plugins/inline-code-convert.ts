@@ -110,8 +110,14 @@ function needsCursorTarget(state: EditorState): number {
   const lastChild = parent.lastChild
   if (!lastChild?.isText) return -1
 
-  // Already has a trailing ZWSP without any target mark — no action needed
-  if (!hasZwspTargetMark(lastChild.marks, state) && lastChild.text?.endsWith(ZWSP)) return -1
+  // Already has a trailing ZWSP — no action needed. Covers both forms: a
+  // separate unmarked node (non-inclusive marks like `code`) AND a ZWSP
+  // merged into the SAME text node as the marked run (inclusive marks —
+  // strong/em/strike_through — pick up the mark at insertText time, per
+  // ProseMirror's inclusive-mark boundary rule). Missing the merged form
+  // here caused repeated no-op selection-set transactions (e.g. clicking
+  // back into an already-targeted run) to insert a SECOND ZWSP each time.
+  if (lastChild.text?.endsWith(ZWSP)) return -1
 
   // Walk backwards skipping existing ZWSP-only unmarked nodes.
   // If the last meaningful child has a target mark → insert ZWSP at end.

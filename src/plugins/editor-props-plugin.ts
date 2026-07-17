@@ -31,6 +31,7 @@ import { Fragment, Slice } from 'prosemirror-model'
 import { AllSelection, Plugin, PluginKey, TextSelection } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 import { parseMarkdown, parseMarkdownAsync } from '../markdown'
+import { ZWSP } from './inline-code-convert'
 import type { LinkOpener, Platform } from '../types'
 
 const editorPropsKey = new PluginKey('moraya-editor-props')
@@ -420,7 +421,47 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
                   const nb = sel.$cursor.nodeBefore
                   if (nb) {
                     event.preventDefault()
-                    if (nb.isText && nb.text) {
+                    if (nb.isText && nb.text && nb.text.endsWith(ZWSP)) {
+                      // Cursor sits right after the sentinel ZWSP that
+                      // inline-code-convert.ts inserts (and keeps re-inserting)
+                      // after trailing bold/italic/code/strike text so WebKit
+                      // has a caret target past the mark. Deleting only the
+                      // ZWSP is immediately undone by that plugin's
+                      // appendTransaction — the marked run is still
+                      // last-in-block, so it re-adds the same ZWSP right back,
+                      // making Backspace a silent no-op. Delete through it
+                      // instead: remove the ZWSP together with the character
+                      // before it.
+                      //
+                      // Inclusive marks (strong/em/strike_through) pick up the
+                      // mark at insertText time, so the ZWSP merges into the
+                      // SAME text node as the preceding character
+                      // (nb.text.length > 1). `code` is inclusive:false, so its
+                      // ZWSP lands as its own unmarked node right after the
+                      // code-marked one (nb.text === ZWSP) — the real character
+                      // to delete is in a separate preceding sibling node.
+                      if (nb.text.length > 1) {
+                        const withoutZwsp = nb.text.slice(0, -1)
+                        const code = withoutZwsp.charCodeAt(withoutZwsp.length - 1)
+                        const delLen = (code >= 0xDC00 && code <= 0xDFFF) ? 2 : 1
+                        view.dispatch(view.state.tr.delete(sel.from - 1 - delLen, sel.from).scrollIntoView())
+                      } else {
+                        const zwspStart = sel.from - 1
+                        const before = view.state.doc.resolve(zwspStart).nodeBefore
+                        if (before) {
+                          if (before.isText && before.text) {
+                            const code = before.text.charCodeAt(before.text.length - 1)
+                            const delLen = (code >= 0xDC00 && code <= 0xDFFF) ? 2 : 1
+                            view.dispatch(view.state.tr.delete(zwspStart - delLen, sel.from).scrollIntoView())
+                          } else {
+                            view.dispatch(view.state.tr.delete(zwspStart - before.nodeSize, sel.from).scrollIntoView())
+                          }
+                        } else {
+                          // Textblock contains only the orphaned sentinel — delete it alone.
+                          view.dispatch(view.state.tr.delete(zwspStart, sel.from).scrollIntoView())
+                        }
+                      }
+                    } else if (nb.isText && nb.text) {
                       const code = nb.text.charCodeAt(nb.text.length - 1)
                       const delLen = (code >= 0xDC00 && code <= 0xDFFF) ? 2 : 1
                       view.dispatch(view.state.tr.delete(sel.from - delLen, sel.from).scrollIntoView())
