@@ -23,7 +23,7 @@ import { EditorState, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { createSchema } from '../schema'
 import { BrowserMediaResolver } from '../adapters/browser-media-resolver'
-import { parseMarkdown } from '../markdown'
+import { parseMarkdown, serializeMarkdown } from '../markdown'
 import { createEditorPlugins } from '../setup'
 
 const testSchema = createSchema({ mediaResolver: new BrowserMediaResolver() })
@@ -45,6 +45,17 @@ function backspaceAt(v: EditorView, pos: number) {
   const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true })
   v.dom.dispatchEvent(event)
   return event.defaultPrevented
+}
+
+/** Types through EditorView.handleTextInput — the same entry point real
+    per-character typing uses (and what the inputRules plugin hooks into).
+    Plain insertText transactions skip input rules entirely. */
+function typeText(v: EditorView, text: string) {
+  for (const ch of text) {
+    const pos = v.state.selection.from
+    const handled = v.someProp('handleTextInput', f => f(v, pos, pos, ch))
+    if (!handled) v.dispatch(v.state.tr.insertText(ch, pos))
+  }
 }
 
 beforeEach(() => {
@@ -167,5 +178,43 @@ describe('buildKeymap: Backspace after trailing formatting mark (ZWSP sentinel)'
     v.dispatch(v.state.tr.setSelection(TextSelection.create(v.state.doc, v.state.selection.from)))
     const zwspCountAfterReselect = (v.state.doc.textContent.match(/​/g) ?? []).length
     expect(zwspCountAfterReselect).toBe(1)
+  })
+})
+
+describe('buildInputRules: bare "**" toggles bold instead of leaving literal delimiters', () => {
+  it('typing ** then content then ** produces real bold with no literal asterisks', async () => {
+    const v = await mount('')
+    typeText(v, '**加粗文字**')
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**加粗文字**')
+    const strongMark = testSchema.marks.strong!
+    v.state.doc.descendants((node) => {
+      if (node.isText) expect(strongMark.isInSet(node.marks)).toBeTruthy()
+    })
+  })
+
+  it('closes and reopens across two segments on the same line', async () => {
+    const v = await mount('')
+    typeText(v, '**a** **b**')
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**a** **b**')
+  })
+
+  it('typing **** with no content in between leaves an empty paragraph', async () => {
+    const v = await mount('')
+    typeText(v, '****')
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('')
+  })
+
+  it('plain typing with no ** is completely unaffected', async () => {
+    const v = await mount('')
+    typeText(v, 'hello world')
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('hello world')
+  })
+
+  it('a bold run started by the toggle can still be Backspace-deleted normally', async () => {
+    const v = await mount('')
+    typeText(v, '**abc**')
+    const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true })
+    v.dom.dispatchEvent(event)
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('ab')
   })
 })

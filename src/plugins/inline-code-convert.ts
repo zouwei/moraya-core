@@ -189,18 +189,38 @@ export function createInlineCodeConvertPlugin(): Plugin {
         // the insertion point (the right boundary of the mark), clear those marks
         // from storedMarks so that typing immediately after the input rule produces
         // plain text (Typora-style: completing **bold** exits bold).
+        //
+        // EXCEPT when we're still inside an in-progress toggle session
+        // (setup.ts's bare "**" InputRule sets storedMarks the moment bold is
+        // turned on, before any marked characters exist) — stripping there
+        // would kill the toggle after its very first typed character.
+        // Checked two ways because storedMarks itself doesn't survive past a
+        // single subsequent keystroke (ProseMirror resets it to null on any
+        // docChanged transaction that doesn't explicitly re-set it): (a) it's
+        // still explicitly active in storedMarks (catches the FIRST typed
+        // character right after the toggle), or (b) the OLD cursor position
+        // was already inside/adjacent to the mark before this transaction
+        // (catches every character after that, once storedMarks has reset to
+        // null and typing is riding the inclusive-mark boundary fallback
+        // instead — same mechanism, just not visible in storedMarks anymore).
         if (newState.selection.from === insertPos) {
           const { $head: $h } = newState.selection
           if ($h?.nodeBefore) {
-            const hasInclusive = ZWSP_MARK_NAMES
-              .filter((n) => n !== 'code')
-              .some((name) => {
-                const mt = newState.schema.marks[name]
-                return mt && $h.nodeBefore!.marks.some((m) => m.type === mt)
-              })
-            if (hasInclusive) {
+            const inclusiveNames = ZWSP_MARK_NAMES.filter((n) => n !== 'code')
+            const hasInclusive = inclusiveNames.some((name) => {
+              const mt = newState.schema.marks[name]
+              return mt && $h.nodeBefore!.marks.some((m) => m.type === mt)
+            })
+            const wasAlreadyActive = inclusiveNames.some((name) => {
+              const mt = oldState.schema.marks[name]
+              if (!mt) return false
+              const inStoredMarks = oldState.storedMarks?.some((m) => m.type === mt) ?? false
+              const inPositionMarks = mt.isInSet(oldState.selection.$from.marks()) !== undefined
+              return inStoredMarks || inPositionMarks
+            })
+            if (hasInclusive && !wasAlreadyActive) {
               const filtered = $h.marks().filter((m) =>
-                !ZWSP_MARK_NAMES.filter((n) => n !== 'code').some((name) => {
+                !inclusiveNames.some((name) => {
                   const mt = newState.schema.marks[name]
                   return mt && m.type === mt
                 }),
