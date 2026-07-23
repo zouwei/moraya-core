@@ -2,6 +2,29 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.10.1] — 2026-07-23
+
+### Added
+
+- **Bare `**` toggles bold live** — typing `**` around text (or an empty pair) now toggles the bold mark inline, Typora-style, instead of leaving the literal `**` delimiters in the document.
+- **Code-block / diagram click-away-to-render.** Entering a code or mermaid block places the caret inside the block, and moving the selection out (clicking away) auto-exits edit mode and re-renders the block. Because the whole editor is a single contenteditable — which fires no DOM `blur` when the caret crosses node boundaries — the NodeView watches the native `selectionchange` and compares against ProseMirror's committed selection (rAF-deferred) to detect the exit. Matches the Typora click-away-to-render interaction (`plugins/code-block-view.ts`).
+
+### Fixed
+
+- **Backspace at the end of bold/italic/code/strike text silently no-op'd.** Clicking to the right of trailing formatted text (e.g. `**bold**` at a line's end) landed the caret after a sentinel ZWSP, where Backspace deleted the invisible sentinel and appeared to do nothing; it now deletes the expected character.
+
+## [0.10.0] — 2026-07-15
+
+### Added
+
+- **AI image provider catalog** — a single source of truth for the built-in AI image-generation providers, mirroring the chat provider catalog so both consumers resolve the same provider metadata.
+
+## [0.9.0] — 2026-07-15
+
+### Added
+
+- **`resolveCatalog` single-source AI provider metadata** + Claude/Gemini base-URL version-suffix dedup (fixes latent double-`/v1` request paths).
+
 ## [0.8.2] — 2026-07-14
 
 ### Fixed

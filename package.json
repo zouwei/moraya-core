@@ -1,6 +1,6 @@
 {
   "name": "@moraya/core",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Shared markdown editor core for Moraya desktop and Moraya Web. ProseMirror schema, markdown-it parser, prosemirror-markdown serializer, plugins, and editor lifecycle factories. Pure ESM, host-agnostic, dependency-injected.",
   "type": "module",
   "main": "./dist/index.js",
