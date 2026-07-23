@@ -25,6 +25,7 @@
  */
 
 import type { Node as PmNode } from 'prosemirror-model'
+import { TextSelection } from 'prosemirror-state'
 import type { EditorView } from 'prosemirror-view'
 import type { renderMermaid as RenderFn, updateMermaidTheme as UpdateThemeFn } from './mermaid-renderer'
 import type { RendererRegistry, RendererPluginModule } from '../types'
@@ -659,6 +660,50 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
       )
     })
 
+    // ── Enter edit: place the caret INSIDE this block ──
+    // The whole editor is one contenteditable, so we keep the invariant
+    // "editing ⟺ selection is inside this block". Putting the cursor in the
+    // code content on entry lets the selection-exit watcher below reliably
+    // detect when the user clicks away.
+    function focusCodeContent() {
+      const pos = getPos()
+      if (pos === undefined) { view.focus(); return }
+      const inner = Math.min(pos + 1, view.state.doc.content.size)
+      try {
+        view.dispatch(view.state.tr.setSelection(TextSelection.near(view.state.doc.resolve(inner), 1)))
+      } catch { /* boundary edge — fall through to plain focus */ }
+      view.focus()
+    }
+
+    // ── Auto-exit editing when the selection leaves this block ──
+    // Moving the caret from this code block to another node fires NO DOM blur
+    // (single contenteditable), so we watch the document's native
+    // `selectionchange` and compare against ProseMirror's committed selection.
+    // Once the caret is no longer inside this block we drop out of edit mode,
+    // which re-renders the diagram/preview (Typora-style click-away-to-render).
+    // rAF-deferred so PM has committed its selection before we read it.
+    let exitCheckRaf: number | null = null
+    function selectionIsInside(): boolean {
+      const pos = getPos()
+      if (pos === undefined) return false
+      const sel = view.state.selection
+      // Strictly inside the block CONTENT (exclude node boundaries so a
+      // whole-node NodeSelection counts as "outside" → renders).
+      return sel.from > pos && sel.to < pos + node.nodeSize
+    }
+    function scheduleExitCheck() {
+      if (!isEditing && !rendererEditing) return
+      if (exitCheckRaf !== null) return
+      exitCheckRaf = requestAnimationFrame(() => {
+        exitCheckRaf = null
+        if (!isEditing && !rendererEditing) return
+        if (selectionIsInside()) return
+        if (isMermaid && isEditing) { isEditing = false; syncMermaidMode() }
+        if (isRenderer && rendererEditing) { rendererEditing = false; syncRendererMode() }
+      })
+    }
+    document.addEventListener('selectionchange', scheduleExitCheck)
+
     // ── Mermaid / Renderer toggle button ──
     toggleBtn.addEventListener('mousedown', (e) => {
       e.preventDefault()
@@ -670,7 +715,8 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
         rendererEditing = !rendererEditing
         syncRendererMode()
       }
-      if (isEditing || rendererEditing) view.focus()
+      if (isEditing || rendererEditing) focusCodeContent()
+      else view.focus()
     })
 
     // Click SVG preview → enter edit mode
@@ -679,7 +725,7 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
       e.stopPropagation()
       isEditing = true
       syncMermaidMode()
-      view.focus()
+      focusCodeContent()
     })
 
     // ── Copy button ──
@@ -751,6 +797,8 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
       },
 
       destroy() {
+        document.removeEventListener('selectionchange', scheduleExitCheck)
+        if (exitCheckRaf !== null) { cancelAnimationFrame(exitCheckRaf); exitCheckRaf = null }
         if (activePicker) {
           activePicker.destroy()
           activePicker = null
