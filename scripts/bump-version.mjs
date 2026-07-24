@@ -79,7 +79,7 @@ console.log(`  ✓ package.json\n`);
 
 console.log(`Version updated to ${next}.\n`);
 console.log(`To release:`);
-console.log(`  git add package.json && git commit -m "chore: release v${next}"`);
+console.log(`  git add . && git commit -m "chore: release v${next}"`);
 console.log(`  git tag v${next}`);
 console.log(`  git push origin main --tags`);
 console.log(`  npm publish --access public   # runs spdx:check + build + test`);
