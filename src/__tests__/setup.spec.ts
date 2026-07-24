@@ -181,7 +181,7 @@ describe('buildKeymap: Backspace after trailing formatting mark (ZWSP sentinel)'
   })
 })
 
-describe('buildInputRules: bare "**" toggles bold instead of leaving literal delimiters', () => {
+describe('buildInputRules: strong (**text**) converts only once fully typed', () => {
   it('typing ** then content then ** produces real bold with no literal asterisks', async () => {
     const v = await mount('')
     typeText(v, '**加粗文字**')
@@ -192,16 +192,25 @@ describe('buildInputRules: bare "**" toggles bold instead of leaving literal del
     })
   })
 
-  it('closes and reopens across two segments on the same line', async () => {
+  it('converts two independent **runs** on the same line', async () => {
     const v = await mount('')
     typeText(v, '**a** **b**')
     expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**a** **b**')
   })
 
-  it('typing **** with no content in between leaves an empty paragraph', async () => {
+  it('leaves a bare "**" literal until it is closed (no live toggle)', async () => {
+    // Regression guard: the removed bare-"**" live-toggle deleted the pair the
+    // moment the second "*" was typed, which surprised users. Typing "**" now
+    // simply shows literal "**" and waits for the closing pair.
+    const v = await mount('')
+    typeText(v, '**')
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('**')
+  })
+
+  it('leaves "****" (no content between) as literal text', async () => {
     const v = await mount('')
     typeText(v, '****')
-    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('')
+    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('****')
   })
 
   it('plain typing with no ** is completely unaffected', async () => {
@@ -210,7 +219,7 @@ describe('buildInputRules: bare "**" toggles bold instead of leaving literal del
     expect(serializeMarkdown(v.state.doc, testSchema)).toBe('hello world')
   })
 
-  it('a bold run started by the toggle can still be Backspace-deleted normally', async () => {
+  it('a bold run created by the input rule can still be Backspace-deleted normally', async () => {
     const v = await mount('')
     typeText(v, '**abc**')
     const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true })

@@ -265,30 +265,6 @@ function buildInputRules(schema: Schema, tier1: Tier1Plugins): Plugin {
         return tr
       },
     ))
-
-    // Strong toggle: a bare "**" with nothing to close yet (the rule above
-    // only fires once a FULL "**text**" run exists) directly flips bold on
-    // for what's typed next — Cmd-B's storedMarks toggle, just triggered by
-    // typing the delimiter instead of a shortcut. A second "**" while bold
-    // is active closes it. No literal "**" characters are ever left in the
-    // document; Typora-style, the raw syntax only ever appears via the
-    // cursor-syntax decoration plugin, never as real content.
-    //
-    // The optional ​ between the two stars matters: while bold is
-    // active, inline-code-convert.ts's cursor-target mechanism re-inserts its
-    // ZWSP sentinel after EVERY typed character (each one is, in turn, the
-    // new last-marked-character needing a fresh caret target) — so the FIRST
-    // star of a closing "**" already lands with a ZWSP appended after it
-    // before the second star arrives, and a bare \*\* would never match.
-    rules.push(new InputRule(/(?<!\*)\*​?\*$/, (state, _match, start, end) => {
-      const strongType = M.strong!
-      const marksHere = state.storedMarks ?? state.doc.resolve(start).marks()
-      const isActive = strongType.isInSet(marksHere) !== undefined
-      const nextMarks = isActive
-        ? marksHere.filter((m) => m.type !== strongType)
-        : [...marksHere.filter((m) => m.type !== strongType), strongType.create()]
-      return state.tr.delete(start, end).setStoredMarks(nextMarks)
-    }))
   }
 
   // Emphasis: *text* or _text_
