@@ -76,6 +76,10 @@
     "./sync": {
       "import": "./dist/sync/index.js",
       "types": "./dist/sync/index.d.ts"
+    },
+    "./export": {
+      "import": "./dist/export/index.js",
+      "types": "./dist/export/index.d.ts"
     }
   },
   "files": [
@@ -129,7 +133,9 @@
     "prosemirror-state": "^1.4.0",
     "prosemirror-tables": "^1.8.0",
     "prosemirror-view": "^1.33.0",
-    "node-diff3": "^3.2.1"
+    "node-diff3": "^3.2.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.1.0"
   },
   "peerDependenciesMeta": {
     "mermaid": {
@@ -140,6 +146,12 @@
     },
     "node-diff3": {
       "optional": true
+    },
+    "html2canvas": {
+      "optional": true
+    },
+    "jspdf": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -148,6 +160,8 @@
     "diff": "^9.0.0",
     "happy-dom": "^20.9.0",
     "highlight.js": "^11.11.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.1.0",
     "katex": "^0.16.28",
     "markdown-it": "^14.1.1",
     "markdown-it-deflist": "^3.0.0",

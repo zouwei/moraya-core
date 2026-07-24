@@ -47,6 +47,10 @@ export default defineConfig({
     // false-conflict autosave races. Own bundle; pulls the node-diff3/diff
     // optional peers, so non-sync consumers never load it.
     'src/sync/index.ts',
+    // v0.11.0 export — shared document export (PDF / long-image / HTML / DOC /
+    // LaTeX). Own bundle; pulls the html2canvas/jspdf optional peers via lazy
+    // import(), so non-export consumers never load them.
+    'src/export/index.ts',
   ],
   format: ['esm'],
   dts: true,
@@ -76,6 +80,9 @@ export default defineConfig({
     // v0.8.0 sync optional peers — kept out of the bundle.
     'node-diff3',
     'diff',
+    // v0.11.0 export optional peers — kept out of the bundle (engine lazy-imports).
+    'html2canvas',
+    'jspdf',
   ],
   publicDir: 'src/styles',
   /*

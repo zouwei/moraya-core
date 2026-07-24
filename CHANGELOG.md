@@ -2,6 +2,20 @@
 
 All notable changes to `@moraya/core` are documented here. SemVer.
 
+## [0.11.0] — 2026-07-24
+
+### Added
+
+- **`@moraya/core/export`** — shared document export (PDF / long-image PNG / HTML / DOC / LaTeX) so PC / Web / Mobile share one implementation instead of it living only on desktop. Long-image and PDF work by screenshotting the already-rendered `.moraya-editor` DOM (full fidelity — tables, KaTeX, mermaid, highlighted code) with html2canvas, paginating content-aware (never slicing a table row / heading / image) and assembling A4 pages with jsPDF; HTML / DOC / LaTeX render markdown to a string.
+  - **Text export upgraded to markdown-it** (`markdownToHtml` / `markdownToHtmlBody`), closing the desktop regex renderer's gaps: GFM **tables**, **ordered lists**, **definition lists**, and **highlight.js** code highlighting now render; raw HTML is preserved (`html: true`, then `sanitizeHtml`), and KaTeX math (with mhchem `\ce`/`\pu`) renders inline.
+  - **`DocSyncIO`-style DI** via `ExportDeps`: the consumer injects a `FileSink` (Tauri save-dialog / browser download / Capacitor Share), a `MermaidRenderer`, per-platform `CanvasCaps` (iOS WKWebView caps tighter), and optionally its own html2canvas/jsPDF instances. The orchestrator `exportDocument(format, deps)` is non-throwing (returns a discriminated `ExportResult`) and emits `onProgress` phases.
+  - `html2canvas` + `jspdf` are **optional peers**, lazily `import()`ed and external in tsup — only consumers importing `/export` load them; every other bundle is unaffected.
+  - Pure `computeBreakOffsets` pagination solver + the capture / pdf / html producers, with 25 tests (pagination, markdown-it fidelity incl. tables/ordered-lists/highlight/mermaid/math, engine dispatch with injected fakes).
+
+## [0.10.2] — 2026-07-24
+
+Version bump (no source changes).
+
 ## [0.10.1] — 2026-07-23
 
 ### Added
