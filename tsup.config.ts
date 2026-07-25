@@ -51,6 +51,11 @@ export default defineConfig({
     // LaTeX). Own bundle; pulls the html2canvas/jspdf optional peers via lazy
     // import(), so non-export consumers never load them.
     'src/export/index.ts',
+    // v0.13.0 typst — shared Typst authoring core: flavor detection, compile
+    // orchestration (debounce + stale-result rejection), diagnostic
+    // normalization. The compiler itself is injected per platform (native CLI
+    // on desktop, WASM on web), so this bundle stays dependency-free.
+    'src/typst/index.ts',
   ],
   format: ['esm'],
   dts: true,
