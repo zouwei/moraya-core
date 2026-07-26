@@ -110,7 +110,7 @@
   ],
   "scripts": {
     "build": "tsup",
-    "pack:local": "pnpm pack --pack-destination ./pack",
+    "pack:local": "pnpm build && pnpm pack --pack-destination ./pack",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
