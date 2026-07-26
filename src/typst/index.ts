@@ -59,3 +59,13 @@ export {
   type AnchoredScrollInput,
   type Box,
 } from './viewport'
+
+export { extractTypstOutline, type TypstHeading } from './outline'
+
+export {
+  DEFAULT_VIEW_MODES,
+  viewModeForFlavor,
+  rememberViewMode,
+  type DocumentViewMode,
+  type ViewModeMemory,
+} from './view-mode'
