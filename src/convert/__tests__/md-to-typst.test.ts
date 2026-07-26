@@ -154,4 +154,13 @@ describe('markdown → Typst: contract', () => {
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.reason).toBe('source-error')
   })
+  it('does not nest a # inside #figure (invalid in code mode)', () => {
+    // Regression: `#figure(#image(…))` made the Typst compiler fail with
+    // "the character `#` is not valid in code", so a converted document with
+    // any captioned image would not compile at all.
+    const out = conv('![Cap](x.png)')
+    expect(out).toContain('#figure(image("x.png")')
+    expect(out).not.toContain('(#image')
+  })
+
 })

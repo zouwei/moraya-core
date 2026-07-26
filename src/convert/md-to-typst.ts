@@ -207,9 +207,13 @@ function serializeTable(node: PMNode, ctx: Ctx, indent: string): string {
 function serializeImage(node: PMNode): string {
   const src = String(node.attrs['src'] ?? '')
   const alt = String(node.attrs['alt'] ?? '')
-  const image = `#image(${quote(src)})`
+  const call = `image(${quote(src)})`
   // A caption is only meaningful inside a figure.
-  return alt ? `#figure(${image}, caption: [${escapeTypst(alt)}])` : image
+  //
+  // `#` switches markup mode into code mode, so it belongs ONLY on the outermost
+  // call. Nesting it (`#figure(#image(…))`) makes the Typst compiler reject the
+  // document with "the character `#` is not valid in code".
+  return alt ? `#figure(${call}, caption: [${escapeTypst(alt)}])` : `#${call}`
 }
 
 /**

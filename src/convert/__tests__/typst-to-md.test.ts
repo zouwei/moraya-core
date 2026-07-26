@@ -55,6 +55,13 @@ describe('typstSourceToMarkdown — blocks', () => {
   })
 
   it('converts a figure to an image with its caption', () => {
+    expect(md('#figure(image("x.png"), caption: [Cap])')).toBe('![Cap](x.png)')
+  })
+
+  it('still reads the legacy nested-# figure form', () => {
+    // `#figure(#image(…))` is invalid Typst (the compiler rejects the nested
+    // `#`), but documents written before that was fixed carry it — read them
+    // back rather than dropping the image.
     expect(md('#figure(#image("x.png"), caption: [Cap])')).toBe('![Cap](x.png)')
   })
 

@@ -446,9 +446,14 @@ function firstString(argsSrc: string): string | null {
 }
 
 function firstImageSrc(argsSrc: string): string | null {
-  const at = argsSrc.indexOf('#image(')
-  if (at === -1) return null
-  return firstString(groupAt(argsSrc, at + '#image'.length, '(', ')'))
+  // Inside `#figure(…)` the arguments are already code, so the correct call is
+  // bare — `image("…")`. Documents written before that fix (and by other tools)
+  // may carry the invalid `#image("…")` form, which the Typst compiler rejects
+  // but which we still read back so no content is lost on conversion.
+  const m = /#?image\s*\(/.exec(argsSrc)
+  if (!m) return null
+  const parenAt = m.index + m[0].length - 1
+  return firstString(groupAt(argsSrc, parenAt, '(', ')'))
 }
 
 /**
