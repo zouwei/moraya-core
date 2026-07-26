@@ -39,3 +39,23 @@ export {
   type PreviewCompiler,
   type PreviewCompilerOptions,
 } from './engine'
+
+export {
+  tokenizeTypst,
+  typstTokenClass,
+  type TypstToken,
+  type TypstTokenType,
+} from './highlight'
+
+export {
+  ZOOM_MIN,
+  ZOOM_MAX,
+  ZOOM_STEP,
+  clampZoom,
+  zoomByWheel,
+  anchoredScroll,
+  isZoomGesture,
+  fitPageBox,
+  type AnchoredScrollInput,
+  type Box,
+} from './viewport'

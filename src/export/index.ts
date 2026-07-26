@@ -46,6 +46,18 @@ export {
   assertCanvasFits,
 } from './capture'
 
+export {
+  exportTypstDocument,
+  renderTypstLongImage,
+  typstPagesToHtml,
+  typstImagesToHtml,
+  stripSvgScripts,
+  svgPixelSize,
+  TYPST_EXPORT_FORMATS,
+  type TypstExportFormat,
+  type TypstExportDeps,
+} from './typst'
+
 export { composePdf } from './pdf'
 export { computeBreakOffsets } from './pagination'
 export type { BlockExtent } from './pagination'

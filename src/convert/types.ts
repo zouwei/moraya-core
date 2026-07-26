@@ -61,6 +61,11 @@ export interface MarkdownToTypstOptions {
 
 /** Dependencies for Typst → markdown (the compiler does the evaluation). */
 export interface TypstToMarkdownDeps {
-  /** Same injected compiler used for preview/export — must support `'html'`. */
-  compiler: TypstCompiler
+  /**
+   * Same injected compiler used for preview/export. Supply it when the platform
+   * can compile to `'html'` (desktop's native binary) for a full evaluation of
+   * the document; omit it — as the browser must, since typst.ts has no HTML
+   * writer — to convert the markup from source instead.
+   */
+  compiler?: TypstCompiler
 }
