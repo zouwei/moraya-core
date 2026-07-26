@@ -8,5 +8,10 @@ coverage/
 .tsbuildinfo
 *.tsbuildinfo
 
-# pnpm pack / npm pack tarballs (local build artifacts)
+# pnpm pack / npm pack tarballs (local build artifacts).
+# `pack/` is the canonical output dir — `pnpm pack:local` writes there, and
+# consumers bridge to it during pre-publication local iteration (see the
+# vendored-tarball rule in the consumers' CLAUDE.md). The whole directory is
+# ignored; the bare `*.tgz` line stays as a safety net for stray tarballs.
+/pack/
 *.tgz

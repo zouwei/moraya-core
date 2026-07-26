@@ -84,6 +84,10 @@
     "./typst": {
       "import": "./dist/typst/index.js",
       "types": "./dist/typst/index.d.ts"
+    },
+    "./convert": {
+      "import": "./dist/convert/index.js",
+      "types": "./dist/convert/index.d.ts"
     }
   },
   "files": [
@@ -106,6 +110,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "pack:local": "pnpm pack --pack-destination ./pack",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -114,6 +119,7 @@
     "spdx:check": "node scripts/check-spdx.mjs",
     "spdx:fix": "node scripts/check-spdx.mjs --fix",
     "version:bump": "node scripts/bump-version.mjs",
+    "release:notes": "node scripts/summarize-release.mjs",
     "prepublishOnly": "npm run spdx:check && npm run build && npm run test",
     "release": "node scripts/release-with-consumers.mjs"
   },

@@ -22,6 +22,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
@@ -78,6 +79,21 @@ writeJSON(pkgPath, pkg);
 console.log(`  ✓ package.json\n`);
 
 console.log(`Version updated to ${next}.\n`);
+// Draft the release commit message from the actual diff (Claude-assisted).
+// Separate script so bumping stays deterministic and offline-capable; skip
+// with `--no-notes`.
+if (!process.argv.includes('--no-notes')) {
+  try {
+    execSync(`node ${resolve(root, 'scripts/summarize-release.mjs')} ${next}`, {
+      cwd: root,
+      stdio: 'inherit',
+    });
+  } catch {
+    // Never let note drafting fail the bump — version files are already written.
+    console.log('\n⚠ Release-note drafting failed; continuing.');
+  }
+}
+
 console.log(`To release:`);
 console.log(`  git add . && git commit -m "chore: release v${next}"`);
 console.log(`  git tag v${next}`);

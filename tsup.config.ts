@@ -56,6 +56,10 @@ export default defineConfig({
     // normalization. The compiler itself is injected per platform (native CLI
     // on desktop, WASM on web), so this bundle stays dependency-free.
     'src/typst/index.ts',
+    // v0.15.0 convert — Markdown ⇄ Typst source conversion. Separate from
+    // /typst (which is deliberately dependency-free): md→typst walks the
+    // ProseMirror AST, so this bundle pulls markdown-it + prosemirror.
+    'src/convert/index.ts',
   ],
   format: ['esm'],
   dts: true,
