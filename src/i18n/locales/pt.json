@@ -1941,7 +1941,7 @@
       },
       "tpl": {
         "screenshot-to-md": {
-          "name": "Imagem → Remarcação",
+          "name": "Imagem → Markdown",
           "desc": "Converta uma captura de tela, foto ou gráfico para limpar o Markdown.",
           "input": "Adicione uma legenda ou deixe em branco – o modelo usa sua imagem."
         },

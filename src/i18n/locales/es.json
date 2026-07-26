@@ -1941,7 +1941,7 @@
       },
       "tpl": {
         "screenshot-to-md": {
-          "name": "Imagen → Rebaja",
+          "name": "Imagen → Markdown",
           "desc": "Convierta una captura de pantalla, una foto o un gráfico para limpiar Markdown.",
           "input": "Agregue un título o déjelo vacío: el modelo usa su imagen."
         },
@@ -1957,7 +1957,7 @@
         },
         "translate-zh-en": {
           "name": "Traducir ZH ↔ EN",
-          "desc": "Detecta automáticamente el idioma de origen. Conserva el descuento.",
+          "desc": "Detecta automáticamente el idioma de origen. Conserva el formato Markdown.",
           "input": "Pega el texto para traducir."
         }
       },
