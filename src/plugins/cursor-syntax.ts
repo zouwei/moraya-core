@@ -153,6 +153,30 @@ function buildDecorations(state: EditorState): DecorationSet {
     )
   }
 
+  // 3b. Armed-but-empty marks: right after typing `**` the mark lives in
+  //     storedMarks and covers no text yet, so getMarkRange above finds nothing
+  //     and the caret would sit with no visible affordance at all — which reads
+  //     as "my asterisks disappeared". Draw the delimiters around the caret so
+  //     the pending mark looks like `**|**` until the first character is typed
+  //     (after which the range branch takes over).
+  if (state.selection.empty && state.storedMarks) {
+    for (const [markName, delim] of Object.entries(MARK_DELIMITERS)) {
+      const markType = state.schema.marks[markName]
+      if (!markType || !markType.isInSet(state.storedMarks)) continue
+      if (getMarkRange(state, pos, markType)) continue // already has content
+      decorations.push(
+        Decoration.widget(pos, makeWidget(delim.open, 'syntax-md-mark'), {
+          side: -1,
+          key: `${markName}-open-pending`,
+        }),
+        Decoration.widget(pos, makeWidget(delim.close, 'syntax-md-mark'), {
+          side: 1,
+          key: `${markName}-close-pending`,
+        }),
+      )
+    }
+  }
+
   // 4. Link marks are handled by link-text-plugin (expand/collapse)
 
   return DecorationSet.create(state.doc, decorations)
@@ -166,8 +190,11 @@ export function createCursorSyntaxPlugin(): Plugin {
         return buildDecorations(state)
       },
       apply(tr, old, _, newState) {
-        // Only recompute when selection or document changes
-        if (!tr.selectionSet && !tr.docChanged) return old
+        // Recompute on selection / document changes, and on storedMarks changes
+        // too: toggling a mark on an empty selection (Cmd+B, or the bare `**`
+        // rule) alters neither, yet it is exactly when the pending-mark
+        // delimiters have to appear or disappear.
+        if (!tr.selectionSet && !tr.docChanged && !tr.storedMarksSet) return old
         return buildDecorations(newState)
       },
     },

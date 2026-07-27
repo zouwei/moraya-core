@@ -265,6 +265,31 @@ function buildInputRules(schema: Schema, tier1: Tier1Plugins): Plugin {
         return tr
       },
     ))
+
+    // A bare `**` with nothing to close yet: turn bold ON for what comes next
+    // instead of leaving two literal asterisks in the document.
+    //
+    // Literal asterisks are not a neutral fallback — markdown serialization
+    // escapes them, so a half-typed `**` round-trips as `\\*\\*` and the user
+    // sees backslashes appear. Toggling the mark keeps the document clean
+    // (`**text**` on save) and cursor-syntax.ts draws the `**|**` delimiters
+    // around the caret, so the affordance is still visible — that missing
+    // feedback is what made an earlier version of this rule look like it had
+    // swallowed the typed asterisks.
+    //
+    // The optional ZWSP between the stars matters: while bold is active,
+    // inline-code-convert.ts re-inserts its caret-target sentinel after every
+    // typed character, so the first star of a closing `**` already has one
+    // appended before the second star arrives, and a bare \*\* would not match.
+    rules.push(new InputRule(/(?<!\*)\*\u200b?\*$/, (state, _match, start, end) => {
+      const strongType = M.strong!
+      const marksHere = state.storedMarks ?? state.doc.resolve(start).marks()
+      const isActive = strongType.isInSet(marksHere) !== undefined
+      const nextMarks = isActive
+        ? marksHere.filter((m) => m.type !== strongType)
+        : [...marksHere.filter((m) => m.type !== strongType), strongType.create()]
+      return state.tr.delete(start, end).setStoredMarks(nextMarks)
+    }))
   }
 
   // Emphasis: *text* or _text_

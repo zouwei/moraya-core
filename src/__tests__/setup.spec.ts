@@ -181,6 +181,54 @@ describe('buildKeymap: Backspace after trailing formatting mark (ZWSP sentinel)'
   })
 })
 
+describe('buildInputRules: bare "**" arms bold instead of leaving literal stars', () => {
+  /** Delimiters the cursor-syntax plugin renders around the caret. */
+  function pendingDelimiters(v: EditorView): string {
+    return Array.from(v.dom.querySelectorAll('.syntax-md-mark'))
+      .map((el) => el.textContent ?? '')
+      .join('|')
+  }
+
+  it('leaves no literal asterisks in the document', async () => {
+    const v = await mount('')
+    typeText(v, '**')
+    // Literal stars would serialize escaped (\\*\\*) the moment the document
+    // round-trips — the bug this rule exists to avoid.
+    expect(v.state.doc.textContent.replace(/\u200b/g, '')).toBe('')
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('')
+  })
+
+  it('arms bold for what is typed next', async () => {
+    const v = await mount('')
+    typeText(v, '**')
+    const strong = testSchema.marks.strong!
+    expect(strong.isInSet(v.state.storedMarks ?? [])).toBeTruthy()
+  })
+
+  it('shows ** delimiters around the caret while the mark is still empty', async () => {
+    const v = await mount('')
+    typeText(v, '**')
+    // Without this the caret sits with no affordance at all, which reads as
+    // "the asterisks I typed disappeared".
+    expect(pendingDelimiters(v)).toBe('**|**')
+  })
+
+  it('produces real bold once content is typed', async () => {
+    const v = await mount('')
+    typeText(v, '**加粗**')
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**加粗**')
+  })
+
+  it('a second ** turns bold back off', async () => {
+    const v = await mount('')
+    typeText(v, '**')
+    typeText(v, '**')
+    const strong = testSchema.marks.strong!
+    expect(strong.isInSet(v.state.storedMarks ?? [])).toBeFalsy()
+    expect(v.state.doc.textContent.replace(/\u200b/g, '')).toBe('')
+  })
+})
+
 describe('buildInputRules: strong (**text**) converts only once fully typed', () => {
   it('typing ** then content then ** produces real bold with no literal asterisks', async () => {
     const v = await mount('')
@@ -198,20 +246,7 @@ describe('buildInputRules: strong (**text**) converts only once fully typed', ()
     expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**a** **b**')
   })
 
-  it('leaves a bare "**" literal until it is closed (no live toggle)', async () => {
-    // Regression guard: the removed bare-"**" live-toggle deleted the pair the
-    // moment the second "*" was typed, which surprised users. Typing "**" now
-    // simply shows literal "**" and waits for the closing pair.
-    const v = await mount('')
-    typeText(v, '**')
-    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('**')
-  })
 
-  it('leaves "****" (no content between) as literal text', async () => {
-    const v = await mount('')
-    typeText(v, '****')
-    expect(v.state.doc.textContent.replace(/​/g, '')).toBe('****')
-  })
 
   it('plain typing with no ** is completely unaffected', async () => {
     const v = await mount('')
