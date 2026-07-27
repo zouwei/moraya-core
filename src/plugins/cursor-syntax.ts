@@ -163,6 +163,12 @@ function buildDecorations(state: EditorState): DecorationSet {
     for (const [markName, delim] of Object.entries(MARK_DELIMITERS)) {
       const markType = state.schema.marks[markName]
       if (!markType || !markType.isInSet(state.storedMarks)) continue
+      // Only where the mark could actually apply. storedMarks can carry a mark
+      // into a block that forbids it (code_block is `marks: ''`), and a widget
+      // rendered there lands INSIDE the code text: `code.textContent` is what
+      // the code-block NodeView feeds to mermaid, so a stray `**` corrupted the
+      // diagram source and the preview rendered garbage.
+      if (!parent.type.allowsMarkType(markType)) continue
       if (getMarkRange(state, pos, markType)) continue // already has content
       decorations.push(
         Decoration.widget(pos, makeWidget(delim.open, 'syntax-md-mark'), {
