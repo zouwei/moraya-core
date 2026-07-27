@@ -283,7 +283,18 @@ function buildInputRules(schema: Schema, tier1: Tier1Plugins): Plugin {
     // appended before the second star arrives, and a bare \*\* would not match.
     rules.push(new InputRule(/(?<!\*)\*\u200b?\*$/, (state, _match, start, end) => {
       const strongType = M.strong!
-      const marksHere = state.storedMarks ?? state.doc.resolve(start).marks()
+      // Read the state off the STARS THE USER JUST TYPED, not off `start`.
+      // `start` sits before them, so resolving there returns the marks of
+      // whatever precedes — after closing a bold run that is the mark's own
+      // trailing ZWSP, which still carries `strong`. The rule then read "still
+      // bold", closed again, and typing `**` right after a bold run did nothing
+      // at all (the stars vanished, no mark armed) — which is what left users
+      // hammering `*` until literal, escape-serialized asterisks appeared.
+      //
+      // The typed stars carry the state at the moment of typing: bold if they
+      // were typed inside a run (→ close it), plain if outside (→ open one).
+      const typed = state.doc.resolve(start).nodeAfter
+      const marksHere = typed ? typed.marks : state.doc.resolve(start).marks()
       const isActive = strongType.isInSet(marksHere) !== undefined
       const nextMarks = isActive
         ? marksHere.filter((m) => m.type !== strongType)

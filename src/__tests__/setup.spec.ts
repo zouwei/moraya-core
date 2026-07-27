@@ -229,6 +229,44 @@ describe('buildInputRules: bare "**" arms bold instead of leaving literal stars'
   })
 })
 
+describe('Reopening bold right after closing it', () => {
+  function armed(v: EditorView): boolean {
+    return testSchema.marks.strong!.isInSet(v.state.storedMarks ?? []) !== undefined
+  }
+
+  it('opens a NEW run instead of doing nothing', async () => {
+    const v = await mount('')
+    typeText(v, 'x**y**')       // write a bold run and close it
+    expect(armed(v)).toBe(false)
+    typeText(v, '**')           // immediately open another
+    // Regression: the rule used to read the marks BEFORE the typed stars, where
+    // the closed run's trailing ZWSP still carries `strong`. It concluded "still
+    // bold", closed again, and the keystrokes vanished — which is what pushed
+    // users into typing literal asterisks that serialize escaped (\*\*).
+    expect(armed(v)).toBe(true)
+  })
+
+  it('the reopened run really is bold, with no literal asterisks left behind', async () => {
+    const v = await mount('')
+    typeText(v, 'x**y**')
+    typeText(v, '**z**')
+    // Adjacent bold runs merge — `x**yz**` is the correct serialization, not
+    // `x**y****z**`. What matters is that `z` ended up bold and that nothing
+    // survived as a literal asterisk (which would serialize escaped).
+    const md = serializeMarkdown(v.state.doc, testSchema)
+    expect(md).toBe('x**yz**')
+    expect(md).not.toContain('\\*')
+  })
+
+  it('still closes a run when the stars are typed inside it', async () => {
+    const v = await mount('')
+    typeText(v, '**a**')
+    expect(armed(v)).toBe(false)   // closed, not reopened
+    typeText(v, 'plain')
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**a**plain')
+  })
+})
+
 describe('Backspace through a bold run keeps the mark armed', () => {
   function armed(v: EditorView): boolean {
     return testSchema.marks.strong!.isInSet(v.state.storedMarks ?? []) !== undefined
