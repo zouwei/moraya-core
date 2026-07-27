@@ -229,6 +229,40 @@ describe('buildInputRules: bare "**" arms bold instead of leaving literal stars'
   })
 })
 
+describe('IME composition inside a bold run', () => {
+  /** Drive a composition the way an IME does: start, update, end, then the
+      composed text arrives as a normal input. */
+  function compose(v: EditorView, text: string) {
+    v.dom.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+    const posBefore = v.state.selection.from
+    const docBefore = v.state.doc.textContent
+    v.dom.dispatchEvent(new CompositionEvent('compositionupdate', { data: text, bubbles: true }))
+    return { posBefore, docBefore }
+  }
+
+  it('does not rewrite the document mid-composition', async () => {
+    const v = await mount('')
+    typeText(v, '**ab')
+    const { docBefore } = compose(v, '中')
+    // The caret-target plugin re-inserts its ZWSP after every keystroke landing
+    // in an inclusive mark. Doing that while the IME is assembling a character
+    // tears the composition down — bold text became untypeable with a Chinese
+    // IME after a character or two. Nothing may change until compositionend.
+    expect(v.state.doc.textContent).toBe(docBefore)
+    v.dom.dispatchEvent(new CompositionEvent('compositionend', { data: '中', bubbles: true }))
+  })
+
+  it('resumes normal sentinel handling after compositionend', async () => {
+    const v = await mount('')
+    typeText(v, '**ab')
+    v.dom.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }))
+    v.dom.dispatchEvent(new CompositionEvent('compositionend', { data: '', bubbles: true }))
+    typeText(v, 'c')
+    // Still bold, and the run is intact.
+    expect(serializeMarkdown(v.state.doc, testSchema)).toBe('**abc**')
+  })
+})
+
 describe('Reopening bold right after closing it', () => {
   function armed(v: EditorView): boolean {
     return testSchema.marks.strong!.isInSet(v.state.storedMarks ?? []) !== undefined

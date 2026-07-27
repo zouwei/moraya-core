@@ -105,7 +105,7 @@ exports[`plugin order fingerprint (§1.2.2) > default consumer config (Web-style
     "index": 11,
     "key": "moraya-inline-code-convert$",
     "slots": {
-      "props": false,
+      "props": true,
       "state": false,
       "view": false,
     },

@@ -133,10 +133,38 @@ function needsCursorTarget(state: EditorState): number {
 }
 
 export function createInlineCodeConvertPlugin(): Plugin {
+  // True between compositionstart and compositionend — i.e. while an IME is
+  // assembling a character. Kept per plugin instance rather than read from the
+  // view because appendTransaction has no view to ask.
+  let composing = false
+
   return new Plugin({
     key: pluginKey,
 
+    props: {
+      handleDOMEvents: {
+        compositionstart: () => {
+          composing = true
+          return false // observe only; the editor still handles the event
+        },
+        compositionend: () => {
+          composing = false
+          return false
+        },
+      },
+    },
+
     appendTransaction(transactions, oldState, newState) {
+      // Never touch the document while an IME is composing. This plugin
+      // re-inserts its caret-target ZWSP after every keystroke that lands
+      // inside an inclusive mark, and a document change mid-composition tears
+      // down the composition WebKit is maintaining — typing bold text with a
+      // Chinese/Japanese IME broke after the first character or two, while the
+      // same IME worked fine outside a mark. The sentinel is re-evaluated on
+      // the transaction that lands the finished text, so nothing is lost by
+      // waiting for compositionend.
+      if (composing) return null
+
       // Skip if this plugin already produced a transaction
       if (transactions.some((tr) => tr.getMeta(pluginKey))) return null
       if (transactions.some((tr) => tr.getMeta('full-delete'))) return null
