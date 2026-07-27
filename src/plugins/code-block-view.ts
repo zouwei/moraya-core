@@ -50,18 +50,29 @@ function loadMermaidApi() {
 let themeObserverInstalled = false
 const mermaidReRenderCallbacks = new Set<() => void>()
 
+function refreshMermaidTheme() {
+  if (mermaidApi) mermaidApi.updateMermaidTheme()
+  for (const cb of mermaidReRenderCallbacks) cb()
+}
+
 function installThemeObserver() {
   if (themeObserverInstalled) return
   themeObserverInstalled = true
   if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return
-  const observer = new MutationObserver(() => {
-    if (mermaidApi) mermaidApi.updateMermaidTheme()
-    for (const cb of mermaidReRenderCallbacks) cb()
-  })
+  const observer = new MutationObserver(refreshMermaidTheme)
   observer.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['data-theme'],
   })
+  // A host on "follow the system" appearance removes `data-theme` entirely, so
+  // an OS light/dark switch mutates nothing for the observer above to see —
+  // the diagrams would keep the appearance they were first rendered with.
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    mq.addEventListener?.('change', () => {
+      if (!document.documentElement.hasAttribute('data-theme')) refreshMermaidTheme()
+    })
+  }
 }
 
 // ── Language registry ─────────────────────────────
