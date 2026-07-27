@@ -229,6 +229,52 @@ describe('buildInputRules: bare "**" arms bold instead of leaving literal stars'
   })
 })
 
+describe('Backspace through a bold run keeps the mark armed', () => {
+  function armed(v: EditorView): boolean {
+    return testSchema.marks.strong!.isInSet(v.state.storedMarks ?? []) !== undefined
+  }
+  function delimiters(v: EditorView): string {
+    return Array.from(v.dom.querySelectorAll('.syntax-md-mark'))
+      .map((el) => el.textContent ?? '')
+      .join('|') || '(none)'
+  }
+  function backspace(v: EditorView) {
+    v.dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true }))
+  }
+
+  it('deleting the last character leaves bold armed, not cancelled', async () => {
+    const v = await mount('')
+    typeText(v, '**ab')
+    backspace(v) // → "a"
+    expect(v.state.doc.textContent.replace(/\u200b/g, '')).toBe('a')
+    backspace(v) // → empty, but still bold
+    expect(v.state.doc.textContent.replace(/\u200b/g, '')).toBe('')
+    // Without this the mark died with its last character and the user had to
+    // retype `**` to carry on.
+    expect(armed(v)).toBe(true)
+    expect(delimiters(v)).toBe('**|**')
+  })
+
+  it('a further Backspace is what cancels bold', async () => {
+    const v = await mount('')
+    typeText(v, '**a')
+    backspace(v) // content gone, bold still armed
+    expect(armed(v)).toBe(true)
+    backspace(v) // now the `****` itself goes
+    expect(armed(v)).toBe(false)
+    expect(delimiters(v)).toBe('(none)')
+  })
+
+  it('does not swallow the previous character when cancelling bold', async () => {
+    const v = await mount('')
+    typeText(v, 'xy**a')
+    backspace(v) // content gone, armed
+    backspace(v) // cancels bold — must NOT eat "y"
+    expect(v.state.doc.textContent.replace(/\u200b/g, '')).toBe('xy')
+    expect(armed(v)).toBe(false)
+  })
+})
+
 describe('buildInputRules: strong (**text**) converts only once fully typed', () => {
   it('typing ** then content then ** produces real bold with no literal asterisks', async () => {
     const v = await mount('')

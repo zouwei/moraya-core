@@ -417,6 +417,26 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
             if (event.key === 'Backspace') {
               if (sel instanceof TextSelection && sel.empty && sel.$cursor) {
                 const { parent, parentOffset } = sel.$cursor
+                // A formatting mark is armed but covers nothing — the state right
+                // after typing `**`, or after deleting the last bold character
+                // (which re-arms below). The `**|**` delimiters are on screen, so
+                // this Backspace has to take THEM away rather than eat the
+                // character before them: content first, then the `****`.
+                // Checked here, not only in buildKeymap: this capture-phase
+                // handler runs first, so the keymap would never see the key.
+                const stored = view.state.storedMarks
+                if (stored && stored.length > 0) {
+                  const before = sel.$cursor.nodeBefore
+                  const armedEmpty = stored.filter(
+                    (m) => m.type.spec.inclusive !== false && !(before && m.isInSet(before.marks)),
+                  )
+                  if (armedEmpty.length > 0) {
+                    event.preventDefault()
+                    const keep = stored.filter((m) => !armedEmpty.includes(m))
+                    view.dispatch(view.state.tr.setStoredMarks(keep.length > 0 ? keep : null))
+                    return true
+                  }
+                }
                 if (parent.isTextblock && parentOffset === parent.content.size && parentOffset > 0) {
                   const nb = sel.$cursor.nodeBefore
                   if (nb) {
@@ -444,7 +464,16 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
                         const withoutZwsp = nb.text.slice(0, -1)
                         const code = withoutZwsp.charCodeAt(withoutZwsp.length - 1)
                         const delLen = (code >= 0xDC00 && code <= 0xDFFF) ? 2 : 1
-                        view.dispatch(view.state.tr.delete(sel.from - 1 - delLen, sel.from).scrollIntoView())
+                        const tr = view.state.tr.delete(sel.from - 1 - delLen, sel.from)
+                        // Deleting the LAST character of a bold/italic/strike run
+                        // would drop the mark with it, so the `**|**` affordance
+                        // vanishes mid-edit and the user has to retype it. Keep the
+                        // mark armed instead; the next Backspace is what clears it
+                        // (see buildKeymap's armed-but-empty case).
+                        if (withoutZwsp.length <= delLen && nb.marks.length > 0) {
+                          tr.setStoredMarks(nb.marks)
+                        }
+                        view.dispatch(tr.scrollIntoView())
                       } else {
                         const zwspStart = sel.from - 1
                         const before = view.state.doc.resolve(zwspStart).nodeBefore

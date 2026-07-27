@@ -526,6 +526,28 @@ function buildKeymap(schema: Schema): Plugin {
     if (!$cursor) return false
     const { parent, parentOffset } = $cursor
 
+    // Case 1.4: A formatting mark is armed but covers nothing yet — the state
+    // the caret is in right after typing `**`, or after deleting the last bold
+    // character (see the re-arm below). The delimiters are on screen, so
+    // Backspace should take THEM away rather than eating the character before
+    // them: "delete the content first, then the `****`".
+    {
+      const stored = state.storedMarks
+      if (stored && stored.length > 0) {
+        const nb = $cursor.nodeBefore
+        const armedEmpty = stored.filter(
+          (m) => m.type.spec.inclusive !== false && !(nb && m.isInSet(nb.marks)),
+        )
+        if (armedEmpty.length > 0) {
+          if (dispatch) {
+            const keep = stored.filter((m) => !armedEmpty.includes(m))
+            dispatch(state.tr.setStoredMarks(keep.length > 0 ? keep : null))
+          }
+          return true
+        }
+      }
+    }
+
     // Case 1.5: Cursor at the START of a heading → demote it to a paragraph
     // instead of the default joinBackward (Typora/Notion convention: the
     // first Backspace at a heading's start strips the "#" markup; a second
@@ -615,7 +637,14 @@ function buildKeymap(schema: Schema): Plugin {
           if (nb.text.length > 1) {
             const withoutZwsp = nb.text.slice(0, -1)
             const delLen = isLowSurrogate(withoutZwsp.charCodeAt(withoutZwsp.length - 1)) ? 2 : 1
-            dispatch(state.tr.delete(sel.from - 1 - delLen, sel.from).scrollIntoView())
+            const tr = state.tr.delete(sel.from - 1 - delLen, sel.from)
+            // Deleting the LAST character of a bold/italic/strike run would drop
+            // the mark with it, so the affordance vanishes mid-edit and the user
+            // has to retype `**`. Keep it armed instead: the delimiters stay on
+            // screen and the next Backspace (Case 1.4) is what removes them.
+            const emptied = withoutZwsp.length <= delLen
+            if (emptied && nb.marks.length > 0) tr.setStoredMarks(nb.marks)
+            dispatch(tr.scrollIntoView())
           } else {
             const zwspStart = sel.from - 1
             const before = state.doc.resolve(zwspStart).nodeBefore
