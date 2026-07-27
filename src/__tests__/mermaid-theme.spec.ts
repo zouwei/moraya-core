@@ -37,9 +37,26 @@ describe('buildMermaidConfig', () => {
 
   it('fills nodes with the surface colour and outlines them in the accent', () => {
     const { themeVariables: v } = buildMermaidConfig(PALETTE, false)
-    expect(v.primaryColor).toBe(PALETTE.surface)
+    expect(v.nodeBkg).toBe(PALETTE.surface)
+    expect(v.mainBkg).toBe(PALETTE.surface)
     expect(v.primaryBorderColor).toBe(PALETTE.accent)
     expect(v.nodeBorder).toBe(PALETTE.accent)
+  })
+
+  it('seeds the categorical scales with a saturated colour', () => {
+    // Regression: primaryColor seeds pie1..12 / cScale0..11 / git0..7 by hue
+    // rotation. Seeding it with the near-white surface left no chroma to
+    // rotate, so every pie slice and git branch came out the same pale tint.
+    const { themeVariables: v } = buildMermaidConfig(PALETTE, false)
+    expect(v.primaryColor).toBe(PALETTE.accent)
+    expect(v.primaryColor).not.toBe(PALETTE.surface)
+  })
+
+  it('leaves secondary/tertiary unset so base can rotate them off primary', () => {
+    // Pinning these to neutral surfaces is what flattened pie2 and pie3.
+    const v = buildMermaidConfig(PALETTE, false).themeVariables as Record<string, unknown>
+    expect('secondaryColor' in v).toBe(false)
+    expect('tertiaryColor' in v).toBe(false)
   })
 
   it('backs edge labels with the page background', () => {

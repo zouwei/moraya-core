@@ -141,15 +141,26 @@ export function buildMermaidConfig(palette: MermaidPalette, dark: boolean) {
       // Tells base which direction to lighten/darken its derived colours.
       darkMode: dark,
       background: palette.background,
-      // Nodes read as editor surfaces outlined in the accent, rather than
-      // solid accent fills — a diagram should sit inside the document, not
-      // shout over it.
-      primaryColor: palette.surface,
+
+      // primaryColor seeds EVERY categorical scale: pie1..pie12, cScale0..11
+      // (journey, C4, timeline) and the git branch colours are all hue
+      // rotations of it. It therefore has to be a SATURATED colour — seeding
+      // it with a near-white surface leaves no chroma to rotate, and every
+      // pie slice, branch and journey band collapses to the same pale tint.
+      primaryColor: palette.accent,
+      // secondaryColor / tertiaryColor are deliberately left unset: base
+      // derives them as hue rotations of primaryColor, which is what keeps
+      // pie2 / pie3 distinct from pie1.
+
+      // The shapes that should read as editor surfaces are pinned explicitly,
+      // because base would otherwise fill them with primaryColor too.
+      mainBkg: palette.surface,
+      nodeBkg: palette.surface,
+      nodeTextColor: palette.text,
+
       primaryTextColor: palette.text,
       primaryBorderColor: palette.accent,
       nodeBorder: palette.accent,
-      secondaryColor: palette.hover,
-      tertiaryColor: palette.background,
       lineColor: palette.textMuted,
       textColor: palette.text,
       titleColor: palette.text,
@@ -158,6 +169,8 @@ export function buildMermaidConfig(palette: MermaidPalette, dark: boolean) {
       edgeLabelBackground: palette.background,
       clusterBkg: palette.background,
       clusterBorder: palette.border,
+      pieTitleTextColor: palette.text,
+      pieSectionTextColor: palette.text,
     },
   }
 }
