@@ -5,6 +5,9 @@ import { describe, it, expect } from 'vitest'
 import {
   resolvePalette,
   buildMermaidConfig,
+  relativeLuminance,
+  mixColors,
+  scaleSeed,
   type MermaidPalette,
 } from '../plugins/mermaid-renderer'
 
@@ -43,15 +46,6 @@ describe('buildMermaidConfig', () => {
     expect(v.nodeBorder).toBe(PALETTE.accent)
   })
 
-  it('seeds the categorical scales with a saturated colour', () => {
-    // Regression: primaryColor seeds pie1..12 / cScale0..11 / git0..7 by hue
-    // rotation. Seeding it with the near-white surface left no chroma to
-    // rotate, so every pie slice and git branch came out the same pale tint.
-    const { themeVariables: v } = buildMermaidConfig(PALETTE, false)
-    expect(v.primaryColor).toBe(PALETTE.accent)
-    expect(v.primaryColor).not.toBe(PALETTE.surface)
-  })
-
   it('leaves secondary/tertiary unset so base can rotate them off primary', () => {
     // Pinning these to neutral surfaces is what flattened pie2 and pie3.
     const v = buildMermaidConfig(PALETTE, false).themeVariables as Record<string, unknown>
@@ -71,6 +65,70 @@ describe('buildMermaidConfig', () => {
     expect(v.textColor).toBe(PALETTE.text)
     expect(v.primaryTextColor).toBe(PALETTE.text)
     expect(v.lineColor).toBe(PALETTE.textMuted)
+  })
+})
+
+describe('scaleSeed', () => {
+  it('lifts the seed well above the accent in BOTH appearances', () => {
+    // base darkens every scale afterwards — by 75 points in a dark appearance.
+    // A seed at accent lightness lands on pure black, turning every mindmap
+    // section into the same black slab.
+    for (const dark of [false, true]) {
+      const seed = scaleSeed({ ...PALETTE, background: dark ? '#1e1e1e' : '#ffffff' }, dark)
+      expect(relativeLuminance(seed)!).toBeGreaterThan(relativeLuminance(PALETTE.accent)! + 0.3)
+    }
+  })
+
+  it('does not follow the page background down in a dark appearance', () => {
+    const onLight = scaleSeed(PALETTE, false)
+    const onDark = scaleSeed({ ...PALETTE, background: '#1e1e1e' }, true)
+    expect(onDark).toBe(onLight)
+  })
+
+  it('keeps chroma so hue rotations stay distinguishable', () => {
+    // Regression: a fully neutral seed collapsed every pie slice to one tint.
+    const seed = scaleSeed(PALETTE, false)
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(seed.slice(i, i + 2), 16))
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeGreaterThan(24)
+  })
+
+  it('seeds primaryColor, and is not the raw accent', () => {
+    const v = buildMermaidConfig(PALETTE, false).themeVariables
+    expect(v.primaryColor).toBe(scaleSeed(PALETTE, false))
+    expect(v.primaryColor).not.toBe(PALETTE.accent)
+    // Borders stay vivid even though the fills are tinted.
+    expect(v.nodeBorder).toBe(PALETTE.accent)
+  })
+
+  it('labels scales with the body text colour', () => {
+    const v = buildMermaidConfig(PALETTE, false).themeVariables
+    expect(v.scaleLabelColor).toBe(PALETTE.text)
+  })
+})
+
+describe('mixColors', () => {
+  it('returns the endpoints at 0 and 1', () => {
+    expect(mixColors('#000000', '#ffffff', 0)).toBe('#000000')
+    expect(mixColors('#000000', '#ffffff', 1)).toBe('#ffffff')
+  })
+
+  it('blends halfway', () => {
+    expect(mixColors('#000000', '#ffffff', 0.5)).toBe('#808080')
+  })
+
+  it('passes the colour through when it cannot parse', () => {
+    expect(mixColors('var(--x)', '#ffffff', 0.5)).toBe('var(--x)')
+  })
+})
+
+describe('relativeLuminance', () => {
+  it('anchors on black and white', () => {
+    expect(relativeLuminance('#000000')).toBeCloseTo(0, 5)
+    expect(relativeLuminance('#ffffff')).toBeCloseTo(1, 5)
+  })
+
+  it('returns null for non-hex input', () => {
+    expect(relativeLuminance('rgb(0,0,0)')).toBeNull()
   })
 })
 

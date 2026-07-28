@@ -121,6 +121,68 @@ function readPalette(dark: boolean): MermaidPalette {
   return resolvePalette((name) => s.getPropertyValue(name), dark)
 }
 
+/** WCAG relative luminance of a `#rgb` / `#rrggbb` colour, or null if unparseable. */
+export function relativeLuminance(hex: string): number | null {
+  const digits = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim())?.[1]
+  if (!digits) return null
+  const h = digits.length === 3 ? digits.replace(/./g, (c) => c + c) : digits
+  const channel = (i: number) => {
+    const v = parseInt(h.slice(i * 2, i * 2 + 2), 16) / 255
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+  }
+  return 0.2126 * channel(0) + 0.7152 * channel(1) + 0.0722 * channel(2)
+}
+
+/** Parse `#rgb` / `#rrggbb` into channel bytes, or null. */
+function parseHex(hex: string): [number, number, number] | null {
+  const digits = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim())?.[1]
+  if (!digits) return null
+  const h = digits.length === 3 ? digits.replace(/./g, (c) => c + c) : digits
+  return [
+    parseInt(h.slice(0, 2), 16),
+    parseInt(h.slice(2, 4), 16),
+    parseInt(h.slice(4, 6), 16),
+  ]
+}
+
+/**
+ * Blend `color` `ratio` of the way towards `towards`. Returns `color` unchanged
+ * if either side is not a hex colour we can read.
+ */
+export function mixColors(color: string, towards: string, ratio: number): string {
+  const a = parseHex(color)
+  const b = parseHex(towards)
+  if (!a || !b) return color
+  const t = Math.min(1, Math.max(0, ratio))
+  const ch = (i: number) => Math.round(a[i]! + (b[i]! - a[i]!) * t)
+  return `#${[0, 1, 2].map((i) => ch(i).toString(16).padStart(2, '0')).join('')}`
+}
+
+/**
+ * The seed for mermaid's categorical scales.
+ *
+ * Two constraints meet here.
+ *
+ * First, mindmap section labels are HTML inside a foreignObject and mermaid
+ * emits NO rule for them — `.section-N text { fill: cScaleLabelN }` only applies
+ * when htmlLabels is off. Those labels just inherit the page's text colour, so
+ * no theme variable can fix their contrast; the fills have to be the side that
+ * adapts.
+ *
+ * Second, base darkens every scale after deriving it: `darken(cScale, 25)` in a
+ * light appearance and `darken(cScale, 75)` in a dark one. 75 points of
+ * lightness is most of the range, so a seed at ordinary accent lightness lands
+ * on pure black and every section becomes an identical black slab.
+ *
+ * Mixing towards WHITE — in both appearances, not towards the page background —
+ * satisfies both: it lifts the seed high enough to survive that darkening with
+ * its hue intact, and it keeps chroma, which is what lets the hue rotations stay
+ * tellable apart as pie slices and git branches.
+ */
+export function scaleSeed(palette: MermaidPalette, _dark: boolean): string {
+  return mixColors(palette.accent, '#ffffff', 0.62)
+}
+
 /**
  * Build the mermaid config for a palette.
  *
@@ -144,10 +206,11 @@ export function buildMermaidConfig(palette: MermaidPalette, dark: boolean) {
 
       // primaryColor seeds EVERY categorical scale: pie1..pie12, cScale0..11
       // (journey, C4, timeline) and the git branch colours are all hue
-      // rotations of it. It therefore has to be a SATURATED colour — seeding
-      // it with a near-white surface leaves no chroma to rotate, and every
-      // pie slice, branch and journey band collapses to the same pale tint.
-      primaryColor: palette.accent,
+      // rotations of it. It needs chroma to rotate — a neutral surface would
+      // collapse every slice and branch to one tint — but it also has to stay
+      // light enough (dark enough, in a dark appearance) for the inherited
+      // label text. See scaleSeed.
+      primaryColor: scaleSeed(palette, dark),
       // secondaryColor / tertiaryColor are deliberately left unset: base
       // derives them as hue rotations of primaryColor, which is what keeps
       // pie2 / pie3 distinct from pie1.
@@ -170,6 +233,9 @@ export function buildMermaidConfig(palette: MermaidPalette, dark: boolean) {
       clusterBkg: palette.background,
       clusterBorder: palette.border,
       pieTitleTextColor: palette.text,
+      // With the scales tinted towards the page, body text reads on them — and
+      // it matches what the mindmap's inherited HTML labels use regardless.
+      scaleLabelColor: palette.text,
       pieSectionTextColor: palette.text,
     },
   }
