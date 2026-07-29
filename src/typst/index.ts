@@ -63,6 +63,18 @@ export {
 export { extractTypstOutline, type TypstHeading } from './outline'
 
 export {
+  parseTemplateIndex,
+  templateCategories,
+  filterTemplates,
+  compareVersions,
+  templatePackageUrl,
+  templateThumbnailUrl,
+  templateImportSpec,
+  type TypstTemplate,
+  type TemplateFilter,
+} from './templates'
+
+export {
   DEFAULT_VIEW_MODES,
   viewModeForFlavor,
   rememberViewMode,
