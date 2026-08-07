@@ -1,0 +1,133 @@
+/*
+ * @moraya/core — code-block syntax palette (GitHub Primer).
+ *
+ * GENERATED from src/syntax-palette.ts by scripts/gen-syntax-css.mjs.
+ * Do not edit by hand; syntax-palette.spec.ts fails when this drifts.
+ *
+ *     import '@moraya/core/plugins/syntax.css'
+ *
+ * Import it wherever highlighted code is rendered — not only the editor. The
+ * selectors below are global because the same `hljs-*` classes appear in AI
+ * chat bubbles, the print route and export containers; scoping them to the
+ * editor is what left those surfaces monochrome.
+ *
+ * Colours are fixed per appearance and do NOT follow the host's UI theme, so
+ * desktop, web and mobile render code identically. Override a semantic role
+ * (not individual tokens) if a host really must differ.
+ */
+
+:root {
+  --hljs-comment: #59636e;
+  --hljs-keyword: #cf222e;
+  --hljs-string: #0a3069;
+  --hljs-constant: #0550ae;
+  --hljs-identifier: #8250df;
+  --hljs-builtin: #953800;
+  --hljs-tag: #116329;
+  --hljs-body: #1f2328;
+  --hljs-link: #0969da;
+  --hljs-added: #116329;
+  --hljs-added-bg: rgba(17, 99, 41, 0.08);
+  --hljs-removed: #82071e;
+  --hljs-removed-bg: rgba(130, 7, 30, 0.08);
+}
+
+[data-theme='dark'] {
+  --hljs-comment: #9198a1;
+  --hljs-keyword: #ff7b72;
+  --hljs-string: #a5d6ff;
+  --hljs-constant: #79c0ff;
+  --hljs-identifier: #d2a8ff;
+  --hljs-builtin: #ffa657;
+  --hljs-tag: #7ee787;
+  --hljs-body: #e6edf3;
+  --hljs-link: #4493f8;
+  --hljs-added: #7ee787;
+  --hljs-added-bg: rgba(46, 160, 67, 0.15);
+  --hljs-removed: #ffa198;
+  --hljs-removed-bg: rgba(248, 81, 73, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --hljs-comment: #9198a1;
+    --hljs-keyword: #ff7b72;
+    --hljs-string: #a5d6ff;
+    --hljs-constant: #79c0ff;
+    --hljs-identifier: #d2a8ff;
+    --hljs-builtin: #ffa657;
+    --hljs-tag: #7ee787;
+    --hljs-body: #e6edf3;
+    --hljs-link: #4493f8;
+    --hljs-added: #7ee787;
+    --hljs-added-bg: rgba(46, 160, 67, 0.15);
+    --hljs-removed: #ffa198;
+    --hljs-removed-bg: rgba(248, 81, 73, 0.15);
+  }
+}
+
+.hljs-comment,
+.hljs-quote { color: var(--hljs-comment); font-style: italic; }
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-function,
+.hljs-class,
+.hljs-meta { color: var(--hljs-identifier); }
+
+.hljs-params,
+.hljs-punctuation { color: var(--hljs-body); }
+
+.hljs-string,
+.hljs-attribute,
+.hljs-regexp,
+.hljs-regex,
+.hljs-doctag,
+.hljs-template-tag,
+.hljs-template-variable { color: var(--hljs-string); }
+
+.hljs-tag,
+.hljs-name,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-selector-pseudo,
+.hljs-selector-attr { color: var(--hljs-tag); }
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-operator { color: var(--hljs-keyword); }
+
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-type,
+.hljs-attr,
+.hljs-property,
+.hljs-variable.constant_,
+.hljs-section,
+.hljs-char.escape_ { color: var(--hljs-constant); }
+
+.hljs-built_in,
+.hljs-variable,
+.hljs-variable.language_,
+.hljs-subst,
+.hljs-bullet,
+.hljs-code,
+.hljs-character { color: var(--hljs-builtin); }
+
+.hljs-link { color: var(--hljs-link); text-decoration: underline; }
+
+.hljs-meta .hljs-keyword,
+.hljs-meta.hljs-keyword { color: var(--hljs-identifier); }
+
+.hljs-section { font-weight: 600; }
+
+.hljs-addition { color: var(--hljs-added); background: var(--hljs-added-bg); }
+
+.hljs-deletion { color: var(--hljs-removed); background: var(--hljs-removed-bg); }
+
+.hljs-emphasis { font-style: italic; }
+
+.hljs-strong { font-weight: 600; }

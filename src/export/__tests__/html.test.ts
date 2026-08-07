@@ -10,6 +10,7 @@ import {
   markdownToLatex,
   inferDocumentTitle,
 } from '../html'
+import { SYNTAX_LIGHT } from '../../syntax-palette'
 
 describe('markdownToHtmlBody — fidelity gap closed (markdown-it)', () => {
   it('renders GFM tables (regex renderer could not)', () => {
@@ -77,12 +78,20 @@ describe('sanitizeHtml', () => {
 })
 
 describe('markdownToHtml', () => {
-  it('wraps a full document with styles + KaTeX/hljs CDN links when includeStyles', async () => {
+  it('wraps a full document with styles and the KaTeX CDN link when includeStyles', async () => {
     const doc = await markdownToHtml('# Title', true)
     expect(doc).toContain('<!DOCTYPE html>')
     expect(doc).toContain('katex.min.css')
-    expect(doc).toContain('highlight.js')
     expect(doc).toContain('<h1>Title</h1>')
+  })
+
+  it('inlines the syntax palette instead of linking highlight.js off a CDN', async () => {
+    // An export has to stay highlighted offline, and the CDN theme was
+    // upstream GitHub's rather than ours.
+    const doc = await markdownToHtml('```js\nconst a = 1\n```', true)
+    expect(doc).not.toContain('highlight.js')
+    expect(doc).toContain('.hljs-keyword')
+    expect(doc).toContain(SYNTAX_LIGHT.keyword)
   })
 
   it('omits styles for html-plain', async () => {

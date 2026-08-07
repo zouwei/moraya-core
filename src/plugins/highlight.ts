@@ -150,14 +150,26 @@ interface HljsNode {
 
 /**
  * Convert an hljs scope string to CSS class names.
- *   "keyword" → ["hljs-keyword"]
- *   "title.function" → ["hljs-title", "function_"]
+ *   "keyword"               → ["hljs-keyword"]
+ *   "title.function"        → ["hljs-title", "function_"]
+ *   "title.class.inherited" → ["hljs-title", "class_", "inherited__"]
+ *
+ * The trailing underscores COUNT UP with depth. That is not decorative — it is
+ * exactly what hljs's own `scopeToCSSClass` does when it renders HTML
+ * (`pieces.map((x, i) => x + '_'.repeat(i + 1))` in highlight.js/lib/core.js).
+ *
+ * This path produces ProseMirror decorations rather than HTML, but both feed
+ * the SAME stylesheet: the editor uses decorations while export, print and chat
+ * use hljs's HTML. Emitting one underscore at every depth here made three-part
+ * scopes — `title.class.inherited`, `title.function.invoke` — carry different
+ * class names in the editor than everywhere else, so any rule for them could
+ * only ever match one of the two surfaces.
  */
-function scopeToClasses(scope: string): string[] {
+export function scopeToClasses(scope: string): string[] {
   const parts = scope.split('.')
   const classes = [`hljs-${parts[0]}`]
   for (let i = 1; i < parts.length; i++) {
-    classes.push(`${parts[i]}_`)
+    classes.push(`${parts[i]}${'_'.repeat(i)}`)
   }
   return classes
 }

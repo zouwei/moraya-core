@@ -30,6 +30,7 @@ import katex from 'katex'
 import 'katex/contrib/mhchem'
 import hljs from 'highlight.js'
 import type { MermaidRenderer } from './types'
+import { SYNTAX_LIGHT, syntaxCssLiteral } from '../syntax-palette'
 
 // ── Escaping ─────────────────────────────────────────────────────────────────
 
@@ -274,7 +275,6 @@ export function sanitizeHtml(html: string): string {
 }
 
 const KATEX_CSS = 'https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css'
-const HLJS_CSS = 'https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css'
 
 const EXPORT_STYLE = `
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -294,12 +294,19 @@ const EXPORT_STYLE = `
   ul, ol { padding-left: 2em; } li { margin: 0.25em 0; }
   dl { margin: 1em 0; } dt { font-weight: 600; } dd { margin: 0 0 0.5em 1.5em; }
   .math-block { text-align: center; margin: 1em 0; overflow-x: auto; }
-  .mermaid-export { text-align: center; margin: 1em 0; }`
+  .mermaid-export { text-align: center; margin: 1em 0; }
+
+/* Token colours, inlined from the shared palette rather than linked off a CDN:
+   an exported document has to keep its highlighting offline, and the CDN theme
+   was upstream GitHub rather than ours. Literal hex — the exported page does
+   not carry our custom properties. */
+${syntaxCssLiteral(SYNTAX_LIGHT)}`
 
 /**
  * Render markdown to a full standalone HTML document. With `includeStyles`, an
- * inline stylesheet plus KaTeX + highlight.js CDN themes are embedded. Mermaid
- * blocks are rendered to SVG if a `MermaidRenderer` is provided.
+ * inline stylesheet is embedded — including the syntax palette, so code stays
+ * highlighted offline — plus the KaTeX CDN theme. Mermaid blocks are rendered
+ * to SVG if a `MermaidRenderer` is provided.
  */
 export async function markdownToHtml(
   md: string,
@@ -320,7 +327,6 @@ export async function markdownToHtml(
 <meta charset="utf-8">
 <title>Exported from Moraya</title>
 <link rel="stylesheet" href="${KATEX_CSS}">
-<link rel="stylesheet" href="${HLJS_CSS}">
 <style>${EXPORT_STYLE}</style>
 </head>
 <body>${body}</body>

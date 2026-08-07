@@ -16,6 +16,8 @@
  * mermaid renderer, and per-platform canvas caps.
  */
 
+import { SYNTAX_LIGHT, syntaxVarsInline } from '../syntax-palette'
+
 export type ExportFormat = 'pdf' | 'html' | 'html-plain' | 'doc' | 'latex' | 'image'
 
 /** Coarse phases a consumer can surface in a progress indicator. */
@@ -151,7 +153,11 @@ export const PAGE_CSS_PX_HEIGHT =
 export const LIGHT_THEME_VARS =
   '--bg-primary:#ffffff;--bg-secondary:#f8f9fa;--bg-hover:#e9ecef;--bg-active:#dee2e6;' +
   '--text-primary:#1a1a1a;--text-secondary:#6c757d;--text-muted:#adb5bd;' +
-  '--border-color:#e0e0e0;--border-light:#f0f0f0;--accent-color:#4a90d9;'
+  '--border-color:#e0e0e0;--border-light:#f0f0f0;--accent-color:#4a90d9;' +
+  // Syntax tokens for the same reason as the chrome above: in dark mode the
+  // root carries the dark palette, which on a forced-white capture would be
+  // dark tokens on white.
+  syntaxVarsInline(SYNTAX_LIGHT)
 
 export interface ExportOption {
   format: ExportFormat
