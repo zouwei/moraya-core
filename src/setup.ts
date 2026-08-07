@@ -180,12 +180,22 @@ function buildInputRules(schema: Schema, tier1: Tier1Plugins): Plugin {
   const N = schema.nodes
   const M = schema.marks
 
-  // Code block: ```language
+  // Code block: ```language, or ``` language — both are valid CommonMark and
+  // the author's choice is preserved on the way back out (see code_block's
+  // `langSpace` attr).
+  //
+  // The space and the language are one optional group on purpose. For a bare
+  // "``` " the group cannot match — a language needs at least one letter — so
+  // it falls back to empty and the trailing `[\s\n]` consumes the space, which
+  // keeps "``` " + space creating a plain fence exactly as before.
   if (N.code_block) {
     rules.push(textblockTypeInputRule(
-      /^```(?<language>[a-zA-Z][a-zA-Z0-9_+#.\-]*)?[\s\n]$/,
+      /^```(?:(?<space>[ \t])?(?<language>[a-zA-Z][a-zA-Z0-9_+#.\-]*))?[\s\n]$/,
       N.code_block,
-      (match) => ({ language: match.groups?.language ?? '' }),
+      (match) => ({
+        language: match.groups?.language ?? '',
+        langSpace: !!match.groups?.space,
+      }),
     ))
   }
 

@@ -335,16 +335,34 @@ const code_block: NodeSpec = {
   code: true,
   attrs: {
     language: { default: 'text' },
+    /**
+     * Whether the author wrote a space after the fence — ``` python rather
+     * than ```python. Both are valid CommonMark and the editor must give back
+     * whichever one it was handed (see the no-forced-syntax-conversion rule);
+     * round-tripping used to silently delete the space. A boolean is enough
+     * because runs of two or more spaces normalise to one.
+     */
+    langSpace: { default: false },
   },
   parseDOM: [{
     tag: 'pre',
     preserveWhitespace: 'full' as const,
     getAttrs(dom: HTMLElement) {
-      return { language: dom.dataset.language || 'text' }
+      return {
+        language: dom.dataset.language || 'text',
+        langSpace: dom.dataset.langSpace === 'true',
+      }
     },
   }],
   toDOM(node) {
-    return ['pre', { 'data-language': (node.attrs.language as string) || undefined }, ['code', 0]]
+    return [
+      'pre',
+      {
+        'data-language': (node.attrs.language as string) || undefined,
+        'data-lang-space': node.attrs.langSpace ? 'true' : undefined,
+      },
+      ['code', 0],
+    ]
   },
 }
 

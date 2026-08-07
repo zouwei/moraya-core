@@ -234,7 +234,13 @@ const parserTokens: Record<string, import('prosemirror-markdown').ParseSpec> = {
   fence: {
     block: 'code_block',
     getAttrs(token) {
-      return { language: token.info.trim() || 'text' }
+      // Keep whether the author separated the fence from the language, so the
+      // serializer can hand back what it was given. markdown-it reports `info`
+      // verbatim, leading space included.
+      return {
+        language: token.info.trim() || 'text',
+        langSpace: /^\s/.test(token.info),
+      }
     },
     noCloseToken: true,
   },
@@ -613,7 +619,10 @@ const serializer = new MarkdownSerializer(
     code_block(state, node) {
       const lang = (node.attrs.language as string) || ''
       const fenceLang = lang === 'text' ? '' : lang
-      state.write(`\`\`\`${fenceLang}\n`)
+      // One space if the author wrote any, none if they wrote none. Runs of
+      // several collapse here — that normalisation is the point.
+      const gap = fenceLang && node.attrs.langSpace ? ' ' : ''
+      state.write(`\`\`\`${gap}${fenceLang}\n`)
       state.text(node.textContent, false)
       state.ensureNewLine()
       state.write('```')
