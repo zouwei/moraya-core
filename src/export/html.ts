@@ -31,6 +31,7 @@ import 'katex/contrib/mhchem'
 import hljs from 'highlight.js'
 import type { MermaidRenderer } from './types'
 import { SYNTAX_LIGHT, syntaxCssLiteral } from '../syntax-palette'
+import { enrichHighlightedHtml, shouldEnrich } from '../plugins/syntax-enrich'
 
 // ── Escaping ─────────────────────────────────────────────────────────────────
 
@@ -93,7 +94,9 @@ function buildExportMarkdownIt(): MarkdownIt {
     }
     if (lang && hljs.getLanguage(lang)) {
       try {
-        const out = hljs.highlight(token.content, { language: lang, ignoreIllegals: true }).value
+        const raw = hljs.highlight(token.content, { language: lang, ignoreIllegals: true }).value
+        // Same second pass the editor runs, so an export matches what was on screen.
+        const out = shouldEnrich(lang) ? enrichHighlightedHtml(raw) : raw
         return `<pre><code class="hljs language-${lang}">${out}</code></pre>`
       } catch {
         /* fall through to default rendering */

@@ -28,6 +28,7 @@ import { Plugin, PluginKey } from 'prosemirror-state'
 import { Decoration, DecorationSet, type EditorView } from 'prosemirror-view'
 import type { Node as PmNode } from 'prosemirror-model'
 import hljs from 'highlight.js/lib/core'
+import { enrichUnscoped, shouldEnrich } from './syntax-enrich'
 
 // Common languages
 import javascript from 'highlight.js/lib/languages/javascript'
@@ -176,17 +177,27 @@ export function scopeToClasses(scope: string): string[] {
 
 /**
  * Flatten the hljs emitter tree into a list of {text, classes} spans.
+ *
+ * `enrich` runs a second pass over text the grammar scoped as NOTHING, adding
+ * operators, member access and call sites that thin grammars (Python's above
+ * all) never emit. It is only ever handed unscoped text, so it cannot repaint a
+ * string or a comment.
  */
 function flattenHljsTree(
   nodes: (HljsNode | string)[],
   parentClasses: string[] = [],
+  enrich = false,
 ): { text: string; classes: string[] }[] {
   const result: { text: string; classes: string[] }[] = []
 
   for (const node of nodes) {
     if (typeof node === 'string') {
       if (node.length > 0) {
-        result.push({ text: node, classes: parentClasses })
+        if (enrich && parentClasses.length === 0) {
+          for (const seg of enrichUnscoped(node)) result.push(seg)
+        } else {
+          result.push({ text: node, classes: parentClasses })
+        }
       }
     } else {
       // hljs v11 uses `scope` (e.g. "keyword", "title.function").
@@ -195,7 +206,7 @@ function flattenHljsTree(
         ? [...parentClasses, ...scopeToClasses(node.scope)]
         : parentClasses
       if (node.children) {
-        result.push(...flattenHljsTree(node.children, classes))
+        result.push(...flattenHljsTree(node.children, classes, enrich))
       }
     }
   }
@@ -266,7 +277,7 @@ function getDecorations(doc: PmNode): DecorationSet {
     const rootNode = emitter._emitter?.rootNode ?? emitter._emitter?.root
     if (!rootNode?.children) return
 
-    const spans = flattenHljsTree(rootNode.children)
+    const spans = flattenHljsTree(rootNode.children, [], shouldEnrich(language))
 
     // Build relative-offset spans for caching + absolute decorations
     const toCache: CachedSpan[] = []
