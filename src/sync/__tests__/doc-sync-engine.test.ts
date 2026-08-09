@@ -310,13 +310,102 @@ describe('DocSyncEngine — offline & error', () => {
     expect(engine.status).toBe('error')
   })
 
-  it('dispose() cancels the pending debounce', async () => {
+  it('dispose() cancels the pending debounce, having drained it first', async () => {
+    // This used to assert zero writes. That was the implementation described
+    // back to itself, not a requirement: the pending buffer is the user's most
+    // recent keystrokes, and dropping it is silent data loss (see the
+    // "dispose drains pending edits" block). What the timer cancellation must
+    // still guarantee is that the write happens ONCE, not again when the
+    // debounce would have fired.
     const store = new FakeStore('x', 'e0')
     const { engine } = makeEngine(store)
     engine.seed('x', 'e0')
     engine.queue('x edited')
     engine.dispose()
     await vi.advanceTimersByTimeAsync(1000)
-    expect(store.writes).toHaveLength(0)
+    await vi.runAllTimersAsync()
+    expect(store.writes).toHaveLength(1)
+    expect(store.writes[0]!.content).toBe('x edited')
+  })
+})
+
+describe('DocSyncEngine — dispose drains pending edits', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
+  it('writes an edit that is still inside the debounce window', async () => {
+    // Web and mobile unmount the editor route on a tab switch, which disposes
+    // the engine. Clearing the debounce without writing dropped whatever the
+    // user typed in the preceding 1.5s — silently, with no dirty marker.
+    const io = new FakeStore('v1', 'e0')
+    const { engine } = makeEngine(io)
+    engine.seed('v1', 'e0')
+
+    engine.queue('v1 + edited')
+    engine.dispose() // before the debounce fires
+
+    await vi.runAllTimersAsync()
+    expect(io.writes.map(w => w.content)).toContain('v1 + edited')
+    expect(io.content).toBe('v1 + edited')
+  })
+
+  it('reports the drained write through onSaved', async () => {
+    const io = new FakeStore('v1', 'e0')
+    const { engine, events } = makeEngine(io)
+    engine.seed('v1', 'e0')
+
+    engine.queue('drained')
+    engine.dispose()
+    await vi.runAllTimersAsync()
+
+    expect(events.saved.map(([, c]) => c)).toContain('drained')
+  })
+
+  it('writes nothing when the buffer matches what is already stored', async () => {
+    const io = new FakeStore('v1', 'e0')
+    const { engine } = makeEngine(io)
+    engine.seed('v1', 'e0')
+
+    engine.queue('v1') // no real change
+    engine.dispose()
+    await vi.runAllTimersAsync()
+
+    expect(io.writes).toHaveLength(0)
+  })
+
+  it('writes nothing when there was never an edit', async () => {
+    const io = new FakeStore('v1', 'e0')
+    const { engine } = makeEngine(io)
+    engine.seed('v1', 'e0')
+
+    engine.dispose()
+    await vi.runAllTimersAsync()
+
+    expect(io.writes).toHaveLength(0)
+  })
+
+  it('stops accepting edits once disposed', async () => {
+    const io = new FakeStore('v1', 'e0')
+    const { engine } = makeEngine(io)
+    engine.seed('v1', 'e0')
+
+    engine.dispose()
+    engine.queue('after teardown')
+    await vi.runAllTimersAsync()
+
+    expect(io.writes).toHaveLength(0)
+  })
+
+  it('is safe to dispose twice', async () => {
+    const io = new FakeStore('v1', 'e0')
+    const { engine } = makeEngine(io)
+    engine.seed('v1', 'e0')
+
+    engine.queue('once')
+    engine.dispose()
+    engine.dispose()
+    await vi.runAllTimersAsync()
+
+    expect(io.writes.filter(w => w.content === 'once')).toHaveLength(1)
   })
 })

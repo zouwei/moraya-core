@@ -130,6 +130,12 @@ export class DocSyncEngine {
   private timer: ReturnType<typeof setTimeout> | null = null
   private _status: DocSyncStatus = 'idle'
   private disposed = false
+  /**
+   * Set only while `dispose()` drains its last write. Every other guard treats
+   * a disposed engine as closed; this one exception lets the final flush get
+   * past them.
+   */
+  private draining = false
 
   constructor(opts: DocSyncEngineOptions) {
     this.opts = opts
@@ -164,7 +170,7 @@ export class DocSyncEngine {
    * when the current flush cycle completes.
    */
   flushNow(): Promise<void> {
-    if (this.disposed) return Promise.resolve()
+    if (this.disposed && !this.draining) return Promise.resolve()
     this.clearTimer()
     if (this.flight) return this.flight
     this.flight = this.runFlushLoop().finally(() => {
@@ -188,9 +194,34 @@ export class DocSyncEngine {
     return this.flushNow()
   }
 
+  /**
+   * Stop accepting edits, writing out anything still pending first.
+   *
+   * The debounce holds the user's most recent keystrokes for `debounceMs`
+   * (1.5s by default). Clearing that timer without writing is silent data
+   * loss — on web and mobile a tab switch unmounts the editor route and
+   * disposes the engine, so typing and immediately switching used to drop the
+   * edit with no dirty marker and no error.
+   *
+   * The write is started, not awaited: dispose runs from synchronous teardown
+   * (`onDestroy`). It is already in flight by the time this returns, so it
+   * completes independently of the component being torn down.
+   */
   dispose(): void {
-    this.disposed = true
+    if (this.disposed) return
     this.clearTimer()
+    const pending = this.base === null || this.buffer !== this.base.content
+    if (pending && this.buffer !== '') {
+      this.draining = true
+      void this.flushNow()
+        .catch(() => {
+          /* teardown path — the offline queue owns the retry */
+        })
+        .finally(() => {
+          this.draining = false
+        })
+    }
+    this.disposed = true
   }
 
   // ── internals ───────────────────────────────────────────────────────────────
@@ -217,7 +248,7 @@ export class DocSyncEngine {
     // "conflict auto-reconciled, re-submit" without ever overlapping writes.
     // eslint-disable-next-line no-constant-condition
     while (true) {
-      if (this.disposed) return
+      if (this.disposed && !this.draining) return
 
       const snapshot = this.buffer
 
@@ -234,7 +265,10 @@ export class DocSyncEngine {
 
       this.setStatus('saving')
       const res = await this.io.write(snapshot, this.base?.etag ?? null)
-      if (this.disposed) return
+      // A drain must see its own result through: bailing here would skip the
+      // offline branch, so a farewell write that failed on a bad connection
+      // would never reach the retry queue and the edit would be lost anyway.
+      if (this.disposed && !this.draining) return
 
       if (res.type === 'ok') {
         this.base = { etag: res.etag, content: snapshot } // atomic advance
