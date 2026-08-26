@@ -32,7 +32,30 @@ Please include:
 - Distribution model (number of users, revenue expectation)
 - Which subpath exports you'll consume (`/schema`, `/markdown`, `/ai`, `/chat-markdown`, etc.)
 
-Commercial license pricing depends on scope. First-party products of the copyright holder — Moraya PC / Web / Mobile (sibling repos under `zouwei/moraya-*`) and **Protago** (source at `zouwei/protago-code`) — operate under an internal commercial license grant.
+Commercial license pricing depends on scope.
+
+### 2.1 First-party internal grant
+
+The copyright holder grants the following own products a perpetual internal
+commercial license to `@moraya/core`, on the terms of section 2 and at no fee.
+These products may therefore ship closed-source, or under a license that is not
+GPL-compatible, without triggering the copyleft obligations of section 1.
+
+| Product | Source repository | Distributed as |
+|---|---|---|
+| Moraya Desktop | `zouwei/moraya` | Apache-2.0 |
+| Moraya Web | `zouwei/moraya-web` | proprietary |
+| Moraya Mobile | `zouwei/moraya-mobile` | proprietary |
+| Protago | `zouwei/protago-code` | proprietary |
+| Feiyan (飞雁) | `zouwei/feiyan-code` | proprietary |
+
+The grant covers all released versions of `@moraya/core`, past and future, and
+extends to the named repository only — not to forks held by third parties.
+
+This section exists so the claim can be checked: each of the products above
+states in its own NOTICE that it uses `@moraya/core` under this grant, and that
+statement is only true while the product is listed here. **A first-party product
+that begins depending on `@moraya/core` must be added here before it ships.**
 
 ## 3. Contributor terms
 

@@ -94,7 +94,8 @@
     "dist",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "LICENSING.md"
   ],
   "publishConfig": {
     "access": "public"
