@@ -401,6 +401,37 @@ function escapeText(str: string): string {
   return d.innerHTML
 }
 
+// ── Preview / edit toggle icons ───────────────────
+
+/**
+ * The toggle used to read `✏️ Edit` / `👁 Preview` — an emoji plus a word, next
+ * to a stroked 14px copy icon. The two rendered at different sizes, in
+ * different weights, and the emoji picked up the platform's own colour, so the
+ * three-button group never read as one control set. These are the copy
+ * button's visual language: 14px, `currentColor`, stroke-width 2, no fill.
+ *
+ * The label moves to `title` / `aria-label`, which is where the copy button
+ * already keeps its own ("Copy").
+ */
+const ICON_ATTRS =
+  'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+  'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+
+/** Pencil — "leave the preview, edit the source". */
+const ICON_EDIT = `<svg ${ICON_ATTRS}><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`
+
+/** Eye — "leave the source, show the rendered preview". */
+const ICON_PREVIEW =
+  `<svg ${ICON_ATTRS}><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>`
+
+function setToggleIcon(btn: HTMLButtonElement, editing: boolean) {
+  const label = editing ? 'Show preview' : 'Edit source'
+  // Static markup — never derived from document content.
+  btn.innerHTML = editing ? ICON_PREVIEW : ICON_EDIT
+  btn.title = label
+  btn.setAttribute('aria-label', label)
+}
+
 // ── Copy button helper ────────────────────────────
 
 function handleCopy(btn: HTMLButtonElement, codeEl: HTMLElement) {
@@ -520,7 +551,7 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
       toggleBtn.style.display = (isMermaid || isRenderer) ? 'inline-flex' : 'none'
       wrapper.classList.toggle('mermaid-preview-mode', showPreview)
       if (isMermaid) {
-        toggleBtn.textContent = isEditing ? '👁 Preview' : '✏️ Edit'
+        setToggleIcon(toggleBtn, isEditing)
         if (showPreview) triggerMermaidRender()
       }
     }
@@ -562,7 +593,7 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
       toggleBtn.style.display = (isMermaid || isRenderer) ? 'inline-flex' : 'none'
       wrapper.classList.toggle('renderer-preview-mode', showPreview)
       if (isRenderer) {
-        toggleBtn.textContent = rendererEditing ? '👁 Preview' : '✏️ Edit'
+        setToggleIcon(toggleBtn, rendererEditing)
         if (showPreview) triggerRendererRender()
       }
     }

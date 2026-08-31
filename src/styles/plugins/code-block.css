@@ -125,6 +125,27 @@
   background: rgba(34, 134, 58, 0.12);
 }
 
+/* Preview/edit toggle.
+   Deliberately identical to `.code-copy-btn` above: the two sit side by side
+   in `.code-toolbar-right` and used to disagree on size, weight and colour
+   (the toggle carried an emoji + a word). Any change here belongs in both. */
+.moraya-editor .mermaid-toggle-btn {
+  display: none; /* code-block-view.ts flips this inline per language */
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, var(--color-text-muted, #888));
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  transition: background 0.12s, color 0.12s;
+}
+.moraya-editor .mermaid-toggle-btn:hover {
+  background: var(--bg-hover, var(--color-bg-hover, rgba(0,0,0,0.06)));
+  color: var(--text-primary, var(--color-text, #1a1a1a));
+}
+
 /* Right-side toolbar group (mermaid toggle + copy) */
 .moraya-editor .code-toolbar-right {
   display: flex;
