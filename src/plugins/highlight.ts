@@ -8,7 +8,7 @@
  * (replaces the prior no-op stub). Applies ProseMirror Decoration spans with
  * `hljs-*` CSS classes. Schema-agnostic via `state.schema` lookups.
  *
- * Performance contract (Moraya CLAUDE.md "Performance Coding Standards" §6):
+ * Performance contract (Moraya AGENTS.md "Performance Coding Standards" §6):
  *   - Per-block cache keyed by `(language, code)` — switching back to a
  *     previously highlighted file skips all hljs calls.
  *   - On doc change: cheap `decorationSet.map(tr.mapping)` keeps positions in

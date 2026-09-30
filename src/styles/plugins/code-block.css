@@ -16,7 +16,7 @@
  * border / width — so it floats invisibly on top of the document, and the
  * search input + language list appear to bleed into the code block below.
  * (This bit moraya-web on iOS Simulator in v0.4.x — see moraya-web's
- * CLAUDE.md entry for the fix history.)
+ * AGENTS.md entry for the fix history.)
  *
  * Variable naming convention:
  *   • Preferred (matches PC's editor.css): `--bg-*`, `--text-*`,

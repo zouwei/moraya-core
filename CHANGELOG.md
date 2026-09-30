@@ -144,7 +144,7 @@ Final batch of plugin migration. All 11 ProseMirror plugins from Moraya desktop'
 **`plugins/highlight.ts`** — full faithful 1:1 migration replaces the prior no-op stub.
 - Imports + registers 39 highlight.js languages (javascript / typescript / python / rust / go / c / cpp / java / ruby / php / swift / kotlin / yaml / json / bash / sql / xml / html / css / scss / dart / r / perl / scala / objectivec / dockerfile / ini / powershell / makefile / groovy / elixir / haskell / protobuf / graphql / latex / nginx / shell / markdown / diff / lua + svelte/jsx/tsx aliases + cs / py / sh / rb / kt / yml / md / pl / objc / ex / hs / proto / gql / tex / nginxconf / ps1)
 - `flattenHljsTree(rootNode)` + `scopeToClasses` walk hljs v11 emitter tree
-- Per-block cache keyed by `(language, code)` with FIFO eviction at 100 entries (Moraya CLAUDE.md "Performance Coding Standards" §6 contract)
+- Per-block cache keyed by `(language, code)` with FIFO eviction at 100 entries (Moraya AGENTS.md "Performance Coding Standards" §6 contract)
 - 300 ms debounced full re-highlight via metadata-only transaction
 - File-switch (`tr.getMeta('file-switch')`) and full-delete (`tr.getMeta('full-delete')`) paths rebuild from scratch
 - Short-circuit when `tr.mapping` doesn't touch any code_block (saves ~90% of keystroke debounces)
@@ -225,7 +225,7 @@ All plugin code is **host-agnostic**: zero Tauri / store / DOM-singleton imports
 #### Pending for next batch (3 DI-coupled plugins)
 - `editor-props-plugin.ts` (580 lines, needs `Platform.getCurrentFilePath` + `isMacOS` + `LinkOpener.open` injection)
 - `code-block-view.ts` (780 lines, needs full `RendererRegistry` integration + mermaid wiring)
-- `highlight.ts` faithful hljs integration (current core stub is no-op; full migration requires per-block decoration cache from Moraya CLAUDE.md performance §6/§9 contract)
+- `highlight.ts` faithful hljs integration (current core stub is no-op; full migration requires per-block decoration cache from Moraya AGENTS.md performance §6/§9 contract)
 
 ### setup.ts batch (2026-05-06)
 
@@ -245,7 +245,7 @@ Replaces the 6KB minimum-viable stub with a 21KB faithful migration of Moraya de
   - `Shift-Enter` → hardbreak with `isInline: false`
   - `Backspace` → 5-case WebKit contenteditable bug fix (full-doc fast delete + NodeSelection-on-atom + cursor-end-before-atom + cursor-start-after-atom + end-of-paragraph-after-inline-atom + end-of-textblock surrogate-pair-aware delete)
   - `Delete` → block-atom protection (NodeSelection move + textblock-end consume)
-- **listShortcutsPlugin** — `Cmd+Alt+O/U/X` → ordered/bullet/task list using `event.code` (macOS Option-key safe, Moraya CLAUDE.md "Option键快捷键处理" feedback memory)
+- **listShortcutsPlugin** — `Cmd+Alt+O/U/X` → ordered/bullet/task list using `event.code` (macOS Option-key safe, Moraya AGENTS.md "Option键快捷键处理" feedback memory)
 - **`createDirtyTrackPlugin`** + **`createLazyChangePlugin`** — O(1) text-content callback vs debounced markdown-serialization callback
 - Full `createEditor(opts)` + `createEditorPlugins(opts, schema?)` — assembles 13 base plugins + Tier 1 lazy-loaded plugins in faithful order:
   1. listShortcuts → 2. inputRules → 3. enter-handler → 4. buildKeymap → 5. baseKeymap →
