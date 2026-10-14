@@ -5,8 +5,8 @@
  * rename mapping so the Phase 3/4 codemod can update callsites consistently.
  *
  * INPUTS
- *   PC repo:   /Users/onela/Documents/huzou/moraya/src/lib/i18n/locales/*.json (12 locales)
- *   Web repo:  /Users/onela/Documents/huzou/moraya/moraya-web/src/lib/i18n/locales/*.json (en, zh-CN)
+ *   PC repo:   ../moraya/src/lib/i18n/locales/*.json (12 locales)
+ *   Web repo:  ../moraya-web/src/lib/i18n/locales/*.json (en, zh-CN)
  *
  * OUTPUTS
  *   moraya-core/src/i18n/locales/<loc>.json   ← merged + renamed bundles
@@ -43,8 +43,8 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const CORE_ROOT = resolve(__dirname, '..')
 
-const PC_LOCALES_DIR  = '/Users/onela/Documents/huzou/moraya/src/lib/i18n/locales'
-const WEB_LOCALES_DIR = '/Users/onela/Documents/huzou/moraya/moraya-web/src/lib/i18n/locales'
+const PC_LOCALES_DIR  = resolve(CORE_ROOT, '../moraya/src/lib/i18n/locales')
+const WEB_LOCALES_DIR = resolve(CORE_ROOT, '../moraya-web/src/lib/i18n/locales')
 const OUT_LOCALES_DIR = join(CORE_ROOT, 'src/i18n/locales')
 const MAPPING_OUT     = join(CORE_ROOT, 'scripts/i18n-mapping.json')
 const CONFLICTS_OUT   = join(CORE_ROOT, 'docs/v0.96.0-merge-conflicts.md')

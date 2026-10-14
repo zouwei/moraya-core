@@ -16,6 +16,8 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 
 const TARGETS = ['en', 'zh-CN']
 
@@ -100,7 +102,7 @@ function deepMerge(base, overlay, lang) {
 }
 
 for (const lang of TARGETS) {
-  const path = `/Users/onela/Documents/huzou/moraya/moraya-core/src/i18n/locales/${lang}.json`
+  const path = resolve(fileURLToPath(new URL('..', import.meta.url)), `src/i18n/locales/${lang}.json`)
   const current = JSON.parse(readFileSync(path, 'utf8'))
   const merged = deepMerge(current, ADDITIONS, lang)
   writeFileSync(path, JSON.stringify(merged, null, 2) + '\n', 'utf8')
