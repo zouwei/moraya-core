@@ -78,7 +78,10 @@ export async function setLocale(loc: SupportedLocale): Promise<void> {
   } else if (loc === 'en') {
     englishFallback = activeMessages
   }
-  localeStore.setIfChanged(loc)
+  // Always notify (not `setIfChanged`): the store starts at 'en', so the first
+  // `setLocale('en')` would otherwise swap in the loaded messages silently and
+  // derived `t` wrappers would keep returning raw keys.
+  localeStore.set(loc)
   applyDocumentDirection(loc)
 }
 
