@@ -80,6 +80,16 @@ describe('setLocale', () => {
     unsub()
   })
 
+  it('notifies subscribers when loading the initial (unchanged) en locale', async () => {
+    let calls = 0
+    const unsub = locale.subscribe(() => { calls++ })
+    calls = 0
+    await setLocale('en')
+    expect(calls).toBe(1)
+    expect(t('app.name')).toBe('Moraya')
+    unsub()
+  })
+
   it('switching locales swaps the active messages', async () => {
     await setLocale('zh-CN')
     expect(t('greeting', { name: 'A' })).toBe('你好 A')
