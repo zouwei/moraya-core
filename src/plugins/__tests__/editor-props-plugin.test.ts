@@ -182,3 +182,56 @@ describe('editor-props-plugin: paste against a non-default (production-shaped) s
     expect(v.state.doc.textContent).toContain('Some paragraph text')
   })
 })
+
+/**
+ * Pinyin pre-edit cancelled with Backspace ("测试文案" + "fa" → "f" → "").
+ * In WebKit compositionend fires BEFORE the keydown that ended it, so that
+ * last Backspace arrived with isComposing === false and the end-of-textblock
+ * Backspace fix deleted "案" — the character before the caret.
+ */
+describe('editor-props-plugin: Backspace that cancels an IME composition', () => {
+  function mountMac(md: string): EditorView {
+    const doc = parseMarkdown(md, testSchema)
+    const plugin = createEditorPropsPlugin({
+      platform: { getCurrentFilePath: () => null, isMacOS: true },
+      linkOpener: { open: () => {} },
+    })
+    const state = EditorState.create({ schema: testSchema, doc, plugins: [plugin] })
+    view = new EditorView(host, { state })
+    const end = view.state.doc.firstChild!.nodeSize - 1
+    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, end)))
+    return view
+  }
+
+  function backspace(v: EditorView, keyCode: number) {
+    const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true, cancelable: true })
+    Object.defineProperty(event, 'keyCode', { get: () => keyCode })
+    v.dom.dispatchEvent(event)
+    return event
+  }
+
+  it('baseline: a plain Backspace at the end of the line is handled and deletes "案"', () => {
+    const v = mountMac('测试文案')
+    const event = backspace(v, 8)
+    expect(event.defaultPrevented).toBe(true)
+    expect(v.state.doc.textContent).toBe('测试文')
+  })
+
+  it('leaves the text alone for the IME-processed Backspace (keyCode 229)', () => {
+    const v = mountMac('测试文案')
+    const event = backspace(v, 229)
+    expect(event.defaultPrevented).toBe(false)
+    expect(v.state.doc.textContent).toBe('测试文案')
+  })
+
+  it('skips the Backspace right after compositionend once, then handles the next one', () => {
+    const v = mountMac('测试文案')
+    v.dom.dispatchEvent(new Event('compositionend', { bubbles: true }))
+    const first = backspace(v, 8)
+    expect(first.defaultPrevented).toBe(false)
+    expect(v.state.doc.textContent).toBe('测试文案')
+    const second = backspace(v, 8)
+    expect(second.defaultPrevented).toBe(true)
+    expect(v.state.doc.textContent).toBe('测试文')
+  })
+})

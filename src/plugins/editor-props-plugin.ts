@@ -29,7 +29,7 @@
 
 import { Fragment, Slice } from 'prosemirror-model'
 import { AllSelection, Plugin, PluginKey, TextSelection } from 'prosemirror-state'
-import { Decoration, DecorationSet } from 'prosemirror-view'
+import { Decoration, DecorationSet, type EditorView } from 'prosemirror-view'
 import { parseMarkdown, parseMarkdownAsync } from '../markdown'
 import { ZWSP } from './inline-code-convert'
 import type { LinkOpener, Platform } from '../types'
@@ -97,6 +97,28 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
 
   // scroll-after-paste state
   let pendingPaste = false
+
+  // Event timestamp of the last compositionend (see isImeKeydown).
+  let compositionEndedAt = -2e8
+
+  /**
+   * Whether a keydown belongs to an IME composition. `isComposing` alone
+   * misses one: in WebKit (Safari / WKWebView) compositionend fires BEFORE the
+   * keydown of the key that ended it, so the Backspace that deletes the last
+   * pre-edit letter arrives with isComposing === false. That keydown still
+   * carries keyCode 229 ("processed by IME"); as a fallback on macOS (WebKit),
+   * mirror ProseMirror's own Safari rule and treat one keydown within 500ms of
+   * compositionend as part of the composition. Skipping a key here only skips
+   * our manual handling — the native edit still runs.
+   */
+  function isImeKeydown(view: EditorView, event: KeyboardEvent): boolean {
+    if (event.isComposing || event.keyCode === 229 || view.composing) return true
+    if (isMacOS && Math.abs(event.timeStamp - compositionEndedAt) < 500) {
+      compositionEndedAt = -2e8
+      return true
+    }
+    return false
+  }
 
   return new Plugin({
     key: editorPropsKey,
@@ -336,8 +358,15 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
          * Also handles fast AllSelection delete + WKWebView end-of-textblock
          * Backspace fix at the highest priority interception point.
          */
+        compositionend(_view, event) {
+          compositionEndedAt = event.timeStamp
+          return false
+        },
+
         keydown(view, event) {
-          if (event.isComposing) return false
+          // Without this, the Backspace that cancels a pinyin pre-edit
+          // ("fa" → "f" → "") deleted the character BEFORE the caret.
+          if (isImeKeydown(view, event)) return false
 
           if (event.key === 'Meta' || event.key === 'Control') {
             view.dom.classList.add('link-hover')
