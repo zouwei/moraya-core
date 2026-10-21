@@ -227,7 +227,12 @@ export function createEnterHandlerPlugin(): Plugin {
                 const end = $from.after()
                 const tr = view.state.tr
                 tr.replaceWith(pos, end, codeBlockType.create({ language }))
-                view.dispatch(tr)
+                // Put the caret INSIDE the new block. Left to mapping, the
+                // caret (inside the replaced range) lands after the block:
+                // fine only when nothing follows it, otherwise it jumps into
+                // the next paragraph and the new block can't be typed into.
+                tr.setSelection(TextSelection.create(tr.doc, pos + 1))
+                view.dispatch(tr.scrollIntoView())
                 return true
               }
             }

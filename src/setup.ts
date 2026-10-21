@@ -33,6 +33,7 @@ import { keymap } from 'prosemirror-keymap'
 import { history, redo, undo } from 'prosemirror-history'
 import {
   baseKeymap,
+  exitCode,
   joinForward,
   setBlockType,
   toggleMark,
@@ -492,6 +493,14 @@ function buildKeymap(schema: Schema): Plugin {
   // Hard break - explicitly set isInline to false for proper markdown serialization
   if (N.hardbreak) {
     bindings['Shift-Enter'] = (state, dispatch) => {
+      // Inside a code block Shift+Enter leaves it: a fresh paragraph below
+      // with the caret in it. A hard break can't live in a code block, so
+      // inserting one used to spill it into a paragraph after the block with
+      // the caret BEHIND the break — "```" typed there was no longer at the
+      // line start, never became a fence, and was saved escaped (\`\`\`).
+      if (state.selection.$from.parent.type.spec.code) {
+        return exitCode(state, dispatch)
+      }
       if (dispatch) {
         dispatch(state.tr.replaceSelectionWith(N.hardbreak!.create({ isInline: false })).scrollIntoView())
       }
