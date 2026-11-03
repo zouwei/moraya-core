@@ -224,7 +224,21 @@ describe('editor-props-plugin: Backspace that cancels an IME composition', () =>
     expect(v.state.doc.textContent).toBe('测试文案')
   })
 
-  it('skips the Backspace right after compositionend once, then handles the next one', () => {
+  it('handles a Backspace right after COMMITTING a word (compositionend with text)', () => {
+    // Space picks the first candidate: the composition ends with data "分".
+    // The next Backspace is a real one and must delete backward ("案"), not be
+    // skipped — skipping it let WebKit + ProseMirror misread it as a forward
+    // delete.
+    const v = mountMac('测试文案')
+    const end = new Event('compositionend', { bubbles: true })
+    Object.defineProperty(end, 'data', { get: () => '分' })
+    v.dom.dispatchEvent(end)
+    const event = backspace(v, 8)
+    expect(event.defaultPrevented).toBe(true)
+    expect(v.state.doc.textContent).toBe('测试文')
+  })
+
+  it('skips the Backspace right after an EMPTY compositionend once, then handles the next one', () => {
     const v = mountMac('测试文案')
     v.dom.dispatchEvent(new Event('compositionend', { bubbles: true }))
     const first = backspace(v, 8)

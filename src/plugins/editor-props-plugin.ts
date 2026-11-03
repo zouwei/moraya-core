@@ -98,7 +98,8 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
   // scroll-after-paste state
   let pendingPaste = false
 
-  // Event timestamp of the last compositionend (see isImeKeydown).
+  // Event timestamp of the last compositionend that ended EMPTY — a cancelled
+  // pre-edit (see isImeKeydown).
   let compositionEndedAt = -2e8
 
   /**
@@ -107,9 +108,15 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
    * keydown of the key that ended it, so the Backspace that deletes the last
    * pre-edit letter arrives with isComposing === false. That keydown still
    * carries keyCode 229 ("processed by IME"); as a fallback on macOS (WebKit),
-   * mirror ProseMirror's own Safari rule and treat one keydown within 500ms of
-   * compositionend as part of the composition. Skipping a key here only skips
-   * our manual handling — the native edit still runs.
+   * treat one keydown within 500ms of a compositionend that ended EMPTY (the
+   * pre-edit was backspaced away) as part of the composition. Skipping a key
+   * here only skips our manual handling — the native edit still runs.
+   *
+   * Only an EMPTY end, never a commit: after committing a word with Space the
+   * next Backspace is a real one. ProseMirror also ignores that keydown (its
+   * own 500ms Safari rule) without recording it as Backspace, so if we skipped
+   * it too, WebKit's native delete ran unguided and ProseMirror could read the
+   * change back as a delete AFTER the caret.
    */
   function isImeKeydown(view: EditorView, event: KeyboardEvent): boolean {
     if (event.isComposing || event.keyCode === 229 || view.composing) return true
@@ -359,7 +366,7 @@ export function createEditorPropsPlugin(opts: EditorPropsPluginOptions): Plugin 
          * Backspace fix at the highest priority interception point.
          */
         compositionend(_view, event) {
-          compositionEndedAt = event.timeStamp
+          compositionEndedAt = (event as CompositionEvent).data ? -2e8 : event.timeStamp
           return false
         },
 
