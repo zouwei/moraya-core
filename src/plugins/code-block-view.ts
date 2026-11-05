@@ -783,7 +783,9 @@ export function createCodeBlockNodeViewFactory(opts: CodeBlockNodeViewOptions = 
 
       stopEvent(event: Event) {
         const target = event.target as Node
-        return !code.contains(target) && wrapper.contains(target) && target !== code
+        // Empty lines and the left padding hit <pre>, not the inline <code>.
+        // ProseMirror must receive those pointer events to place the caret.
+        return !pre.contains(target) && wrapper.contains(target)
       },
 
       ignoreMutation(mutation: { target: Node }) {
